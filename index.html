@@ -349,6 +349,60 @@ tr:hover td{background:rgba(46,174,232,.04)}
 .scroll-panel{overflow-y:auto;max-height:220px}
 .scroll-panel::-webkit-scrollbar{width:3px}
 .scroll-panel::-webkit-scrollbar-thumb{background:var(--line2);border-radius:2px}
+
+/* ══ MOBILE RISK MAP POPOUT ══ */
+.risk-popout-trigger{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(46,174,232,.08);border:1px solid rgba(46,174,232,.28);
+  border-radius:5px;padding:3px 8px;color:var(--blue);
+  font-family:'Syne',sans-serif;font-size:10px;font-weight:800;cursor:pointer;
+}
+.risk-popout-trigger:hover{background:rgba(46,174,232,.16);color:#9fe5ff}
+.modal-backdrop{
+  position:fixed;inset:0;z-index:9999;display:none;
+  background:rgba(1,6,11,.82);backdrop-filter:blur(8px);
+}
+.modal-backdrop.open{display:flex;align-items:stretch;justify-content:center}
+.risk-modal{
+  width:100vw;height:100dvh;display:flex;flex-direction:column;
+  background:linear-gradient(160deg,#05121f,#02070d);color:var(--text);
+  border:1px solid rgba(46,174,232,.22);
+}
+.risk-modal-hd{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:10px 12px;border-bottom:1px solid var(--line);
+  background:rgba(3,13,22,.94);flex-shrink:0;
+}
+.risk-modal-title{
+  font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:800;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--text);
+}
+.risk-modal-sub{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.35}
+.risk-modal-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.risk-modal-btn{
+  border:1px solid var(--line2);background:rgba(7,24,39,.9);color:var(--text);
+  border-radius:6px;padding:6px 9px;font-size:11px;font-weight:800;cursor:pointer;
+}
+.risk-modal-btn:hover{border-color:var(--blue);color:var(--blue)}
+.risk-chart-shell{
+  flex:1;overflow:auto;-webkit-overflow-scrolling:touch;
+  padding:8px;background:radial-gradient(circle at 50% 20%,rgba(46,174,232,.08),transparent 45%);
+}
+#riskGraphExpanded{height:calc(100dvh - 72px);min-height:620px;min-width:1220px}
+.mobile-map-hint{
+  position:absolute;left:12px;bottom:10px;z-index:2;
+  background:rgba(3,13,22,.78);border:1px solid var(--line2);border-radius:7px;
+  color:var(--muted);padding:6px 8px;font-size:10px;pointer-events:none;
+}
+@media (max-width: 760px){
+  .risk-modal-hd{align-items:flex-start;padding:9px 10px}
+  .risk-modal-title{font-size:11px}
+  .risk-modal-sub{font-size:9.5px;max-width:62vw}
+  .risk-modal-btn{padding:6px 8px;font-size:10px}
+  #riskGraphExpanded{height:calc(100dvh - 78px);min-height:680px;min-width:1320px}
+  .mobile-map-hint{font-size:9.5px;left:10px;right:10px;text-align:center}
+}
+
 </style>
 </head>
 <body>
@@ -366,38 +420,38 @@ tr:hover td{background:rgba(46,174,232,.04)}
   <div class="nav">
     <div class="nav-group">
       <div class="nav-label">Real-Time</div>
-      <button class="active" onclick="showTab('command',this)">
+      <button class="active" data-tab="command" onclick="showTab('command',this)">
         <span class="ico">⬡</span>Command Center
         <span class="goal-dot" style="background:var(--green)"></span>
       </button>
     </div>
     <div class="nav-group">
       <div class="nav-label">Goals</div>
-      <button onclick="showTab('fcr',this)">
+      <button data-tab="fcr" onclick="showTab('fcr',this)">
         <span class="ico">◎</span>FCR &amp; Resolution
         <span class="goal-dot" style="background:var(--blue)"></span>
       </button>
-      <button onclick="showTab('incidents',this)">
+      <button data-tab="incidents" onclick="showTab('incidents',this)">
         <span class="ico">⚠</span>Incident Reduction
         <span class="goal-dot" style="background:var(--teal)"></span>
       </button>
-      <button onclick="showTab('automation',this)">
+      <button data-tab="automation" onclick="showTab('automation',this)">
         <span class="ico">⚡</span>Automation
         <span class="goal-dot" style="background:var(--yellow)"></span>
       </button>
     </div>
     <div class="nav-group">
       <div class="nav-label">Operations</div>
-      <button onclick="showTab('pcards',this)">
+      <button data-tab="pcards" onclick="showTab('pcards',this)">
         <span class="ico">◫</span>P-Cards
       </button>
-      <button onclick="showTab('analytics',this)">
-        <span class="ico">〜</span>Delay Prevention
+      <button data-tab="analytics" onclick="showTab('analytics',this)">
+        <span class="ico">〜</span>Analytics / MTTA
       </button>
     </div>
     <div class="nav-group">
       <div class="nav-label">Output</div>
-      <button onclick="showTab('reports',this)">
+      <button data-tab="reports" onclick="showTab('reports',this)">
         <span class="ico">≡</span>Reports
       </button>
     </div>
@@ -414,7 +468,7 @@ tr:hover td{background:rgba(46,174,232,.04)}
   <div class="topbar">
     <div class="topbar-left">
       <h1>ICC COMMAND CENTER</h1>
-      <div class="sub">Operational Intelligence Layer · FCR · Incident Reduction · Delay Prevention · Automation</div>
+      <div class="sub">Operational Intelligence Layer · ServiceNow + Dynatrace + Custom DB</div>
     </div>
     <div class="topbar-right">
       <span id="clock"></span>
@@ -454,7 +508,7 @@ tr:hover td{background:rgba(46,174,232,.04)}
         <div class="goal-info">
           <div class="gl">Goal 3 · Delay Prevention</div>
           <div class="gv purple">12 delays</div>
-          <div class="gs">MTTA/MTTR measured</div>
+          <div class="gs">3.8m first comment</div>
         </div>
       </div>
       <div class="goal-card g4" onclick="showTab('automation',document.querySelector('[data-tab=automation]'))">
@@ -475,14 +529,14 @@ tr:hover td{background:rgba(46,174,232,.04)}
       <div class="kpi"><div class="kpi-label">Active Swarms</div><div class="kpi-val red">3</div><div class="kpi-sub">▼ 1 vs yesterday</div></div>
       <div class="kpi"><div class="kpi-label">Major Inc. Risk</div><div class="kpi-val orange">MODERATE</div><div class="kpi-sub">Score: 63/100</div></div>
       <div class="kpi"><div class="kpi-label">Automation Savings MTD</div><div class="kpi-val green">12.4 hrs</div><div class="kpi-sub">▲ 2.1 hrs vs last mo.</div></div>
-      <div class="kpi"><div class="kpi-label">Escalation Delays &gt;15m</div><div class="kpi-val orange">12</div><div class="kpi-sub">▲ 3 vs yesterday</div></div>
+      <div class="kpi"><div class="kpi-label">Delay Prevention Signals</div><div class="kpi-val orange">12 / 3.8m</div><div class="kpi-sub">Delays &gt;15m · first comment avg</div></div>
       <div class="kpi"><div class="kpi-label">Prevented Major Inc.</div><div class="kpi-val green">4</div><div class="kpi-sub">▲ 2 vs last 7 days</div></div>
     </div>
 
     <!-- Row 1: Risk Map | Snapshot+Automation | Swarms -->
     <div class="g3">
       <div class="card">
-        <div class="card-hd"><span class="card-title">Operational Risk Map</span><span class="card-link">View Topology ↗</span></div>
+        <div class="card-hd"><span class="card-title">Operational Risk Map</span><button class="risk-popout-trigger" onclick="openRiskMap()">Expand Map ⤢</button></div>
         <div id="riskGraph" class="ch-360"></div>
       </div>
       <div class="gcol">
@@ -629,7 +683,7 @@ tr:hover td{background:rgba(46,174,232,.04)}
     <div class="sec-hd">
       <h2>INCIDENT REDUCTION</h2>
       <span class="sec-tag tag-goal">Goal 2 · YoY Reduction</span>
-      <span class="sec-tag tag-rt">Real-Time + Performance Reporting</span>
+      <span class="sec-tag tag-rt">Real-Time + Historical</span>
     </div>
 
     <div class="kpi-row kpi-6">
@@ -709,13 +763,13 @@ tr:hover td{background:rgba(46,174,232,.04)}
       <div class="card">
         <div class="card-hd"><span class="card-title">Automation Opportunities</span></div>
         <table>
-          <thead><tr><th>Opportunity</th><th>Source</th><th>Conf</th><th>Impact</th><th>Est. Savings</th><th>Action</th></tr></thead>
+          <thead><tr><th>Opportunity</th><th>Signal</th><th>AAG / Playbook Match</th><th>Cluster</th><th>Conf</th><th>Impact</th><th>Est. Savings</th><th>Action</th></tr></thead>
           <tbody>
-            <tr><td>Move Money App Pool Restart</td><td>Pattern Match</td><td class="green">94%</td><td><span class="badge b-red">High</span></td><td>1.2 hrs</td><td><div style="display:flex;gap:4px"><button class="btn btn-blue">Review</button><button class="btn btn-red">Run</button></div></td></tr>
-            <tr><td>Kafka Consumer Lag Recovery</td><td>Metric Threshold</td><td class="green">88%</td><td><span class="badge b-red">High</span></td><td>0.8 hrs</td><td><div style="display:flex;gap:4px"><button class="btn btn-blue">Review</button><button class="btn btn-red">Run</button></div></td></tr>
-            <tr><td>Disk Cleanup – Node03</td><td>Disk &gt;95%</td><td class="green">91%</td><td><span class="badge b-orange">Med</span></td><td>0.3 hrs</td><td><div style="display:flex;gap:4px"><button class="btn btn-blue">Review</button><button class="btn btn-red">Run</button></div></td></tr>
-            <tr><td>SQL Connection Reset</td><td>Recurring Pattern</td><td class="yellow">79%</td><td><span class="badge b-orange">Med</span></td><td>0.5 hrs</td><td><div style="display:flex;gap:4px"><button class="btn btn-blue">Review</button><button class="btn btn-muted">Suppress</button></div></td></tr>
-            <tr><td>F5 Pool Node Re-enable</td><td>Recurring Pattern</td><td class="yellow">82%</td><td><span class="badge b-yellow">Low</span></td><td>0.4 hrs</td><td><div style="display:flex;gap:4px"><button class="btn btn-blue">Review</button><button class="btn btn-muted">Suppress</button></div></td></tr>
+            <tr><td>Move Money App Pool Restart</td><td>Recurring cluster → automation candidate</td><td><span class="badge b-green">AAG matched</span></td><td>Move Money Pool</td><td class="green">94%</td><td><span class="badge b-red">High</span></td><td>1.2 hrs</td><td><div style="display:flex;gap:4px"><button class="btn btn-blue">Review</button><button class="btn btn-red">Run</button></div></td></tr>
+            <tr><td>Kafka Consumer Lag Recovery</td><td>Metric threshold + repeat offender</td><td><span class="badge b-green">Playbook matched</span></td><td>Kafka Lag Group</td><td class="green">88%</td><td><span class="badge b-red">High</span></td><td>0.8 hrs</td><td><div style="display:flex;gap:4px"><button class="btn btn-blue">Review</button><button class="btn btn-red">Run</button></div></td></tr>
+            <tr><td>Disk Cleanup – Node03</td><td>Disk &gt;95% pattern</td><td><span class="badge b-green">AAG matched</span></td><td>Platform Node</td><td class="green">91%</td><td><span class="badge b-orange">Med</span></td><td>0.3 hrs</td><td><div style="display:flex;gap:4px"><button class="btn btn-blue">Review</button><button class="btn btn-red">Run</button></div></td></tr>
+            <tr><td>SQL Connection Reset</td><td>Recurring cluster → candidate</td><td><span class="badge b-yellow">Partial match</span></td><td>SQL Timeout Cluster</td><td class="yellow">79%</td><td><span class="badge b-orange">Med</span></td><td>0.5 hrs</td><td><div style="display:flex;gap:4px"><button class="btn btn-blue">Review</button><button class="btn btn-muted">Suppress</button></div></td></tr>
+            <tr><td>F5 Pool Node Re-enable</td><td>Repeat remediation pattern</td><td><span class="badge b-yellow">Needs validation</span></td><td>Network Latency Set</td><td class="yellow">82%</td><td><span class="badge b-yellow">Low</span></td><td>0.4 hrs</td><td><div style="display:flex;gap:4px"><button class="btn btn-blue">Review</button><button class="btn btn-muted">Suppress</button></div></td></tr>
           </tbody>
         </table>
       </div>
@@ -728,12 +782,12 @@ tr:hover td{background:rgba(46,174,232,.04)}
         <div style="margin-bottom:10px">
           <div class="prog-row"><span class="prog-label">Manual actions identified</span><div class="prog-bar"><div class="prog-fill" style="width:100%;background:var(--line2)"></div></div><span class="prog-val blue">228</span></div>
           <div class="prog-row"><span class="prog-label">Automatable actions</span><div class="prog-bar"><div class="prog-fill" style="width:50%;background:var(--teal)"></div></div><span class="prog-val teal">114</span></div>
-          <div class="prog-row"><span class="prog-label">Covered by playbook</span><div class="prog-bar"><div class="prog-fill" style="width:35%;background:var(--blue)"></div></div><span class="prog-val blue">78</span></div>
+          <div class="prog-row"><span class="prog-label">AAG / playbook matched</span><div class="prog-bar"><div class="prog-fill" style="width:35%;background:var(--blue)"></div></div><span class="prog-val blue">78</span></div>
           <div class="prog-row"><span class="prog-label">Executed this month</span><div class="prog-bar"><div class="prog-fill" style="width:22%;background:var(--green)"></div></div><span class="prog-val green">50</span></div>
           <div class="prog-row"><span class="prog-label">Approval required</span><div class="prog-bar"><div class="prog-fill" style="width:16%;background:var(--orange)"></div></div><span class="prog-val orange">36</span></div>
         </div>
         <div class="divider"></div>
-        <div style="font-size:10px;color:var(--muted)">Coverage: <span class="green" style="font-weight:700">50%</span> of automatable actions have a playbook</div>
+        <div style="font-size:10px;color:var(--muted)">Coverage: <span class="green" style="font-weight:700">50%</span> of automatable actions have an AAG or playbook match</div>
       </div>
     </div>
 
@@ -821,6 +875,23 @@ tr:hover td{background:rgba(46,174,232,.04)}
       </ul>
     </div>
 
+    <div class="card" style="margin-top:11px">
+      <div class="card-hd"><span class="card-title">Comment Union Windows — Swarm Grouping Signal</span><span class="badge b-blue">4 windows</span></div>
+      <div class="infobox" style="margin-bottom:9px">
+        <span class="ib-icon">◎</span>
+        <span>Groups p-cards when comments, timestamps, entities, and incidents overlap inside the same operational window. This helps identify duplicates and active swarms earlier.</span>
+      </div>
+      <table>
+        <thead><tr><th>Window</th><th>Grouped P-Cards</th><th>Primary VCT</th><th>Comment Signal</th><th>Swarm Action</th></tr></thead>
+        <tbody>
+          <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">09:00–09:15</td><td>4</td><td>Move Money</td><td><span class="badge b-red">Same fix path</span></td><td><button class="btn btn-blue">Group</button></td></tr>
+          <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">09:30–09:45</td><td>3</td><td>Kafka</td><td><span class="badge b-orange">Shared entities</span></td><td><button class="btn btn-blue">Swarm</button></td></tr>
+          <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">10:00–10:20</td><td>2</td><td>SQL Database</td><td><span class="badge b-yellow">Repeat notes</span></td><td><button class="btn btn-muted">Watch</button></td></tr>
+          <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">10:40–11:00</td><td>2</td><td>Advisor Email</td><td><span class="badge b-yellow">Latency pattern</span></td><td><button class="btn btn-muted">Watch</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+
   </section>
 
   <!-- ══════════════════════════════════
@@ -828,9 +899,9 @@ tr:hover td{background:rgba(46,174,232,.04)}
   ══════════════════════════════════ -->
   <section id="analytics" class="hidden">
     <div class="sec-hd">
-      <h2>DELAY PREVENTION ANALYTICS</h2>
+      <h2>DELAY PREVENTION</h2>
       <span class="sec-tag tag-goal">Goal 3 · Delay Prevention</span>
-      <span class="sec-tag" style="background:rgba(139,108,246,.1);color:var(--purple);border:1px solid rgba(139,108,246,.22)">Performance Reporting</span>
+      <span class="sec-tag" style="background:rgba(139,108,246,.1);color:var(--purple);border:1px solid rgba(139,108,246,.22)">Historical</span>
     </div>
 
     <div class="kpi-row kpi-6">
@@ -839,12 +910,12 @@ tr:hover td{background:rgba(46,174,232,.04)}
       <div class="kpi"><div class="kpi-label">First Comment Time</div><div class="kpi-val blue">3.8 min</div><div class="kpi-sub">Avg since P-Card open</div></div>
       <div class="kpi"><div class="kpi-label">Escalation Delays &gt;15m</div><div class="kpi-val orange">12</div><div class="kpi-sub">▲ 3 vs yesterday</div></div>
       <div class="kpi"><div class="kpi-label">Avg Comment Gap</div><div class="kpi-val yellow">14 min</div><div class="kpi-sub">Time between updates</div></div>
-      <div class="kpi"><div class="kpi-label">CIO Teams Posts (shift)</div><div class="kpi-val blue">6</div><div class="kpi-sub">Standard: within 15m</div></div>
+      <div class="kpi"><div class="kpi-label">P-Card Age at First Update</div><div class="kpi-val blue">3.8 min</div><div class="kpi-sub">Primary delay-prevention signal</div></div>
     </div>
 
     <div class="g2">
       <div class="card">
-        <div class="card-hd"><span class="card-title">Delay Prevention Measures — MTTA / MTTR Trend</span></div>
+        <div class="card-hd"><span class="card-title">MTTA / MTTR Performance Measures — 12 Weeks</span></div>
         <div id="mttaTrend" class="ch-240"></div>
       </div>
       <div class="card">
@@ -874,7 +945,7 @@ tr:hover td{background:rgba(46,174,232,.04)}
         <div class="divider"></div>
         <div class="infobox">
           <span class="ib-icon">ℹ</span>
-          <span>Delay prevention target: reduce handoff, escalation, and communication delays. MTTA/MTTR are measured here for performance reporting. Current avg escalation delay: 18.1m.</span>
+          <span>Delay prevention target: reduce handoff, escalation, comment-gap, and communication delays. MTTA/MTTR remain supporting performance measures. CIO Teams update standard: initial post within 15m of bridge open.</span>
         </div>
       </div>
     </div>
@@ -889,7 +960,7 @@ tr:hover td{background:rgba(46,174,232,.04)}
     <div class="kpi-row kpi-4">
       <div class="kpi"><div class="kpi-label">FCR vs Target</div><div class="kpi-val blue">34.2% / 44%</div><div class="kpi-sub">Goal 1 progress</div><div class="kpi-bar"><div class="kpi-bar-fill" style="width:78%;background:var(--blue)"></div></div></div>
       <div class="kpi"><div class="kpi-label">Incident Reduction YoY</div><div class="kpi-val green">−18.0%</div><div class="kpi-sub">Goal 2 on track</div></div>
-      <div class="kpi"><div class="kpi-label">Delay Prevention</div><div class="kpi-val purple">−10.5%</div><div class="kpi-sub">MTTA/MTTR measured</div></div>
+      <div class="kpi"><div class="kpi-label">Delay Prevention</div><div class="kpi-val purple">12 delays</div><div class="kpi-sub">MTTA/MTTR measured for reporting</div></div>
       <div class="kpi"><div class="kpi-label">Automation Savings</div><div class="kpi-val yellow">12.4 hrs</div><div class="kpi-sub">Goal 4 this month</div></div>
     </div>
     <div class="g2">
@@ -917,6 +988,26 @@ tr:hover td{background:rgba(46,174,232,.04)}
   </div><!-- /content -->
 </main>
 </div><!-- /app -->
+
+<!-- ══════════ MOBILE-FRIENDLY RISK MAP POPOUT ══════════ -->
+<div id="riskMapModal" class="modal-backdrop" aria-hidden="true">
+  <div class="risk-modal" role="dialog" aria-modal="true" aria-label="Expanded operational risk map">
+    <div class="risk-modal-hd">
+      <div>
+        <div class="risk-modal-title">Expanded Operational Risk Map</div>
+        <div class="risk-modal-sub">Separated topology view for iPhone Safari. Pinch, pan, or scroll horizontally to inspect VCTs, services, and dependency risk.</div>
+      </div>
+      <div class="risk-modal-actions">
+        <button class="risk-modal-btn" onclick="resetRiskMapZoom()">Reset</button>
+        <button class="risk-modal-btn" onclick="closeRiskMap()">Close ✕</button>
+      </div>
+    </div>
+    <div class="risk-chart-shell">
+      <div id="riskGraphExpanded"></div>
+      <div class="mobile-map-hint">Tip: drag the map, pinch to zoom, or swipe sideways to separate crowded bubbles.</div>
+    </div>
+  </div>
+</div>
 
 <script>
 /* ══════════════════════════════════════
@@ -1107,6 +1198,71 @@ gauge.setOption({
     data:[{value:63,name:'MODERATE RISK'}]
   }]
 });
+
+
+/* ══════════════════════════════════════
+   EXPANDED RISK MAP POPOUT
+══════════════════════════════════════ */
+let expandedRiskChart = null;
+function expandedRiskNodes(){
+  const scaleX = 1.35;
+  const scaleY = 1.7;
+  return riskNodes.map(n => ({...n, x:n.x*scaleX+40, y:n.y*scaleY+20}));
+}
+function buildRiskGraphOption(nodes, expanded=false){
+  return {
+    backgroundColor:'transparent',
+    tooltip:{...T.tooltip,
+      formatter(p){
+        if(p.dataType==='edge') return `<b>${p.data.source}</b> → <b>${p.data.target}</b><br/>Dependency weight: ${p.data.weight}/10`;
+        const d=p.data.raw;
+        return `<b style="font-size:12px">${d.name}</b><br/>Layer: ${d.layer}<br/>Risk: <span style="color:${riskCol(d.risk)};font-weight:700">${d.risk.toUpperCase()}</span><br/>P-Cards: <b>${d.pcards}</b> · Incidents: <b>${d.incidents}</b><br/>Swarm: ${d.swarm?'<span style="color:#e83535">Active</span>':'None'} · Trend: ${trendI(d.trend)}`;
+      }
+    },
+    legend:{bottom:expanded?10:0,left:'center',textStyle:{color:T.muted,fontSize:10},data:['High Risk','Moderate Risk','Low Risk']},
+    series:[{
+      type:'graph',layout:'none',roam:true,draggable:true,
+      edgeSymbol:['none','arrow'],edgeSymbolSize:[0,expanded?9:7],
+      emphasis:{focus:'adjacency',lineStyle:{width:expanded?5:4}},
+      categories:[{name:'High Risk'},{name:'Moderate Risk'},{name:'Low Risk'}],
+      data:nodes.map(n=>({
+        name:n.name,raw:n,category:n.risk==='high'?0:n.risk==='moderate'?1:2,
+        x:n.x,y:n.y,symbol:'roundRect',
+        symbolSize:expanded?[118+(n.pcards*5),64+(n.pcards*1.8)]:[90+(n.pcards*4),52+(n.pcards*1.5)],
+        itemStyle:{color:'#071827',borderColor:riskCol(n.risk),borderWidth:n.risk==='high'?2.8:1.9,shadowBlur:n.risk==='high'?18:9,shadowColor:riskCol(n.risk)},
+        label:{show:true,color:T.text,fontSize:expanded?12:10.5,lineHeight:expanded?17:15,
+          formatter(p){const d=p.data.raw; return `{nm|${d.name}}\n{pc|${d.pcards} P} {inc|${d.incidents} INC} {tr|${trendI(d.trend)}}`;},
+          rich:{nm:{fontWeight:800,color:T.text,fontSize:expanded?12:10.5},pc:{fontWeight:800,color:riskCol(n.risk),fontSize:expanded?12:11},inc:{fontWeight:800,color:T.blue,fontSize:expanded?11:10},tr:{fontWeight:800,color:riskCol(n.risk),fontSize:expanded?13:12}}
+        }
+      })),
+      links:riskLinks.map(l=>({source:l.s,target:l.t,weight:l.w,lineStyle:{color:l.w>=7?T.red:l.w>=5?T.orange:T.green,width:(expanded?1.2:.7)+(l.w/(expanded?3:3.5)),opacity:expanded?.62:.5,curveness:.2}}))
+    }]
+  };
+}
+function openRiskMap(){
+  const modal = document.getElementById('riskMapModal');
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden','false');
+  document.body.style.overflow='hidden';
+  setTimeout(() => {
+    if(!expandedRiskChart){ expandedRiskChart = echarts.init(document.getElementById('riskGraphExpanded'),'dark'); }
+    expandedRiskChart.setOption(buildRiskGraphOption(expandedRiskNodes(), true), true);
+    expandedRiskChart.resize();
+  }, 60);
+}
+function closeRiskMap(){
+  const modal = document.getElementById('riskMapModal');
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden','true');
+  document.body.style.overflow='';
+}
+function resetRiskMapZoom(){
+  if(expandedRiskChart){
+    expandedRiskChart.setOption(buildRiskGraphOption(expandedRiskNodes(), true), true);
+    expandedRiskChart.resize();
+  }
+}
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeRiskMap(); });
 
 /* ══ LAZY INIT FLAGS ══ */
 let fcrInited=false, incInited=false, autoInited=false;
