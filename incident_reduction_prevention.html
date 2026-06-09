@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ICC Incident Reduction Prevention Lab</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --bg:#030d16;--panel:#071827;--panel2:#061220;--line:#152e44;--line2:#1d3d57;
+  --text:#cfe8f7;--muted:#5e8aaa;--green:#0fcc74;--yellow:#f5b014;--orange:#f57c1f;
+  --red:#e83535;--blue:#2eaee8;--teal:#1ac9b0;--purple:#8b6cf6;--shadow:rgba(0,0,0,.45)
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;font-size:13px}
+body{overflow-x:hidden}
+.shell{min-height:100vh;display:grid;grid-template-columns:210px 1fr}
+aside{position:sticky;top:0;height:100vh;background:linear-gradient(180deg,#040f1a,#030b13);border-right:1px solid var(--line);padding:14px 10px;overflow:auto}
+.logo{display:flex;gap:10px;align-items:center;padding:2px 4px 16px;border-bottom:1px solid var(--line);margin-bottom:10px}
+.logo-mark{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,#093659,#1565a8);border:1px solid #2077c2;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:800;color:#fff}
+.logo .l1{font-family:'JetBrains Mono',monospace;color:var(--blue);font-weight:800;letter-spacing:.05em}.logo .l2{font-size:10px;color:var(--muted);margin-top:2px}.nav-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;color:var(--muted);opacity:.7;margin:16px 8px 6px;text-transform:uppercase}.nav a{display:flex;align-items:center;gap:8px;color:var(--muted);text-decoration:none;border:1px solid transparent;border-radius:8px;padding:9px 10px;margin:2px 0;font-weight:700;font-size:12px}.nav a:hover,.nav a.active{background:rgba(46,174,232,.09);border-color:rgba(46,174,232,.25);color:var(--blue)}.nav .dot{margin-left:auto;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+main{min-width:0}.topbar{position:sticky;top:0;z-index:5;background:rgba(3,13,22,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}.topbar h1{font-family:'JetBrains Mono',monospace;font-size:16px;letter-spacing:.09em;background:linear-gradient(90deg,#e8f6ff,#6ec8f0);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.topbar .sub{font-size:10px;color:var(--muted);margin-top:2px}.top-actions{display:flex;gap:8px;align-items:center}.pill{font-family:'JetBrains Mono',monospace;border:1px solid var(--line2);border-radius:999px;padding:5px 10px;font-size:10px;color:var(--muted);background:var(--panel)}.btn{border:1px solid rgba(46,174,232,.3);background:rgba(46,174,232,.1);color:var(--blue);border-radius:7px;padding:7px 10px;font-size:11px;font-weight:800;text-decoration:none}.btn:hover{background:rgba(46,174,232,.18)}.content{padding:14px 16px 24px}.hero{display:grid;grid-template-columns:1.3fr .9fr;gap:12px;margin-bottom:12px}.card{background:linear-gradient(160deg,#071c2e,#040d18);border:1px solid var(--line);border-radius:10px;padding:13px;box-shadow:0 10px 30px var(--shadow);position:relative;overflow:hidden}.card:before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(46,174,232,.15),transparent)}.card-hd{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}.card-title{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.card-sub{font-size:10px;color:var(--muted)}.goal-copy{font-size:13px;line-height:1.6;color:var(--muted);max-width:920px}.goal-copy b{color:var(--text)}.kpis{display:grid;grid-template-columns:repeat(8,1fr);gap:9px;margin-bottom:12px}.kpi{background:linear-gradient(160deg,#071c2e,#04101b);border:1px solid var(--line);border-radius:9px;padding:11px;min-height:92px}.kpi-label{font-size:9.5px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;line-height:1.35}.kpi-val{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:22px;margin:7px 0 4px;line-height:1}.kpi-sub{font-size:9.5px;color:var(--muted);line-height:1.35}.grid-3{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:12px;margin-bottom:12px}.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}.grid-wide{display:grid;grid-template-columns:1.25fr .75fr;gap:12px;margin-bottom:12px}.chart{height:245px}.chart-sm{height:210px}.chart-lg{height:330px}table{width:100%;border-collapse:collapse;font-size:11.5px}th{color:var(--muted);font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}td{padding:7px 8px;border-bottom:1px solid rgba(21,46,68,.5);vertical-align:top}tr:hover td{background:rgba(46,174,232,.04)}.badge{display:inline-block;padding:2px 6px;border-radius:4px;font-size:9.5px;font-weight:800;letter-spacing:.03em}.b-red{background:rgba(232,53,53,.14);color:#ff8888;border:1px solid rgba(232,53,53,.25)}.b-orange{background:rgba(245,124,31,.14);color:#ffb070;border:1px solid rgba(245,124,31,.25)}.b-yellow{background:rgba(245,176,20,.14);color:#ffd166;border:1px solid rgba(245,176,20,.25)}.b-green{background:rgba(15,204,116,.1);color:#5effa8;border:1px solid rgba(15,204,116,.2)}.b-blue{background:rgba(46,174,232,.1);color:#7dd8ff;border:1px solid rgba(46,174,232,.2)}.b-teal{background:rgba(26,201,176,.1);color:#74ffe8;border:1px solid rgba(26,201,176,.2)}.blue{color:var(--blue)}.green{color:var(--green)}.red{color:var(--red)}.orange{color:var(--orange)}.yellow{color:var(--yellow)}.teal{color:var(--teal)}.purple{color:var(--purple)}.signal-list{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.signal{border:1px solid var(--line);background:rgba(6,18,30,.75);border-radius:8px;padding:9px}.signal strong{display:block;font-size:12px;margin-bottom:3px}.signal span{display:block;font-size:10.5px;color:var(--muted);line-height:1.35}.objective{border:1px solid var(--line);background:rgba(6,18,30,.75);border-radius:8px;padding:10px;margin-bottom:7px}.objective strong{display:flex;align-items:center;gap:7px;font-size:12px}.objective p{font-size:10.5px;color:var(--muted);line-height:1.45;margin-top:4px}.rank{font-family:'JetBrains Mono',monospace;color:var(--muted);font-size:10px}.mobile-note{display:none}
+@media(max-width:1100px){.shell{grid-template-columns:1fr}aside{position:relative;height:auto;border-right:0;border-bottom:1px solid var(--line)}.nav{display:grid;grid-template-columns:repeat(2,1fr);gap:4px}.nav-label{grid-column:1/-1}.hero,.grid-3,.grid-2,.grid-wide{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}.chart-lg{height:360px}.mobile-note{display:block}.topbar{align-items:flex-start;flex-direction:column}.top-actions{flex-wrap:wrap}}@media(max-width:560px){.content{padding:10px}.kpis{grid-template-columns:1fr}.signal-list{grid-template-columns:1fr}.nav{grid-template-columns:1fr}.chart,.chart-sm{height:260px}.chart-lg{height:420px}.topbar h1{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside>
+  <div class="logo"><div class="logo-mark">IR</div><div><div class="l1">ICC NOC</div><div class="l2">Incident Reduction Lab</div></div></div>
+  <nav class="nav">
+    <div class="nav-label">Prototype</div>
+    <a href="index.html">⬡ Main Command Center</a>
+    <a class="active" href="incident_reduction_prevention.html">⚠ Incident Prevention <span class="dot"></span></a>
+    <div class="nav-label">Jump To</div>
+    <a href="#watch">◉ Realtime Watch</a>
+    <a href="#sources">◎ Source Funnel</a>
+    <a href="#autoclosed">⟳ Auto-Closed</a>
+    <a href="#synthetic">◇ Synthetic / Threshold</a>
+    <a href="#backlog">▣ Prevention Backlog</a>
+  </nav>
+</aside>
+<main>
+  <div class="topbar">
+    <div><h1>GOAL 2 · INCIDENT REDUCTION PREVENTION LAB</h1><div class="sub">25% YoY reduction · Dynatrace p-cards + AlertSite + threshold monitoring + recurring patterns</div></div>
+    <div class="top-actions"><span class="pill">LIVE PROTOTYPE</span><a class="btn" href="index.html">Back to Command Center</a></div>
+  </div>
+  <div class="content">
+    <div class="hero">
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Recommended Goal 2 Framing</span><span class="badge b-teal">25% YoY</span></div>
+        <p class="goal-copy"><b>Reduce incidents by 25% year over year</b> by lowering avoidable incident creation from Dynatrace p-cards, AlertSite synthetic failures, threshold-monitoring noise, duplicate event clusters, and recurring known patterns. The dashboard should monitor incident-generation signals in real time and analyze historical trends to identify tuning, grouping, automation, playbook, and problem-management opportunities.</p>
+      </div>
+      <div class="card mobile-note">
+        <div class="card-hd"><span class="card-title">Mobile Note</span></div>
+        <p class="goal-copy">This page is mobile-responsive. Dense charts stack into single-column views for iPhone Safari, while the main dashboard remains the realtime command landing page.</p>
+      </div>
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Reduction Path</span><span class="card-sub">Where the 25% can come from</span></div>
+        <div class="signal-list">
+          <div class="signal"><strong class="green">Auto-close cleanup</strong><span>Reduce no-action/self-healing incidents.</span></div>
+          <div class="signal"><strong class="teal">P-card conversion</strong><span>Act, group, or suppress before INC creation.</span></div>
+          <div class="signal"><strong class="yellow">Synthetic tuning</strong><span>Separate single-location blips from real impact.</span></div>
+          <div class="signal"><strong class="orange">Repeat offenders</strong><span>Target the top apps, entities, monitors, and rules.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <section id="watch" class="kpis">
+      <div class="kpi"><div class="kpi-label">YoY Incident Reduction</div><div class="kpi-val green">18%</div><div class="kpi-sub">Target: 25% reduction</div></div>
+      <div class="kpi"><div class="kpi-label">Gap to Goal</div><div class="kpi-val yellow">7 pts</div><div class="kpi-sub">Need additional reduction</div></div>
+      <div class="kpi"><div class="kpi-label">P-Cards Near INC Threshold</div><div class="kpi-val orange">9</div><div class="kpi-sub">Realtime prevention watch</div></div>
+      <div class="kpi"><div class="kpi-label">Auto-Closed Today</div><div class="kpi-val yellow">11</div><div class="kpi-sub">6 closed &lt;15m / no action</div></div>
+      <div class="kpi"><div class="kpi-label">Synthetic Incidents</div><div class="kpi-val orange">7</div><div class="kpi-sub">4 single-location failures</div></div>
+      <div class="kpi"><div class="kpi-label">Threshold Incidents</div><div class="kpi-val yellow">13</div><div class="kpi-sub">5 no customer impact</div></div>
+      <div class="kpi"><div class="kpi-label">Repeat Offender Active</div><div class="kpi-val red">6</div><div class="kpi-sub">3+ recurrences / 30d</div></div>
+      <div class="kpi"><div class="kpi-label">Prevented This Week</div><div class="kpi-val green">4</div><div class="kpi-sub">Grouped / tuned / automated</div></div>
+    </section>
+
+    <div class="grid-wide" id="sources">
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Incident Source Funnel</span><span class="card-sub">Where incident volume originates</span></div>
+        <div id="sourceFunnel" class="chart-lg"></div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Realtime Incident Reduction Watch</span><span class="badge b-orange">Actionable</span></div>
+        <table>
+          <thead><tr><th>Signal</th><th>Now</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td>P-cards near incident threshold</td><td class="orange">9</td><td><span class="badge b-orange">Triage now</span></td></tr>
+            <tr><td>Existing incident match</td><td class="blue">5</td><td><span class="badge b-blue">Attach / group</span></td></tr>
+            <tr><td>Auto-close &lt;15m pattern</td><td class="yellow">6</td><td><span class="badge b-yellow">Review tuning</span></td></tr>
+            <tr><td>Known playbook match</td><td class="green">8</td><td><span class="badge b-green">Run / recommend</span></td></tr>
+            <tr><td>Synthetic single-location</td><td class="yellow">4</td><td><span class="badge b-yellow">Watch before INC</span></td></tr>
+            <tr><td>Recurring cluster forming</td><td class="red">3</td><td><span class="badge b-red">Swarm / PRB</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid-3" id="autoclosed">
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Auto-Closed / No-Action Incidents</span><span class="badge b-yellow">Noise Candidates</span></div>
+        <div id="autoClosed" class="chart"></div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><span class="card-title">P-Card → INC Conversion</span><span class="card-sub">Prevent earlier</span></div>
+        <div id="conversion" class="chart"></div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Avoidable Incident Mix</span><span class="card-sub">30-day estimate</span></div>
+        <div id="avoidMix" class="chart"></div>
+      </div>
+    </div>
+
+    <div class="grid-2" id="synthetic">
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Synthetic Failure Analysis</span><span class="card-sub">AlertSite monitor quality</span></div>
+        <table>
+          <thead><tr><th>Monitor</th><th>Failures</th><th>Single Loc.</th><th>Auto-close</th><th>Confidence</th><th>Recommendation</th></tr></thead>
+          <tbody>
+            <tr><td><b>Move Money Login Flow</b></td><td>18</td><td>2</td><td>11%</td><td><span class="badge b-green">High</span></td><td>Keep incident-generating</td></tr>
+            <tr><td><b>Advisor Email SMTP</b></td><td>13</td><td>9</td><td>62%</td><td><span class="badge b-yellow">Low</span></td><td>Require multi-location persistence</td></tr>
+            <tr><td><b>Account View Search</b></td><td>11</td><td>8</td><td>55%</td><td><span class="badge b-yellow">Low</span></td><td>Tune location / retry window</td></tr>
+            <tr><td><b>Client Mgmt Submit</b></td><td>9</td><td>1</td><td>22%</td><td><span class="badge b-green">High</span></td><td>Correlate with DT service impact</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Threshold Monitoring Review</span><span class="card-sub">Tune fixed thresholds</span></div>
+        <table>
+          <thead><tr><th>Rule / Signal</th><th>INCs</th><th>No Impact</th><th>Auto-close</th><th>Change Candidate</th></tr></thead>
+          <tbody>
+            <tr><td>CPU &gt;90% 5m</td><td>22</td><td>14</td><td>59%</td><td><span class="badge b-orange">Add duration</span></td></tr>
+            <tr><td>Disk &gt;95%</td><td>17</td><td>4</td><td>18%</td><td><span class="badge b-green">Automation</span></td></tr>
+            <tr><td>DB Pool Saturation</td><td>15</td><td>2</td><td>13%</td><td><span class="badge b-blue">Keep + correlate</span></td></tr>
+            <tr><td>Single Synthetic Fail</td><td>13</td><td>9</td><td>62%</td><td><span class="badge b-yellow">Require 2+ loc</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid-wide">
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Top Repeat Offenders</span><span class="card-sub">Target these first to reach 25%</span></div>
+        <table>
+          <thead><tr><th>#</th><th>App / Entity / Monitor</th><th>Source</th><th>Incidents</th><th>Auto-close</th><th>Conv.</th><th>Fix Path</th><th>Est. Reduction</th></tr></thead>
+          <tbody>
+            <tr><td class="rank">01</td><td><b>Advisor Email SMTP Synthetic</b></td><td>AlertSite</td><td class="orange">13</td><td>62%</td><td>—</td><td><span class="badge b-yellow">Synthetic tuning</span></td><td class="green">6–8 / mo</td></tr>
+            <tr><td class="rank">02</td><td><b>Kafka Consumer Lag</b></td><td>Dynatrace</td><td class="red">12</td><td>8%</td><td>31%</td><td><span class="badge b-green">Automation</span></td><td class="green">4–6 / mo</td></tr>
+            <tr><td class="rank">03</td><td><b>Move Money App Pool</b></td><td>P-card</td><td class="red">11</td><td>11%</td><td>28%</td><td><span class="badge b-green">Playbook / AAG</span></td><td class="green">3–5 / mo</td></tr>
+            <tr><td class="rank">04</td><td><b>CPU &gt;90% Threshold</b></td><td>Threshold</td><td class="orange">9</td><td>59%</td><td>—</td><td><span class="badge b-orange">Duration gate</span></td><td class="green">4–7 / mo</td></tr>
+            <tr><td class="rank">05</td><td><b>SQL Connection Pool</b></td><td>Dynatrace</td><td class="orange">8</td><td>13%</td><td>22%</td><td><span class="badge b-blue">PRB / PTASK</span></td><td class="green">2–4 / mo</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Derived Goal Objectives</span></div>
+        <div class="objective"><strong><span class="badge b-yellow">1</span> Reduce low-value auto-closed incidents</strong><p>Identify incidents auto-closed within 15 minutes, with no work notes, no reassignment, and no customer impact.</p></div>
+        <div class="objective"><strong><span class="badge b-teal">2</span> Lower p-card to incident conversion</strong><p>Monitor p-cards approaching incident criteria and resolve, group, or suppress known patterns before INC creation.</p></div>
+        <div class="objective"><strong><span class="badge b-orange">3</span> Reduce synthetic-generated noise</strong><p>Analyze AlertSite failures by monitor, location count, duration, and correlation with Dynatrace.</p></div>
+        <div class="objective"><strong><span class="badge b-red">4</span> Target repeat offenders</strong><p>Rank recurring incidents by VCT, app, entity, monitor, root cause, assignment group, and error signature.</p></div>
+        <div class="objective"><strong><span class="badge b-green">5</span> Use automation and playbooks</strong><p>Find known patterns with safe remediation actions and track estimated incidents avoided.</p></div>
+      </div>
+    </div>
+
+    <div class="grid-2" id="backlog">
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Prevention Backlog</span><span class="badge b-blue">Weekly Review</span></div>
+        <table>
+          <thead><tr><th>Candidate</th><th>Type</th><th>Evidence</th><th>Owner</th><th>Next Action</th></tr></thead>
+          <tbody>
+            <tr><td>Advisor Email SMTP single-location failures</td><td>Synthetic tuning</td><td>62% auto-close</td><td>Monitoring</td><td>Require 2+ locations or 10m persistence</td></tr>
+            <tr><td>Kafka consumer lag recovery</td><td>Automation</td><td>12 INCs / 30d</td><td>Automation</td><td>Validate Ansible runbook and approval path</td></tr>
+            <tr><td>Move Money app pool restarts</td><td>AAG/playbook</td><td>Known fix used by T2</td><td>App SRE</td><td>Shift left playbook to ICC</td></tr>
+            <tr><td>CPU threshold alerts</td><td>Threshold gating</td><td>14 no-impact INCs</td><td>Observability</td><td>Add duration + VCT impact qualifier</td></tr>
+            <tr><td>SQL connection pool saturation</td><td>Problem mgmt</td><td>Repeat offender</td><td>DB / App</td><td>Create PRB / PTASK review</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Reduction Forecast</span><span class="card-sub">Potential contribution to 25%</span></div>
+        <div id="forecast" class="chart"></div>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+<script>
+const T={text:'#cfe8f7',muted:'#5e8aaa',line:'#152e44',line2:'#1d3d57',green:'#0fcc74',yellow:'#f5b014',orange:'#f57c1f',red:'#e83535',blue:'#2eaee8',teal:'#1ac9b0',purple:'#8b6cf6',tooltip:{backgroundColor:'#071827',borderColor:'#1d3d57',textStyle:{color:'#cfe8f7',fontFamily:'Syne,sans-serif',fontSize:11},extraCssText:'border-radius:7px;box-shadow:0 4px 18px rgba(0,0,0,.55)'}};
+function axis(){return{axisLine:{lineStyle:{color:T.line2}},axisTick:{lineStyle:{color:T.line2}},splitLine:{lineStyle:{color:T.line}},axisLabel:{color:T.muted,fontFamily:'JetBrains Mono,monospace',fontSize:10}}}
+const charts=[];function c(id){const x=echarts.init(document.getElementById(id),'dark');charts.push(x);return x}
+const weeks=['W-8','W-7','W-6','W-5','W-4','W-3','W-2','W-1'];
+c('sourceFunnel').setOption({backgroundColor:'transparent',tooltip:{...T.tooltip,trigger:'item'},series:[{type:'sankey',nodeAlign:'left',nodeGap:16,nodeWidth:18,emphasis:{focus:'adjacency'},label:{color:T.muted,fontFamily:'Syne,sans-serif',fontSize:11},lineStyle:{color:'gradient',opacity:.35},data:[{name:'All Monitoring Signals',itemStyle:{color:T.blue}},{name:'Dynatrace P-Cards',itemStyle:{color:T.teal}},{name:'AlertSite Synthetic',itemStyle:{color:T.yellow}},{name:'Threshold Rules',itemStyle:{color:T.orange}},{name:'ServiceNow Incidents',itemStyle:{color:T.red}},{name:'Auto-Closed',itemStyle:{color:T.yellow}},{name:'Actionable Incidents',itemStyle:{color:T.green}},{name:'Prevention Backlog',itemStyle:{color:T.purple}}],links:[{source:'All Monitoring Signals',target:'Dynatrace P-Cards',value:118},{source:'All Monitoring Signals',target:'AlertSite Synthetic',value:42},{source:'All Monitoring Signals',target:'Threshold Rules',value:56},{source:'Dynatrace P-Cards',target:'ServiceNow Incidents',value:38},{source:'AlertSite Synthetic',target:'ServiceNow Incidents',value:18},{source:'Threshold Rules',target:'ServiceNow Incidents',value:24},{source:'ServiceNow Incidents',target:'Auto-Closed',value:27},{source:'ServiceNow Incidents',target:'Actionable Incidents',value:40},{source:'Auto-Closed',target:'Prevention Backlog',value:18},{source:'Actionable Incidents',target:'Prevention Backlog',value:12}]}]});
+c('autoClosed').setOption({backgroundColor:'transparent',tooltip:{...T.tooltip,trigger:'axis'},grid:{top:15,right:15,bottom:30,left:40},xAxis:{type:'category',data:['<5m','5-15m','15-30m','30-60m','>60m'],...axis()},yAxis:{type:'value',...axis()},series:[{name:'Auto-closed',type:'bar',data:[9,18,14,8,5],itemStyle:{color:T.yellow,borderRadius:[3,3,0,0]}},{name:'No action',type:'bar',data:[7,15,8,3,1],itemStyle:{color:T.orange,borderRadius:[3,3,0,0]}}],legend:{bottom:0,textStyle:{color:T.muted,fontSize:10}}});
+c('conversion').setOption({backgroundColor:'transparent',tooltip:{...T.tooltip,trigger:'axis'},grid:{top:18,right:18,bottom:30,left:45},xAxis:{type:'category',data:weeks,...axis()},yAxis:{type:'value',axisLabel:{formatter:'{value}%',...axis().axisLabel},...axis()},series:[{name:'P-card → INC',type:'line',smooth:true,data:[18.6,17.9,17.2,16.8,15.9,15.1,14.7,14.2],lineStyle:{color:T.teal,width:3},itemStyle:{color:T.teal},areaStyle:{color:'rgba(26,201,176,.18)'}},{name:'Target',type:'line',data:[12,12,12,12,12,12,12,12],symbol:'none',lineStyle:{color:T.green,type:'dashed'}}],legend:{bottom:0,textStyle:{color:T.muted,fontSize:10}}});
+c('avoidMix').setOption({backgroundColor:'transparent',tooltip:{...T.tooltip,formatter:'{b}: {c} ({d}%)'},legend:{bottom:0,textStyle:{color:T.muted,fontSize:10}},series:[{type:'pie',radius:['46%','70%'],center:['50%','43%'],label:{color:T.muted,fontSize:10},itemStyle:{borderColor:'#071827',borderWidth:2,borderRadius:5},data:[{name:'Auto-closed / no action',value:27,itemStyle:{color:T.yellow}},{name:'Synthetic low-confidence',value:15,itemStyle:{color:T.orange}},{name:'Threshold tuning',value:18,itemStyle:{color:T.red}},{name:'Duplicate clusters',value:11,itemStyle:{color:T.blue}},{name:'Known automation',value:9,itemStyle:{color:T.green}}]}]});
+c('forecast').setOption({backgroundColor:'transparent',tooltip:{...T.tooltip,trigger:'axis'},grid:{top:15,right:20,bottom:35,left:120},xAxis:{type:'value',axisLabel:{formatter:'{value}%',...axis().axisLabel},...axis()},yAxis:{type:'category',data:['Automation','PRB / PTASK','Grouping','Threshold tuning','Synthetic tuning','Auto-close cleanup'],...axis()},series:[{type:'bar',data:[4,3,4,5,5,6].map((v,i)=>({value:v,itemStyle:{color:[T.green,T.purple,T.blue,T.orange,T.yellow,T.teal][i],borderRadius:[0,4,4,0]}})),label:{show:true,position:'right',formatter:'+{c} pts',color:T.muted,fontSize:10}}]});
+window.addEventListener('resize',()=>charts.forEach(x=>{try{x.resize()}catch(e){}}));
+</script>
+</body>
+</html>
