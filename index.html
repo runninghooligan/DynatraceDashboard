@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>ICC Command Center vNext · Phase 4 Workflow Action Layer</title>
+<title>ICC Command Center vNext</title>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
 <style>
@@ -221,7 +221,6 @@ tr:hover td{background:rgba(46,174,232,.04)}
 .b-green{background:rgba(15,204,116,.1);color:#5effa8;border:1px solid rgba(15,204,116,.2)}
 .b-blue{background:rgba(46,174,232,.1);color:#7dd8ff;border:1px solid rgba(46,174,232,.2)}
 .b-muted{background:rgba(94,138,170,.1);color:var(--muted);border:1px solid rgba(94,138,170,.2)}
-.b-purple{background:rgba(139,108,246,.12);color:#b7a4ff;border:1px solid rgba(139,108,246,.25)}
 
 /* ══ BUTTONS ══ */
 .btn{padding:3px 8px;border-radius:4px;cursor:pointer;
@@ -405,174 +404,26 @@ tr:hover td{background:rgba(46,174,232,.04)}
 }
 
 
-/* ══ SOURCE-AWARE COMMAND CENTER UPDATES ══ */
-.goal-card{flex-direction:column;align-items:flex-start;justify-content:space-between;min-height:92px}
-.goal-main{display:flex;align-items:center;gap:10px;width:100%}
-.goal-action{margin-top:6px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--blue);letter-spacing:.08em;text-transform:uppercase}
-.source-breakdown{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:6px}
-.source-chip{border:1px solid var(--line2);background:rgba(6,18,30,.75);border-radius:5px;padding:5px 6px;text-align:center}
-.source-chip .n{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:800;display:block}
-.source-chip .l{font-size:8.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
-.signal-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid rgba(21,46,68,.45)}
-.signal-row:last-child{border-bottom:none}
-.signal-name{font-size:11px;font-weight:700;color:var(--text)}
-.signal-meta{font-size:9.5px;color:var(--muted);margin-top:2px}
-.signal-count{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:800}
-.kpi-note{margin-top:7px;font-size:9px;color:var(--muted);line-height:1.35}
-.pc-note{margin-bottom:9px}
-.home-hub-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:11px}
-.home-hub{border:1px solid var(--line);background:rgba(6,18,30,.74);border-radius:8px;padding:9px 10px;cursor:pointer;transition:all .16s}
-.home-hub:hover{border-color:var(--blue);background:rgba(46,174,232,.06)}
-.home-hub .h{font-size:10px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.08em}
-.home-hub .b{font-size:12px;color:var(--text);font-weight:700;margin-top:3px}
-.home-hub .a{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--blue);margin-top:5px}
-@media(max-width:860px){.home-hub-row{grid-template-columns:1fr 1fr}.source-breakdown{grid-template-columns:1fr}.goal-card{min-height:108px}}
 
-
-
-
-
-/* ══ PHASE 2 COMMAND CENTER HARDENING ══ */
-.action-grid{display:grid;grid-template-columns:1.1fr .95fr 1fr;gap:11px;margin-bottom:11px}
-.action-card{background:linear-gradient(160deg,#071c2e,#040d18);border:1px solid var(--line);border-radius:9px;padding:12px;position:relative;overflow:hidden}
-.action-card.hot{border-color:rgba(245,124,31,.35);box-shadow:0 0 0 1px rgba(245,124,31,.05) inset}
-.action-card.critical{border-color:rgba(232,53,53,.35);box-shadow:0 0 16px rgba(232,53,53,.07)}
-.watch-row{display:grid;grid-template-columns:78px 1fr auto;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid rgba(21,46,68,.45)}
-.watch-row:last-child{border-bottom:none}
-.watch-id{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--blue);font-weight:800}
-.watch-title{font-size:11.5px;font-weight:700;color:var(--text)}
-.watch-meta{font-size:9.5px;color:var(--muted);margin-top:2px}
-.timer-block{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0 10px;padding:10px;border:1px solid rgba(245,124,31,.28);border-radius:8px;background:rgba(245,124,31,.055)}
-.timer-label{font-size:10px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.08em}
-.timer-value{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:900;color:var(--orange);letter-spacing:.03em}
-.handoff-chain{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-top:8px}
-.handoff-step{border:1px solid var(--line);background:rgba(6,18,30,.72);border-radius:7px;padding:7px;text-align:center;position:relative;min-height:62px}
-.handoff-step:not(:last-child)::after{content:'→';position:absolute;right:-9px;top:50%;transform:translateY(-50%);color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:12px}
-.handoff-step .n{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:900;display:block;margin-bottom:2px}
-.handoff-step .l{font-size:8.5px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.05em;line-height:1.25}
-.integration-alert{display:flex;align-items:flex-start;gap:8px;margin-top:8px;padding:8px;border:1px solid rgba(245,176,20,.25);border-radius:7px;background:rgba(245,176,20,.055);font-size:10px;color:var(--muted);line-height:1.35}
-.integration-alert b{color:var(--yellow)}
-.risk-large{min-height:270px}
-.risk-large #gauge{height:270px}
-@media(max-width:1080px){.action-grid{grid-template-columns:1fr}.handoff-chain{grid-template-columns:1fr}.handoff-step:not(:last-child)::after{content:'↓';right:50%;top:auto;bottom:-12px;transform:translateX(50%)}}
-
-
-/* ══ PHASE 1 STRUCTURE / LAYER CLARITY ══ */
-.layer-badge{
-  display:inline-flex;align-items:center;justify-content:center;
-  border-radius:4px;padding:1px 5px;margin-left:4px;
-  font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:800;
-  letter-spacing:.08em;text-transform:uppercase;line-height:1.4;
-  border:1px solid transparent;white-space:nowrap;
-}
-.layer-badge.live{color:var(--green);background:rgba(15,204,116,.08);border-color:rgba(15,204,116,.24)}
-.layer-badge.hist{color:var(--purple);background:rgba(139,108,246,.08);border-color:rgba(139,108,246,.24)}
-.section-divider{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
-  margin:2px 0 10px;padding:7px 10px;border:1px solid var(--line);
-  border-radius:8px;background:rgba(6,18,30,.58);
-}
-.section-divider span{
-  font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:800;
-  letter-spacing:.14em;text-transform:uppercase;color:var(--text);
-}
-.section-divider em{font-style:normal;font-size:10px;color:var(--muted)}
-.topology-collapse{margin:11px 0;border:1px solid rgba(46,174,232,.2);border-radius:9px;background:rgba(46,174,232,.035);overflow:hidden}
-.topology-collapse summary{
-  list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;
-  padding:10px 12px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:800;
-  letter-spacing:.1em;text-transform:uppercase;color:var(--blue);
-}
-.topology-collapse summary::-webkit-details-marker{display:none}
-.topology-collapse summary::after{content:'＋';color:var(--muted);font-size:13px}
-.topology-collapse[open] summary::after{content:'－'}
-.topology-body{padding:0 12px 12px;color:var(--muted);font-size:11px}
-.topology-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:9px}
-.topology-mini{border:1px solid var(--line);border-radius:7px;background:rgba(6,18,30,.75);padding:9px}
-.topology-mini .k{font-size:9px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.06em}
-.topology-mini .v{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:800;margin-top:4px;color:var(--text)}
-.lifecycle-card{display:flex;align-items:center;justify-content:space-between;gap:14px}
-.lifecycle-card p{font-size:11px;color:var(--muted);line-height:1.45;max-width:760px}
-.pcard-modal{width:min(860px,94vw);max-height:88dvh;margin:auto;display:flex;flex-direction:column;background:linear-gradient(160deg,#071c2e,#030912);border:1px solid rgba(46,174,232,.28);border-radius:12px;box-shadow:0 24px 90px rgba(0,0,0,.6);overflow:hidden}
-.pcard-modal-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:13px 15px;border-bottom:1px solid var(--line);background:rgba(3,13,22,.92)}
-.pcard-modal-title{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text)}
-.pcard-modal-sub{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.35}
-.pcard-modal-body{overflow:auto;padding:14px 16px;-webkit-overflow-scrolling:touch}
-@media (max-width:760px){
-  .topology-grid{grid-template-columns:repeat(2,1fr)}
-  .section-divider{align-items:flex-start;flex-direction:column;gap:2px}
-  .pcard-modal{width:96vw;max-height:92dvh}
-  .lifecycle-card{align-items:flex-start;flex-direction:column}
-}
-
-
-/* ══ PHASE 3: GOAL TAB REFINEMENT ══ */
-.goal-progress-grid{display:grid;grid-template-columns:320px 1fr;gap:11px;margin-bottom:11px}
-.goal-arc-card{display:flex;align-items:center;gap:16px;min-height:170px}
-.goal-arc{width:128px;height:128px;border-radius:50%;display:grid;place-items:center;position:relative;flex-shrink:0;background:conic-gradient(var(--blue) 0 77.7%, rgba(94,138,170,.18) 0 100%);box-shadow:0 0 22px rgba(46,174,232,.10)}
-.goal-arc::after{content:'';position:absolute;width:92px;height:92px;border-radius:50%;background:linear-gradient(160deg,#071c2e,#040d18);border:1px solid var(--line)}
-.goal-arc span{position:relative;z-index:1;font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:800;color:var(--blue)}
-.goal-arc.green{background:conic-gradient(var(--green) 0 72%, rgba(94,138,170,.18) 0 100%)}
-.goal-arc.green span{color:var(--green)}
-.goal-arc.yellow{background:conic-gradient(var(--yellow) 0 67%, rgba(94,138,170,.18) 0 100%)}
-.goal-arc.yellow span{color:var(--yellow)}
-.goal-arc.purple{background:conic-gradient(var(--purple) 0 72%, rgba(94,138,170,.18) 0 100%)}
-.goal-arc.purple span{color:var(--purple)}
-.goal-metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;flex:1}
-.goal-metric{background:rgba(6,18,30,.75);border:1px solid var(--line);border-radius:7px;padding:9px}
-.goal-metric .l{font-size:9.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
-.goal-metric .v{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:800;margin-top:3px}
-.subsection-band{display:flex;align-items:center;gap:10px;margin:11px 0 9px;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
-.subsection-band::before,.subsection-band::after{content:'';height:1px;background:var(--line);flex:1}
-.big-outcome{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:11px}
-.outcome-card{border:1px solid var(--line);border-radius:8px;padding:12px;background:rgba(6,18,30,.82)}
-.outcome-card.primary{border-color:rgba(15,204,116,.28);background:rgba(15,204,116,.055)}
-.outcome-card .l{font-size:9.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
-.outcome-card .v{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:800;margin:5px 0 2px}
-.outcome-card .s{font-size:10px;color:var(--muted)}
-.spark-mini{display:inline-flex;align-items:flex-end;gap:2px;height:18px;min-width:48px}
-.spark-mini i{display:block;width:5px;border-radius:2px;background:var(--line2)}
-.spark-mini.up i:nth-child(1){height:7px}.spark-mini.up i:nth-child(2){height:9px}.spark-mini.up i:nth-child(3){height:12px}.spark-mini.up i:nth-child(4){height:16px}
-.spark-mini.down i:nth-child(1){height:16px}.spark-mini.down i:nth-child(2){height:12px}.spark-mini.down i:nth-child(3){height:9px}.spark-mini.down i:nth-child(4){height:7px}
-.spark-mini.flat i:nth-child(1){height:10px}.spark-mini.flat i:nth-child(2){height:12px}.spark-mini.flat i:nth-child(3){height:11px}.spark-mini.flat i:nth-child(4){height:12px}
-.phase-note{font-size:10.5px;color:var(--muted);line-height:1.45;margin-top:6px}
-.shift-compare{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.shift-card{background:rgba(6,18,30,.8);border:1px solid var(--line);border-radius:8px;padding:10px}
-.shift-card .l{font-size:9.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
-.shift-card .v{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:800;margin:4px 0}
-.queue-note{padding:8px 10px;border-radius:7px;border:1px solid rgba(46,174,232,.18);background:rgba(46,174,232,.045);font-size:10.5px;color:var(--muted);line-height:1.45;margin-bottom:9px}
-@media(max-width:900px){.goal-progress-grid{grid-template-columns:1fr}.big-outcome{grid-template-columns:1fr}.shift-compare{grid-template-columns:1fr 1fr}.goal-metrics{grid-template-columns:1fr}}
-
-
-
-/* ══ PHASE 4: WORKFLOW / ACTION LAYER ══ */
-.action-status-row{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:8px}
-.action-pill{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line2);border-radius:999px;padding:3px 8px;font-size:9.5px;font-weight:700;color:var(--muted);background:rgba(6,18,30,.75)}
-.action-pill.hot{border-color:rgba(232,53,53,.25);color:#ff8888;background:rgba(232,53,53,.08)}
-.action-pill.ok{border-color:rgba(15,204,116,.22);color:var(--green);background:rgba(15,204,116,.07)}
-.action-pill.warn{border-color:rgba(245,176,20,.25);color:var(--yellow);background:rgba(245,176,20,.07)}
-.action-btn-row{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
-.row-clickable{cursor:pointer}
-.row-clickable:hover td{background:rgba(46,174,232,.075)!important}
-.drawer-shell{width:min(520px,96vw);max-height:92dvh;margin:auto 14px auto auto;display:flex;flex-direction:column;background:linear-gradient(160deg,#071c2e,#030912);border:1px solid rgba(46,174,232,.28);border-radius:12px;box-shadow:0 24px 90px rgba(0,0,0,.7);overflow:hidden}
-.drawer-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:13px 15px;border-bottom:1px solid var(--line);background:rgba(3,13,22,.95)}
-.drawer-title{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text)}
-.drawer-sub{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.35}
-.drawer-body{overflow:auto;padding:14px 16px;-webkit-overflow-scrolling:touch}
-.drawer-kv{display:grid;grid-template-columns:120px 1fr;gap:7px;font-size:11px;padding:6px 0;border-bottom:1px solid rgba(21,46,68,.45)}
-.drawer-kv b{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.06em}
-.drawer-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin:12px 0}
-.drawer-action-card{border:1px solid var(--line);border-radius:8px;padding:9px;background:rgba(6,18,30,.72)}
-.drawer-action-card .h{font-weight:800;font-size:11px;color:var(--text)}
-.drawer-action-card .d{font-size:10px;color:var(--muted);line-height:1.35;margin:4px 0 8px}
-.handoff-modal{width:min(920px,95vw);max-height:90dvh;margin:auto;display:flex;flex-direction:column;background:linear-gradient(160deg,#071c2e,#030912);border:1px solid rgba(15,204,116,.22);border-radius:12px;box-shadow:0 24px 90px rgba(0,0,0,.7);overflow:hidden}
-.handoff-body{overflow:auto;padding:14px 16px}.handoff-preview{white-space:pre-wrap;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.6;color:var(--text);background:rgba(3,13,22,.72);border:1px solid var(--line);border-radius:8px;padding:12px}
-.report-status{display:inline-flex;align-items:center;gap:4px;border-radius:5px;padding:2px 6px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.05em}.report-status.ready{background:rgba(15,204,116,.1);color:var(--green);border:1px solid rgba(15,204,116,.2)}.report-status.gen{background:rgba(245,176,20,.1);color:var(--yellow);border:1px solid rgba(245,176,20,.22)}.report-status.err{background:rgba(232,53,53,.1);color:#ff8888;border:1px solid rgba(232,53,53,.22)}
-.report-preview{min-height:210px;background:rgba(6,18,30,.74);border:1px solid var(--line);border-radius:8px;padding:12px;font-size:11px;color:var(--muted);line-height:1.55}
-.report-preview h3{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text);margin-bottom:8px;letter-spacing:.06em;text-transform:uppercase}.report-preview ul{margin-left:16px;margin-top:7px}.report-preview li{margin-bottom:4px}
-.workflow-note-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0 11px}.workflow-note{border:1px solid var(--line);border-radius:8px;padding:9px;background:rgba(6,18,30,.66)}.workflow-note .h{font-size:10px;font-weight:800;color:var(--text);text-transform:uppercase;letter-spacing:.07em}.workflow-note .b{font-size:10px;color:var(--muted);line-height:1.35;margin-top:4px}
-@media(max-width:900px){.drawer-shell{margin:auto;width:96vw}.drawer-actions{grid-template-columns:1fr}.workflow-note-grid{grid-template-columns:1fr 1fr}}
-@media(max-width:560px){.workflow-note-grid{grid-template-columns:1fr}.action-btn-row{flex-direction:column;align-items:stretch}.action-btn-row .btn{width:100%}}
+/* ══════════════════════════════════════════
+   PHASE 5: VISUAL POLISH + INTELLIGENCE LAYER
+══════════════════════════════════════════ */
+.sev-critical,.sev-p1{color:#ff8a8a!important;border-color:rgba(232,53,53,.35)!important;background:rgba(232,53,53,.14)!important}
+.sev-high,.sev-p2{color:#ffb070!important;border-color:rgba(245,124,31,.35)!important;background:rgba(245,124,31,.14)!important}
+.sev-moderate,.sev-p3major{color:#ffd166!important;border-color:rgba(245,176,20,.35)!important;background:rgba(245,176,20,.14)!important}
+.sev-low,.sev-p3nonmajor,.sev-p4{color:#9fb8cc!important;border-color:rgba(94,138,170,.25)!important;background:rgba(94,138,170,.12)!important}
+.kpi-freshness{position:absolute;right:8px;top:7px;font-family:'JetBrains Mono',monospace;font-size:8px;border:1px solid rgba(94,138,170,.22);border-radius:10px;padding:1px 5px;color:var(--muted);background:rgba(6,18,30,.72)}
+.kpi-freshness.warn{color:var(--yellow);border-color:rgba(245,176,20,.28);background:rgba(245,176,20,.06)}
+.kpi-freshness.stale{color:#ff8888;border-color:rgba(232,53,53,.28);background:rgba(232,53,53,.06)}
+.collector-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 0 11px}
+.collector-card{background:rgba(6,18,30,.82);border:1px solid var(--line);border-radius:8px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:46px}
+.collector-left{display:flex;flex-direction:column;gap:2px}.collector-name{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text)}.collector-meta{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted)}
+.collector-status{font-size:9px;font-weight:800;border-radius:12px;padding:2px 6px;border:1px solid}.collector-status.ok{color:var(--green);border-color:rgba(15,204,116,.28);background:rgba(15,204,116,.08)}.collector-status.warn{color:var(--yellow);border-color:rgba(245,176,20,.28);background:rgba(245,176,20,.08)}
+.spark-mini{width:78px;height:22px;display:inline-block;vertical-align:middle;margin-left:6px}.spark-mini polyline{fill:none;stroke:currentColor;stroke-width:2;opacity:.9}.spark-mini circle{fill:currentColor;opacity:.95}
+.wall-progress{position:fixed;left:0;right:0;bottom:0;height:3px;background:rgba(46,174,232,.08);z-index:99998;display:none}.wall-progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--teal));transition:width .2s linear}
+body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.wall-mode aside{display:none}body.wall-mode .app{grid-template-columns:1fr}body.wall-mode .topbar{padding:12px 22px}body.wall-mode .content{padding:16px 20px}body.wall-mode .kpi-val{font-size:25px}body.wall-mode .card{border-radius:12px}body.wall-mode .goal-banner{grid-template-columns:repeat(4,1fr)}body.wall-mode .g3{grid-template-columns:1.55fr .95fr .95fr}
+.phase5-note{font-size:10.5px;color:var(--muted);line-height:1.45;border:1px dashed rgba(46,174,232,.2);background:rgba(46,174,232,.04);border-radius:7px;padding:8px 10px;margin-bottom:11px}
+@media(max-width:900px){.collector-strip{grid-template-columns:repeat(2,1fr)}body.wall-mode .goal-banner{grid-template-columns:1fr 1fr}}
 
 </style>
 </head>
@@ -592,7 +443,7 @@ tr:hover td{background:rgba(46,174,232,.04)}
     <div class="nav-group">
       <div class="nav-label">Real-Time</div>
       <button class="active" data-tab="command" onclick="showTab('command',this)">
-        <span class="ico">⬡</span>Command Center <span class="layer-badge live">LIVE</span>
+        <span class="ico">⬡</span>Command Center
         <span class="goal-dot" style="background:var(--green)"></span>
       </button>
     </div>
@@ -606,6 +457,10 @@ tr:hover td{background:rgba(46,174,232,.04)}
         <span class="ico">⚠</span>Incident Reduction
         <span class="goal-dot" style="background:var(--teal)"></span>
       </button>
+      <button onclick="window.location.href='incident_reduction_prevention.html'">
+        <span class="ico">↗</span>Prevention Lab
+        <span class="goal-dot" style="background:var(--teal)"></span>
+      </button>
       <button data-tab="automation" onclick="showTab('automation',this)">
         <span class="ico">⚡</span>Automation
         <span class="goal-dot" style="background:var(--yellow)"></span>
@@ -614,23 +469,23 @@ tr:hover td{background:rgba(46,174,232,.04)}
     <div class="nav-group">
       <div class="nav-label">Operations</div>
       <button data-tab="pcards" onclick="showTab('pcards',this)">
-        <span class="ico">◫</span>P-Cards <span class="layer-badge live">LIVE</span>
+        <span class="ico">◫</span>P-Cards
       </button>
       <button data-tab="analytics" onclick="showTab('analytics',this)">
-        <span class="ico">〜</span>Delay &amp; MTTA <span class="layer-badge hist">HIST</span>
+        <span class="ico">〜</span>Analytics / MTTA
       </button>
     </div>
     <div class="nav-group">
       <div class="nav-label">Output</div>
       <button data-tab="reports" onclick="showTab('reports',this)">
-        <span class="ico">≡</span>Reports <span class="layer-badge hist">HIST</span>
+        <span class="ico">≡</span>Reports
       </button>
     </div>
   </div>
   <div class="sidebar-footer">
     <span class="pulse"></span>All collectors online<br>
     <span style="opacity:.45;font-size:8.5px">DT · SNOW · AlertSite · DPA</span><br>
-    <span style="opacity:.35;font-size:8px">vNext Phase 4 · ICC NOC</span>
+    <span style="opacity:.35;font-size:8px">Phase 5 · Visual Intelligence</span>
   </div>
 </aside>
 
@@ -645,8 +500,9 @@ tr:hover td{background:rgba(46,174,232,.04)}
       <span id="clock"></span>
       <div class="live-pill"><span class="pulse"></span>LIVE</div>
       <button class="tb-pill">Shift: Day</button>
-      <button class="tb-pill" onclick="openShiftHandoff()">Shift Handoff</button>
+      <button class="tb-pill" onclick="window.location.href='incident_reduction_prevention.html'">Goal 2 Lab ↗</button>
       <button class="tb-pill">⊟ Filters</button>
+      <button class="tb-pill" id="wallModeBtn" onclick="toggleWallMode()">▣ Wall Mode</button>
     </div>
   </div>
 
@@ -657,99 +513,52 @@ tr:hover td{background:rgba(46,174,232,.04)}
   ══════════════════════════════════ -->
   <section id="command">
 
-    <div class="section-divider"><span>LIVE STATE — Current Shift</span><em>Realtime triage signals and active operational risk</em></div>
-
     <!-- Goal Banner -->
     <div class="goal-banner">
-      <div class="goal-card g1" onclick="showTabByName('fcr')">
-        <div class="goal-main"><span class="goal-icon">◎</span>
-          <div class="goal-info">
-            <div class="gl">Goal 1 · FCR</div>
-            <div class="gv blue">34.2%</div>
-            <div class="gs">Realtime: likely FCR + missed FCR queue</div>
-          </div>
+      <div class="goal-card g1" onclick="showTab('fcr',document.querySelector('[data-tab=fcr]'))">
+        <span class="goal-icon">◎</span>
+        <div class="goal-info">
+          <div class="gl">Goal 1 · FCR</div>
+          <div class="gv blue">34.2%</div>
+          <div class="gs">Target: +30% → 44%</div>
         </div>
-        <div class="goal-action">Open FCR workbench →</div>
       </div>
-      <div class="goal-card g2" onclick="showTabByName('incidents')">
-        <div class="goal-main"><span class="goal-icon">⬇</span>
-          <div class="goal-info">
-            <div class="gl">Goal 2 · Incident Reduction</div>
-            <div class="gv teal">28 open</div>
-            <div class="gs">Manual 9 · DT 13 · AlertSite 6</div>
-          </div>
+      <div class="goal-card g2" onclick="showTab('incidents',document.querySelector('[data-tab=incidents]'))">
+        <span class="goal-icon">⬇</span>
+        <div class="goal-info">
+          <div class="gl">Goal 2 · Incidents</div>
+          <div class="gv teal">−18.0%</div>
+          <div class="gs">YoY · 4 prevented</div>
         </div>
-        <div class="goal-action">Open source breakdown →</div>
       </div>
-      <div class="goal-card g3" onclick="showTabByName('analytics')">
-        <div class="goal-main"><span class="goal-icon">⏱</span>
-          <div class="goal-info">
-            <div class="gl">Goal 3 · Delay Prevention</div>
-            <div class="gv purple">12 delays</div>
-            <div class="gs">3.8m first comment · 14m avg gap</div>
-          </div>
+      <div class="goal-card g3" onclick="showTab('analytics',document.querySelector('[data-tab=analytics]'))">
+        <span class="goal-icon">⏱</span>
+        <div class="goal-info">
+          <div class="gl">Goal 3 · Delay Prevention</div>
+          <div class="gv purple">12 delays</div>
+          <div class="gs">3.8m first comment</div>
         </div>
-        <div class="goal-action">Open delay signals →</div>
       </div>
-      <div class="goal-card g4" onclick="showTabByName('automation')">
-        <div class="goal-main"><span class="goal-icon">⚡</span>
-          <div class="goal-info">
-            <div class="gl">Goal 4 · Automation</div>
-            <div class="gv yellow">3 opps</div>
-            <div class="gs">Known pattern + playbook match</div>
-          </div>
+      <div class="goal-card g4" onclick="showTab('automation',document.querySelector('[data-tab=automation]'))">
+        <span class="goal-icon">⚡</span>
+        <div class="goal-info">
+          <div class="gl">Goal 4 · Automation</div>
+          <div class="gv yellow">3 opps</div>
+          <div class="gs">12.4 hrs saved MTD</div>
         </div>
-        <div class="goal-action">Open automation queue →</div>
       </div>
     </div>
 
     <!-- KPI Strip -->
     <div class="kpi-row kpi-8">
       <div class="kpi"><div class="kpi-label">FCR % Official</div><div class="kpi-val green">34.2%</div><div class="kpi-sub">▲ 5.6% vs 8wk avg</div><div class="kpi-bar"><div class="kpi-bar-fill" style="width:34%;background:var(--green)"></div></div></div>
-      <div class="kpi"><div class="kpi-label">Active Incident Sources</div><div class="kpi-val blue">28</div><div class="kpi-sub">Manual 9 · DT 13 · AlertSite 6</div><div class="source-breakdown"><div class="source-chip"><span class="n blue">9</span><span class="l">Manual</span></div><div class="source-chip"><span class="n orange">13</span><span class="l">DT</span></div><div class="source-chip"><span class="n yellow">6</span><span class="l">AlertSite</span></div></div></div>
+      <div class="kpi"><div class="kpi-label">Incident Reduction YoY</div><div class="kpi-val green">−18.0%</div><div class="kpi-sub">▼ vs prior year</div></div>
       <div class="kpi"><div class="kpi-label">Long Running P-Cards</div><div class="kpi-val orange">7</div><div class="kpi-sub">▼ 2 vs yesterday</div></div>
       <div class="kpi"><div class="kpi-label">Active Swarms</div><div class="kpi-val red">3</div><div class="kpi-sub">▼ 1 vs yesterday</div></div>
       <div class="kpi"><div class="kpi-label">Major Inc. Risk</div><div class="kpi-val orange">MODERATE</div><div class="kpi-sub">Score: 63/100</div></div>
-      <div class="kpi"><div class="kpi-label">Unacknowledged Signals</div><div class="kpi-val orange">11</div><div class="kpi-sub">DT thresholds + synthetics · no INC yet</div><div class="source-breakdown"><div class="source-chip"><span class="n orange">7</span><span class="l">DT threshold</span></div><div class="source-chip"><span class="n yellow">4</span><span class="l">Synthetic</span></div><div class="source-chip"><span class="n green">0</span><span class="l">Manual</span></div></div></div>
+      <div class="kpi"><div class="kpi-label">Automation Savings MTD</div><div class="kpi-val green">12.4 hrs</div><div class="kpi-sub">▲ 2.1 hrs vs last mo.</div></div>
       <div class="kpi"><div class="kpi-label">Delay Prevention Signals</div><div class="kpi-val orange">12 / 3.8m</div><div class="kpi-sub">Delays &gt;15m · first comment avg</div></div>
-      <div class="kpi"><div class="kpi-label">Signals Near INC Criteria</div><div class="kpi-val yellow">9</div><div class="kpi-sub">DT 5 · AlertSite 3 · Manual watch 1</div></div>
-    </div>
-
-    <div class="home-hub-row">
-      <div class="home-hub" onclick="showTabByName('fcr')"><div class="h">FCR Signal</div><div class="b">18 likely FCR candidates</div><div class="a">Go to Goal 1 →</div></div>
-      <div class="home-hub" onclick="showTabByName('incidents')"><div class="h">Incident Source Signal</div><div class="b">DT + Manual + AlertSite breakdown</div><div class="a">Go to Goal 2 →</div></div>
-      <div class="home-hub" onclick="showTabByName('analytics')"><div class="h">Delay Signal</div><div class="b">12 delays · 3 missing first comments</div><div class="a">Go to Goal 3 →</div></div>
-      <div class="home-hub" onclick="showTabByName('automation')"><div class="h">Automation Signal</div><div class="b">3 realtime playbook opportunities</div><div class="a">Go to Goal 4 →</div></div>
-    </div>
-
-    <div class="action-grid">
-      <div class="action-card hot">
-        <div class="card-hd"><span class="card-title">Likely FCR Watchlist</span><span class="badge b-blue">Top 3</span></div>
-        <div class="watch-row"><div class="watch-id">INC0042811</div><div><div class="watch-title">Move Money app pool recovered by ICC action</div><div class="watch-meta">No reassignment · known playbook · 14m duration</div></div><button class="btn btn-green" onclick="openFcrRecovery(event)">Confirm FCR</button></div>
-        <div class="watch-row"><div class="watch-id">INC0042798</div><div><div class="watch-title">Kafka consumer lag cleared after standard recovery</div><div class="watch-meta">Resolved by ICC · no child task · AAG match</div></div><button class="btn btn-green" onclick="openFcrRecovery(event)">Confirm FCR</button></div>
-        <div class="watch-row"><div class="watch-id">INC0042756</div><div><div class="watch-title">SQL timeout triaged and resolved during first engagement</div><div class="watch-meta">No escalation · closure note present</div></div><button class="btn btn-green" onclick="openFcrRecovery(event)">Confirm FCR</button></div>
-        <div class="card-link" style="margin-top:8px" onclick="showTabByName('fcr')">Open FCR workbench →</div>
-      </div>
-      <div class="action-card critical">
-        <div class="card-hd"><span class="card-title">Oldest Unacknowledged P-Card</span><span class="badge b-red">Action</span></div>
-        <div class="timer-block"><div><div class="timer-label">PB-0044229 · Advisor Email</div><div class="signal-meta">No first NOC comment · threshold signal still active</div></div><div id="oldestUnackTimer" class="timer-value">08:42</div></div>
-        <div class="signal-row"><div><div class="signal-name">Signals with no acknowledgement</div><div class="signal-meta">First comment missing &gt;5m</div></div><div class="signal-count red">3</div></div>
-        <div class="signal-row"><div><div class="signal-name">Near incident criteria</div><div class="signal-meta">DT threshold or synthetic persistence window</div></div><div class="signal-count yellow">9</div></div>
-        <div class="card-link" style="margin-top:8px" onclick="showTabByName('pcards')">Open P-Card queue →</div>
-      </div>
-      <div class="action-card">
-        <div class="card-hd"><span class="card-title">Current Shift Handoff Chain</span><span class="badge b-green">Live</span></div>
-        <div class="handoff-chain">
-          <div class="handoff-step"><span class="n blue">42</span><span class="l">Open P-Cards</span></div>
-          <div class="handoff-step"><span class="n orange">3</span><span class="l">Missing First Comment</span></div>
-          <div class="handoff-step"><span class="n blue">6</span><span class="l">INC Linked</span></div>
-          <div class="handoff-step"><span class="n yellow">5</span><span class="l">Assigned / Pending</span></div>
-          <div class="handoff-step"><span class="n red">3</span><span class="l">Escalated / Swarm</span></div>
-        </div>
-        <div class="kpi-note">Snapshot for shift handoff: p-card state, acknowledgement gaps, optional incident links, assignments, and swarm/escalation state.</div>
-        <div class="action-status-row"><span class="action-pill hot">3 need comment</span><span class="action-pill warn">5 pending assignment</span><span class="action-pill ok">ready for handoff draft</span></div>
-        <button class="btn btn-blue" style="margin-top:8px" onclick="openShiftHandoff()">Draft Shift Handoff</button>
-      </div>
+      <div class="kpi"><div class="kpi-label">Prevented Major Inc.</div><div class="kpi-val green">4</div><div class="kpi-sub">▲ 2 vs last 7 days</div></div>
     </div>
 
     <!-- Row 1: Risk Map | Snapshot+Automation | Swarms -->
@@ -765,15 +574,15 @@ tr:hover td{background:rgba(46,174,232,.04)}
             <div class="snap" onclick="showTabByName('pcards')"><div class="snap-lbl">Open P-Cards</div><div class="snap-num blue">42</div><div class="snap-sub">▼ 6</div></div>
             <div class="snap"><div class="snap-lbl">Long Running</div><div class="snap-num orange">7</div><div class="snap-sub">▼ 2</div></div>
             <div class="snap"><div class="snap-lbl">New Today</div><div class="snap-num blue">14</div><div class="snap-sub">▲ 3</div></div>
-            <div class="snap" onclick="showTabByName('incidents')"><div class="snap-lbl">Open Incidents</div><div class="snap-num blue">28</div><div class="snap-sub">M9 · DT13 · AS6</div></div>
+            <div class="snap"><div class="snap-lbl">Open Incidents</div><div class="snap-num blue">28</div><div class="snap-sub">▼ 4</div></div>
             <div class="snap"><div class="snap-lbl">Major Incidents</div><div class="snap-num red">1</div><div class="snap-sub">—</div></div>
             <div class="snap"><div class="snap-lbl">Active Bridges</div><div class="snap-num red">3</div><div class="snap-sub">▼ 1</div></div>
             <div class="snap"><div class="snap-lbl">Escalations Pending</div><div class="snap-num yellow">5</div><div class="snap-sub">▲ 1</div></div>
-            <div class="snap" onclick="showTabByName('pcards')"><div class="snap-lbl">P-Card Groups</div><div class="snap-num yellow">5</div><div class="snap-sub">9 likely dupes</div></div>
+            <div class="snap"><div class="snap-lbl">Unassigned</div><div class="snap-num yellow">2</div><div class="snap-sub">—</div></div>
           </div>
         </div>
         <div class="card">
-          <div class="card-hd"><span class="card-title">Automation — Attention Required</span><span class="badge b-yellow">Power Automate degraded</span></div>
+          <div class="card-hd"><span class="card-title">Automation — Attention Required</span><span class="badge b-red">3</span></div>
           <table>
             <thead><tr><th>Opportunity</th><th>Conf</th><th>Impact</th><th>Action</th></tr></thead>
             <tbody>
@@ -782,7 +591,7 @@ tr:hover td{background:rgba(46,174,232,.04)}
               <tr><td>Disk Cleanup – Node03</td><td>91%</td><td><span class="badge b-orange">Med</span></td><td><div style="display:flex;gap:4px"><button class="btn btn-blue">Review</button><button class="btn btn-red">Run</button></div></td></tr>
             </tbody>
           </table>
-          <div class="integration-alert"><span>⚠</span><span><b>Propagation:</b> Power Automate degradation may delay automation notifications and approval handoffs. Validate Ansible/Rundeck status before running operator-assisted actions.</span></div><div class="card-link" style="margin-top:8px;display:block" onclick="showTabByName('automation')">Open Automation Tab →</div>
+          <div class="card-link" style="margin-top:8px;display:block" onclick="showTabByName('automation')">Open Automation Tab →</div>
         </div>
       </div>
       <div class="card">
@@ -805,50 +614,25 @@ tr:hover td{background:rgba(46,174,232,.04)}
       </div>
     </div>
 
-
-
-    <details class="topology-collapse">
-      <summary>Topology Enrichment Context</summary>
-      <div class="topology-body">
-        Dynatrace topology enrichment is used here as supporting context for blast radius, P-Card grouping, swarm routing, and deduplication. It is no longer a top-level page in Phase 1; it supports the live Command Center and deeper P-Card/Incident Reduction workbenches.
-        <div class="topology-grid">
-          <div class="topology-mini"><div class="k">Enriched entities</div><div class="v blue">86</div></div>
-          <div class="topology-mini"><div class="k">Active dependency edges</div><div class="v teal">143</div></div>
-          <div class="topology-mini"><div class="k">Groups with shared root</div><div class="v orange">5</div></div>
-          <div class="topology-mini"><div class="k">Blast-radius watch</div><div class="v red">3</div></div>
-        </div>
-      </div>
-    </details>
-
-    <div class="section-divider"><span>SHIFT SUMMARY</span><em>Condensed current-shift rollup; historical trends stay in goal tabs and reports</em></div>
-
-    <!-- Row 2: True real-time ops tiles -->
+    <!-- Row 2: Focus | Sankey | Gauge -->
     <div class="g3b">
       <div class="card">
-        <div class="card-hd"><span class="card-title">Active Incident Sources</span><span class="card-link" onclick="showTabByName('incidents')">Analyze ↗</span></div>
-        <div class="source-breakdown" style="grid-template-columns:repeat(3,1fr);margin-bottom:9px">
-          <div class="source-chip"><span class="n blue">9</span><span class="l">Manual SNow</span></div>
-          <div class="source-chip"><span class="n orange">13</span><span class="l">Dynatrace</span></div>
-          <div class="source-chip"><span class="n yellow">6</span><span class="l">AlertSite</span></div>
+        <div class="card-hd"><span class="card-title">Current Focus Areas</span></div>
+        <div class="focus-grid">
+          <div class="focus-c"><div class="focus-name">Move Money</div><div class="focus-score red">92</div><div class="focus-meta">7 P-Cards · 2 INCs</div></div>
+          <div class="focus-c"><div class="focus-name">Client Mgmt</div><div class="focus-score orange">84</div><div class="focus-meta">6 P-Cards · 1 INC</div></div>
+          <div class="focus-c"><div class="focus-name">Trading</div><div class="focus-score green">71</div><div class="focus-meta">3 P-Cards</div></div>
         </div>
-        <div class="signal-row"><div><div class="signal-name">P3 Non-Major prevention watch</div><div class="signal-meta">Escalate as needed by app/scope</div></div><div class="signal-count yellow">8</div></div>
-        <div class="signal-row"><div><div class="signal-name">P3 Major / swarm candidates</div><div class="signal-meta">Breakout room likely</div></div><div class="signal-count orange">3</div></div>
-        <div class="signal-row"><div><div class="signal-name">P1/P2 watch</div><div class="signal-meta">Potential all-hands escalation</div></div><div class="signal-count red">1</div></div>
       </div>
       <div class="card">
-        <div class="card-hd"><span class="card-title">Unacknowledged Signals</span><span class="badge b-orange">11</span></div>
-        <div class="signal-row"><div><div class="signal-name">Dynatrace thresholds breaching</div><div class="signal-meta">No incident yet · 4 near criteria</div></div><div class="signal-count orange">7</div></div>
-        <div class="signal-row"><div><div class="signal-name">AlertSite synthetics failing</div><div class="signal-meta">2 single-location · 2 multi-location</div></div><div class="signal-count yellow">4</div></div>
-        <div class="signal-row"><div><div class="signal-name">No NOC acknowledgment</div><div class="signal-meta">First comment missing &gt;5m</div></div><div class="signal-count red">3</div></div>
-        <div class="kpi-note">These are signals requiring triage before they qualify for incident creation or before clients are impacted.</div>
+        <div class="card-hd"><span class="card-title">Escalation Flow</span></div>
+        <div id="sankey" class="ch-220"></div>
       </div>
-      <div class="card risk-large">
-        <div class="card-hd"><span class="card-title">Major Incident Risk Score — Expanded</span><span class="badge b-orange">63/100</span></div>
-        <div id="gauge" class="ch-270"></div>
-        <div class="kpi-note">Elevated because one P3 Major swarm is active, three P3 Non-Major signals are widening in scope, and one dependency cluster crosses multiple VCTs.</div>
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Major Incident Risk Score</span></div>
+        <div id="gauge" class="ch-220"></div>
       </div>
     </div>
-    <div id="sankey" style="display:none;height:1px"></div>
 
   </section>
 
@@ -859,35 +643,14 @@ tr:hover td{background:rgba(46,174,232,.04)}
     <div class="sec-hd">
       <h2>FCR &amp; RESOLUTION</h2>
       <span class="sec-tag tag-goal">Goal 1 · +30% FCR</span>
-      <span class="sec-tag" style="background:rgba(46,174,232,.08);color:var(--blue);border:1px solid rgba(46,174,232,.18)">Goal Performance</span>
-    </div>
-
-    <div class="goal-progress-grid">
-      <div class="card goal-arc-card">
-        <div class="goal-arc"><span>78%</span></div>
-        <div>
-          <div class="card-title" style="margin-bottom:7px">Target Gap Progress</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:800;color:var(--text)">34.2% → 44.0%</div>
-          <div class="phase-note">Current official FCR is 34.2%. Target is a 30% improvement, modeled here as 44.0%. Remaining gap: <b class="orange">9.8 percentage points</b>.</div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-hd"><span class="card-title">FCR Count Context</span><span class="badge b-blue">8-week period</span></div>
-        <div class="goal-metrics">
-          <div class="goal-metric"><div class="l">Resolved by ICC</div><div class="v green">61</div></div>
-          <div class="goal-metric"><div class="l">Escalated / reassigned</div><div class="v orange">18</div></div>
-          <div class="goal-metric"><div class="l">Official FCR tickets</div><div class="v blue">34</div></div>
-          <div class="goal-metric"><div class="l">Estimated missed FCR</div><div class="v yellow">9</div></div>
-        </div>
-        <div class="phase-note">Actionable likely-FCR review moved to Command Center. This tab owns the performance story, target gap, trend, and escalation path evidence.</div>
-      </div>
+      <span class="sec-tag tag-rt">Real-Time</span>
     </div>
 
     <div class="kpi-row kpi-6">
       <div class="kpi"><div class="kpi-label">FCR % Official</div><div class="kpi-val green">34.2%</div><div class="kpi-sub">Target: 44%</div><div class="kpi-bar"><div class="kpi-bar-fill" style="width:78%;background:var(--blue)"></div></div></div>
-      <div class="kpi"><div class="kpi-label">Target Gap</div><div class="kpi-val orange">9.8 pts</div><div class="kpi-sub">Needed to reach 44%</div></div>
-      <div class="kpi"><div class="kpi-label">Missed FCR Review</div><div class="kpi-val orange">9</div><div class="kpi-sub">Candidate recovery pool</div></div>
-      <div class="kpi"><div class="kpi-label">Resolved by ICC</div><div class="kpi-val green">61</div><div class="kpi-sub">Official period count</div></div>
+      <div class="kpi"><div class="kpi-label">Likely FCR Candidates</div><div class="kpi-val blue">18</div><div class="kpi-sub">Awaiting validation</div></div>
+      <div class="kpi"><div class="kpi-label">Missed FCR (est.)</div><div class="kpi-val orange">9</div><div class="kpi-sub">Escalated without attempt</div></div>
+      <div class="kpi"><div class="kpi-label">Resolved by ICC</div><div class="kpi-val green">61</div><div class="kpi-sub">▲ 7 vs last shift</div></div>
       <div class="kpi"><div class="kpi-label">Escalation Rate</div><div class="kpi-val orange">22%</div><div class="kpi-sub">▲ 2% vs last 8wk</div></div>
       <div class="kpi"><div class="kpi-label">Avg Reassignments</div><div class="kpi-val yellow">1.4</div><div class="kpi-sub">▼ 0.2 vs last week</div></div>
     </div>
@@ -905,22 +668,33 @@ tr:hover td{background:rgba(46,174,232,.04)}
 
     <div class="g2">
       <div class="card">
-        <div class="card-hd"><span class="card-title">Missed FCR Candidates — Performance Review</span><span class="badge b-orange">9</span></div>
-        <div class="queue-note">Likely-FCR action queue is surfaced on Command Center. This panel remains as the retrospective performance review list for coaching, playbook gaps, and official FCR recovery evidence.</div>
+        <div class="card-hd"><span class="card-title">Likely FCR Candidates</span><span class="badge b-blue">18</span></div>
+        <div class="infobox" style="margin-bottom:9px">
+          <span class="ib-icon">ℹ</span>
+          <span>Tickets where ICC may have resolved the issue but the FCR flag was not set. Review queue for training opportunities and official FCR recovery.</span>
+        </div>
         <div class="scroll-panel">
-          <div class="cand-row"><span class="cand-num">INC0042803</span><span class="cand-title">Kafka lag — escalated at 8m, ICC had playbook available</span><span class="cand-tag"><span class="badge b-orange">Review</span></span></div>
-          <div class="cand-row"><span class="cand-num">INC0042789</span><span class="cand-title">Move Money — pool restart escalated, T2 confirmed same fix</span><span class="cand-tag"><span class="badge b-orange">Review</span></span></div>
-          <div class="cand-row"><span class="cand-num">INC0042761</span><span class="cand-title">Linux disk alert — cleanup playbook existed, not used</span><span class="cand-tag"><span class="badge b-orange">Review</span></span></div>
-          <div class="cand-row"><span class="cand-num">INC0042740</span><span class="cand-title">SQL connection reset — T2 applied standard ICC procedure</span><span class="cand-tag"><span class="badge b-orange">Review</span></span></div>
+          <div class="cand-row"><span class="cand-num">INC0042811</span><span class="cand-title">Move Money – App Pool restart performed, no escalation</span><span class="cand-tag"><span class="badge b-green">Likely FCR</span></span></div>
+          <div class="cand-row"><span class="cand-num">INC0042798</span><span class="cand-title">Kafka consumer lag – ICC resolved via playbook</span><span class="cand-tag"><span class="badge b-green">Likely FCR</span></span></div>
+          <div class="cand-row"><span class="cand-num">INC0042756</span><span class="cand-title">SQL timeout – ICC issued DB team restart, closed within 12m</span><span class="cand-tag"><span class="badge b-green">Likely FCR</span></span></div>
+          <div class="cand-row"><span class="cand-num">INC0042744</span><span class="cand-title">F5 pool node offline – ICC rerouted, no T2 engage</span><span class="cand-tag"><span class="badge b-green">Likely FCR</span></span></div>
+          <div class="cand-row"><span class="cand-num">INC0042731</span><span class="cand-title">Advisor Email – SMTP relay flush by ICC</span><span class="cand-tag"><span class="badge b-green">Likely FCR</span></span></div>
+          <div class="cand-row"><span class="cand-num">INC0042720</span><span class="cand-title">DataPower – Gateway restart handled by ICC team</span><span class="cand-tag"><span class="badge b-green">Likely FCR</span></span></div>
         </div>
       </div>
       <div class="card">
-        <div class="card-hd"><span class="card-title">FCR Recovery Evidence Model</span><span class="badge b-blue">Future workflow</span></div>
-        <div class="prog-row"><span class="prog-label">No reassignment</span><div class="prog-bar"><div class="prog-fill" style="width:82%;background:var(--green)"></div></div><span class="prog-val green">82%</span></div>
-        <div class="prog-row"><span class="prog-label">Closed by ICC</span><div class="prog-bar"><div class="prog-fill" style="width:74%;background:var(--blue)"></div></div><span class="prog-val blue">74%</span></div>
-        <div class="prog-row"><span class="prog-label">Known playbook</span><div class="prog-bar"><div class="prog-fill" style="width:61%;background:var(--teal)"></div></div><span class="prog-val teal">61%</span></div>
-        <div class="prog-row"><span class="prog-label">Missing FCR flag</span><div class="prog-bar"><div class="prog-fill" style="width:38%;background:var(--orange)"></div></div><span class="prog-val orange">38%</span></div>
-        <div class="phase-note">Future workflow: Confirm FCR from Command Center, record recovery evidence, and send back to the official ServiceNow reporting process.</div>
+        <div class="card-hd"><span class="card-title">Missed FCR Candidates</span><span class="badge b-orange">9</span></div>
+        <div class="infobox" style="margin-bottom:9px">
+          <span class="ib-icon">⚠</span>
+          <span>Tickets escalated to T2/T3 where resolution pattern suggests ICC could have resolved. Review for coaching and playbook gaps.</span>
+        </div>
+        <div class="scroll-panel">
+          <div class="cand-row"><span class="cand-num">INC0042803</span><span class="cand-title">Kafka lag – escalated at 8m, ICC had playbook available</span><span class="cand-tag"><span class="badge b-orange">Missed FCR</span></span></div>
+          <div class="cand-row"><span class="cand-num">INC0042789</span><span class="cand-title">Move Money – pool restart escalated, T2 confirmed same fix</span><span class="cand-tag"><span class="badge b-orange">Missed FCR</span></span></div>
+          <div class="cand-row"><span class="cand-num">INC0042761</span><span class="cand-title">Linux disk alert – cleanup playbook existed, not used</span><span class="cand-tag"><span class="badge b-orange">Missed FCR</span></span></div>
+          <div class="cand-row"><span class="cand-num">INC0042740</span><span class="cand-title">SQL connection reset – T2 applied standard ICC procedure</span><span class="cand-tag"><span class="badge b-orange">Missed FCR</span></span></div>
+          <div class="cand-row"><span class="cand-num">INC0042718</span><span class="cand-title">AWS pod restart – T3 confirmed as safe self-service action</span><span class="cand-tag"><span class="badge b-orange">Missed FCR</span></span></div>
+        </div>
       </div>
     </div>
 
@@ -936,65 +710,63 @@ tr:hover td{background:rgba(46,174,232,.04)}
   <section id="incidents" class="hidden">
     <div class="sec-hd">
       <h2>INCIDENT REDUCTION</h2>
-      <span class="sec-tag tag-goal">Goal 2 · 25% YoY Reduction</span>
-      <span class="sec-tag" style="background:rgba(26,201,176,.08);color:var(--teal);border:1px solid rgba(26,201,176,.18)">Goal Performance</span>
-    </div>
-
-    <div class="big-outcome">
-      <div class="outcome-card primary"><div class="l">Incident count context</div><div class="v green">510 vs 622</div><div class="s">Current period vs same period last year</div></div>
-      <div class="outcome-card"><div class="l">YoY reduction</div><div class="v green">−18.0%</div><div class="s">Target: −25% YoY</div></div>
-      <div class="outcome-card"><div class="l">Prevented / avoided</div><div class="v green">4</div><div class="s">Evidence-backed this week</div></div>
+      <span class="sec-tag tag-goal">Goal 2 · YoY Reduction</span>
+      <span class="sec-tag tag-rt">Real-Time + Historical</span>
     </div>
 
     <div class="kpi-row kpi-6">
-      <div class="kpi"><div class="kpi-label">Target Gap</div><div class="kpi-val orange">7 pts</div><div class="kpi-sub">Remaining to 25%</div></div>
-      <div class="kpi"><div class="kpi-label">P-Card / INC Link Rate</div><div class="kpi-val orange">14.2%</div><div class="kpi-sub">Optional association, not 1:1</div></div>
+      <div class="kpi"><div class="kpi-label">Incidents YoY Change</div><div class="kpi-val green">−18.0%</div><div class="kpi-sub">vs same period LY</div></div>
+      <div class="kpi"><div class="kpi-label">P-Card → INC Conv. Rate</div><div class="kpi-val orange">14.2%</div><div class="kpi-sub">▼ 1.8% vs last month</div></div>
       <div class="kpi"><div class="kpi-label">Prevented / Avoided</div><div class="kpi-val green">4</div><div class="kpi-sub">This week</div></div>
       <div class="kpi"><div class="kpi-label">Repeat Offender Apps</div><div class="kpi-val red">6</div><div class="kpi-sub">3+ recurrences / 30d</div></div>
-      <div class="kpi"><div class="kpi-label">Duplicate / Clustered</div><div class="kpi-val yellow">11</div><div class="kpi-sub">Dedup candidates</div></div>
-      <div class="kpi"><div class="kpi-label">Source Mix Watch</div><div class="kpi-val blue">3 paths</div><div class="kpi-sub">Manual / DT / AlertSite</div></div>
-    </div>
-
-    <div class="card" style="margin-bottom:11px">
-      <div class="card-hd"><span class="card-title">Incident Creation Paths</span><span class="badge b-blue">Source-aware reduction</span></div>
-      <div class="infobox" style="margin-bottom:9px"><span class="ib-icon">↯</span><span>Open incidents can originate from manual ServiceNow creation, Dynatrace threshold/problem criteria, or AlertSite synthetic failures. P-Cards are correlated and may be linked, but they are not assumed to create incidents one-for-one.</span></div>
-      <div class="source-breakdown" style="grid-template-columns:repeat(3,1fr)">
-        <div class="source-chip"><span class="n blue">9</span><span class="l">Manual SNow</span></div>
-        <div class="source-chip"><span class="n orange">13</span><span class="l">Dynatrace Thresholds</span></div>
-        <div class="source-chip"><span class="n yellow">6</span><span class="l">AlertSite Synthetic</span></div>
-      </div>
+      <div class="kpi"><div class="kpi-label">Duplicate / Clustered</div><div class="kpi-val yellow">11</div><div class="kpi-sub">Grouped this shift</div></div>
+      <div class="kpi"><div class="kpi-label">Long-Running P-Cards</div><div class="kpi-val orange">7</div><div class="kpi-sub">&gt;60 min threshold</div></div>
     </div>
 
     <div class="g3e">
-      <div class="card"><div class="card-hd"><span class="card-title">Incident Trend — 12 Weeks</span><span class="card-link">Export</span></div><div id="incTrend" class="ch-240"></div></div>
-      <div class="card"><div class="card-hd"><span class="card-title">P-Card / Incident Linking</span></div><div id="convChart" class="ch-240"></div></div>
-      <div class="card"><div class="card-hd"><span class="card-title">Prevented Incidents Evidence</span></div><div id="preventChart" class="ch-240"></div></div>
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Incident Trend — 12 Weeks</span><span class="card-link">Export</span></div>
+        <div id="incTrend" class="ch-240"></div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><span class="card-title">P-Card → INC Conversion</span></div>
+        <div id="convChart" class="ch-240"></div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Prevented Incidents Est.</span></div>
+        <div id="preventChart" class="ch-240"></div>
+      </div>
     </div>
 
     <div class="g2">
       <div class="card">
         <div class="card-hd"><span class="card-title">Top Repeat Offender Apps / Services</span><span class="badge b-red">6</span></div>
         <table>
-          <thead><tr><th>App / Service</th><th>Recurrences</th><th>P-Cards</th><th>INCs</th><th>4wk Trend</th><th>Risk</th></tr></thead>
+          <thead><tr><th>App / Service</th><th>Recurrences</th><th>P-Cards</th><th>INCs</th><th>Last Seen</th><th>Risk</th></tr></thead>
           <tbody>
-            <tr><td><b>Move Money</b></td><td class="red">9</td><td>7</td><td>2</td><td><span class="spark-mini up"><i></i><i></i><i></i><i></i></span></td><td><span class="badge b-red">High</span></td></tr>
-            <tr><td><b>Kafka Cluster</b></td><td class="red">7</td><td>10</td><td>3</td><td><span class="spark-mini up"><i></i><i></i><i></i><i></i></span></td><td><span class="badge b-red">High</span></td></tr>
-            <tr><td><b>SQL Database</b></td><td class="orange">6</td><td>8</td><td>2</td><td><span class="spark-mini flat"><i></i><i></i><i></i><i></i></span></td><td><span class="badge b-red">High</span></td></tr>
-            <tr><td><b>Client Mgmt</b></td><td class="orange">5</td><td>6</td><td>1</td><td><span class="spark-mini down"><i></i><i></i><i></i><i></i></span></td><td><span class="badge b-orange">Mod</span></td></tr>
-            <tr><td><b>F5 Load Balancer</b></td><td class="yellow">4</td><td>5</td><td>1</td><td><span class="spark-mini flat"><i></i><i></i><i></i><i></i></span></td><td><span class="badge b-orange">Mod</span></td></tr>
-            <tr><td><b>Advisor Email</b></td><td class="yellow">3</td><td>4</td><td>1</td><td><span class="spark-mini down"><i></i><i></i><i></i><i></i></span></td><td><span class="badge b-yellow">Low</span></td></tr>
+            <tr><td><b>Move Money</b></td><td class="red">9</td><td>7</td><td>2</td><td>Today 10:12</td><td><span class="badge b-red">High</span></td></tr>
+            <tr><td><b>Kafka Cluster</b></td><td class="red">7</td><td>10</td><td>3</td><td>Today 09:44</td><td><span class="badge b-red">High</span></td></tr>
+            <tr><td><b>SQL Database</b></td><td class="orange">6</td><td>8</td><td>2</td><td>Today 08:55</td><td><span class="badge b-red">High</span></td></tr>
+            <tr><td><b>Client Mgmt</b></td><td class="orange">5</td><td>6</td><td>1</td><td>Yesterday</td><td><span class="badge b-orange">Mod</span></td></tr>
+            <tr><td><b>F5 Load Balancer</b></td><td class="yellow">4</td><td>5</td><td>1</td><td>2 days ago</td><td><span class="badge b-orange">Mod</span></td></tr>
+            <tr><td><b>Advisor Email</b></td><td class="yellow">3</td><td>4</td><td>1</td><td>Today 11:00</td><td><span class="badge b-yellow">Low</span></td></tr>
           </tbody>
         </table>
       </div>
       <div class="card">
-        <div class="card-hd"><span class="card-title">P-Card Deduplication Impact</span><span class="badge b-yellow">11 groups</span></div>
-        <div class="prog-row"><span class="prog-label">Likely same event</span><div class="prog-bar"><div class="prog-fill" style="width:64%;background:var(--orange)"></div></div><span class="prog-val orange">7</span></div>
-        <div class="prog-row"><span class="prog-label">Existing INC match</span><div class="prog-bar"><div class="prog-fill" style="width:45%;background:var(--blue)"></div></div><span class="prog-val blue">5</span></div>
-        <div class="prog-row"><span class="prog-label">Separate events</span><div class="prog-bar"><div class="prog-fill" style="width:27%;background:var(--muted)"></div></div><span class="prog-val">3</span></div>
-        <div class="prog-row"><span class="prog-label">Need triage review</span><div class="prog-bar"><div class="prog-fill" style="width:36%;background:var(--yellow)"></div></div><span class="prog-val yellow">4</span></div>
-        <div class="phase-note">Used for incident reduction evidence: when related p-cards are grouped and linked to an existing incident instead of creating redundant incidents.</div>
+        <div class="card-hd"><span class="card-title">P-Card Clusters / Duplicate Groups</span><span class="badge b-yellow">11</span></div>
+        <table>
+          <thead><tr><th>Cluster</th><th>Cards</th><th>VCT / Domain</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td><b>Move Money Pool</b></td><td>4</td><td>App Platform</td><td><span class="badge b-red">Active</span></td><td><button class="btn btn-blue">View</button></td></tr>
+            <tr><td><b>Kafka Lag Group</b></td><td>3</td><td>Middleware</td><td><span class="badge b-red">Active</span></td><td><button class="btn btn-blue">View</button></td></tr>
+            <tr><td><b>SQL Timeout Cluster</b></td><td>2</td><td>Database</td><td><span class="badge b-orange">Grouped</span></td><td><button class="btn btn-blue">View</button></td></tr>
+            <tr><td><b>Network Latency Set</b></td><td>2</td><td>Network</td><td><span class="badge b-yellow">Monitoring</span></td><td><button class="btn btn-blue">View</button></td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
+
   </section>
 
   <!-- ══════════════════════════════════
@@ -1004,255 +776,221 @@ tr:hover td{background:rgba(46,174,232,.04)}
     <div class="sec-hd">
       <h2>AUTOMATION INTELLIGENCE</h2>
       <span class="sec-tag tag-goal">Goal 4 · 2–3 Automations</span>
-      <span class="sec-tag" style="background:rgba(245,176,20,.08);color:var(--yellow);border:1px solid rgba(245,176,20,.18)">Live Queue + Performance</span>
     </div>
 
     <div class="kpi-row kpi-6">
-      <div class="kpi"><div class="kpi-label">New Automation Candidates</div><div class="kpi-val yellow">2 / 3</div><div class="kpi-sub">Monthly goal pipeline</div><div class="kpi-bar"><div class="kpi-bar-fill" style="width:67%;background:var(--yellow)"></div></div></div>
-      <div class="kpi"><div class="kpi-label">Pending Recs</div><div class="kpi-val orange">3</div><div class="kpi-sub">Live review queue</div></div>
-      <div class="kpi"><div class="kpi-label">High Impact Opps</div><div class="kpi-val green">6</div><div class="kpi-sub">Repeatable patterns</div></div>
-      <div class="kpi"><div class="kpi-label">Executions MTD</div><div class="kpi-val blue">156</div><div class="kpi-sub">Performance section</div></div>
-      <div class="kpi"><div class="kpi-label">Success Rate</div><div class="kpi-val green">91%</div><div class="kpi-sub">Execution quality</div></div>
-      <div class="kpi"><div class="kpi-label">Time Saved MTD</div><div class="kpi-val green">12.4 hrs</div><div class="kpi-sub">Reporting metric</div></div>
+      <div class="kpi"><div class="kpi-label">Executions MTD</div><div class="kpi-val blue">156</div></div>
+      <div class="kpi"><div class="kpi-label">Success Rate</div><div class="kpi-val green">91%</div></div>
+      <div class="kpi"><div class="kpi-label">Time Saved MTD</div><div class="kpi-val green">12.4 hrs</div></div>
+      <div class="kpi"><div class="kpi-label">Incidents Avoided</div><div class="kpi-val green">8</div></div>
+      <div class="kpi"><div class="kpi-label">Pending Recs</div><div class="kpi-val orange">3</div></div>
+      <div class="kpi"><div class="kpi-label">High Impact Opps</div><div class="kpi-val green">6</div></div>
     </div>
 
-    <div class="subsection-band"><span>Live Queue</span></div>
-    <div class="g2w">
+    <div class="g3e">
       <div class="card">
-        <div class="card-hd"><span class="card-title">Automation Opportunities — Action Queue</span><span class="badge b-red">3 attention</span></div>
+        <div class="card-hd"><span class="card-title">Automation Opportunities</span></div>
         <table>
-          <thead><tr><th>Opportunity</th><th>Source</th><th>AAG / Playbook</th><th>Conf</th><th>Impact</th><th>Action</th></tr></thead>
+          <thead><tr><th>Opportunity</th><th>Signal</th><th>AAG / Playbook Match</th><th>Cluster</th><th>Conf</th><th>Impact</th><th>Est. Savings</th><th>Action</th></tr></thead>
           <tbody>
-            <tr><td>Move Money App Pool Restart</td><td>Recurring group</td><td><span class="badge b-green">Matched</span></td><td class="green">94%</td><td><span class="badge b-red">High</span></td><td><button class="btn btn-blue" onclick="openAutomationReview(event)">Review</button></td></tr>
-            <tr><td>Kafka Consumer Lag Recovery</td><td>Metric threshold</td><td><span class="badge b-green">Matched</span></td><td class="green">88%</td><td><span class="badge b-red">High</span></td><td><button class="btn btn-blue" onclick="openAutomationReview(event)">Review</button></td></tr>
-            <tr><td>Disk Cleanup – Node03</td><td>Disk &gt;95%</td><td><span class="badge b-green">Matched</span></td><td class="green">91%</td><td><span class="badge b-orange">Med</span></td><td><button class="btn btn-blue" onclick="openAutomationReview(event)">Review</button></td></tr>
-            <tr><td>SQL Connection Reset</td><td>Recurring pattern</td><td><span class="badge b-yellow">Candidate</span></td><td class="yellow">79%</td><td><span class="badge b-orange">Med</span></td><td><button class="btn btn-muted">Suppress</button></td></tr>
+            <tr><td>Move Money App Pool Restart</td><td>Recurring cluster → automation candidate</td><td><span class="badge b-green">AAG matched</span></td><td>Move Money Pool</td><td class="green">94%</td><td><span class="badge b-red">High</span></td><td>1.2 hrs</td><td><div style="display:flex;gap:4px"><button class="btn btn-blue">Review</button><button class="btn btn-red">Run</button></div></td></tr>
+            <tr><td>Kafka Consumer Lag Recovery</td><td>Metric threshold + repeat offender</td><td><span class="badge b-green">Playbook matched</span></td><td>Kafka Lag Group</td><td class="green">88%</td><td><span class="badge b-red">High</span></td><td>0.8 hrs</td><td><div style="display:flex;gap:4px"><button class="btn btn-blue">Review</button><button class="btn btn-red">Run</button></div></td></tr>
+            <tr><td>Disk Cleanup – Node03</td><td>Disk &gt;95% pattern</td><td><span class="badge b-green">AAG matched</span></td><td>Platform Node</td><td class="green">91%</td><td><span class="badge b-orange">Med</span></td><td>0.3 hrs</td><td><div style="display:flex;gap:4px"><button class="btn btn-blue">Review</button><button class="btn btn-red">Run</button></div></td></tr>
+            <tr><td>SQL Connection Reset</td><td>Recurring cluster → candidate</td><td><span class="badge b-yellow">Partial match</span></td><td>SQL Timeout Cluster</td><td class="yellow">79%</td><td><span class="badge b-orange">Med</span></td><td>0.5 hrs</td><td><div style="display:flex;gap:4px"><button class="btn btn-blue">Review</button><button class="btn btn-muted">Suppress</button></div></td></tr>
+            <tr><td>F5 Pool Node Re-enable</td><td>Repeat remediation pattern</td><td><span class="badge b-yellow">Needs validation</span></td><td>Network Latency Set</td><td class="yellow">82%</td><td><span class="badge b-yellow">Low</span></td><td>0.4 hrs</td><td><div style="display:flex;gap:4px"><button class="btn btn-blue">Review</button><button class="btn btn-muted">Suppress</button></div></td></tr>
           </tbody>
         </table>
       </div>
       <div class="card">
-        <div class="card-hd"><span class="card-title">Pending Approval Queue</span><span class="badge b-orange">36</span></div>
-        <div class="cand-row"><span class="cand-num">ANS-NEW-01</span><span class="cand-title">Advisor Email relay recycle · guarded by single-VCT blast radius</span><span class="cand-tag"><button class="btn btn-green" onclick="approveAutomation(event)">Approve</button></span></div>
-        <div class="cand-row"><span class="cand-num">ANS-NEW-02</span><span class="cand-title">Kafka lag recovery · requires middleware approval</span><span class="cand-tag"><button class="btn btn-blue" onclick="openAutomationReview(event)">Review</button></span></div>
-        <div class="cand-row"><span class="cand-num">ANS-NEW-03</span><span class="cand-title">F5 pool re-enable · confidence below auto-run threshold</span><span class="cand-tag"><button class="btn btn-muted" onclick="holdAutomation(event)">Hold</button></span></div>
-        <div class="phase-note">Live queue owns current operator action. Performance metrics stay below.</div>
-      </div>
-    </div>
-
-    <div class="subsection-band"><span>Performance</span></div>
-    <div class="g3e">
-      <div class="card"><div class="card-hd"><span class="card-title">Execution Summary</span></div><div id="autoPie" class="ch-240"></div></div>
-      <div class="card">
-        <div class="card-hd"><span class="card-title">New Automations Pipeline</span><span class="badge b-yellow">2 of 3</span></div>
-        <div class="prog-row"><span class="prog-label">Identified</span><div class="prog-bar"><div class="prog-fill" style="width:100%;background:var(--line2)"></div></div><span class="prog-val blue">6</span></div>
-        <div class="prog-row"><span class="prog-label">Validated</span><div class="prog-bar"><div class="prog-fill" style="width:67%;background:var(--yellow)"></div></div><span class="prog-val yellow">4</span></div>
-        <div class="prog-row"><span class="prog-label">Approved</span><div class="prog-bar"><div class="prog-fill" style="width:50%;background:var(--green)"></div></div><span class="prog-val green">3</span></div>
-        <div class="prog-row"><span class="prog-label">Promoted this month</span><div class="prog-bar"><div class="prog-fill" style="width:67%;background:var(--teal)"></div></div><span class="prog-val teal">2</span></div>
-        <div class="phase-note">Goal is 2–3 new automation opportunities. Track net-new candidates, not only execution volume.</div>
+        <div class="card-hd"><span class="card-title">Execution Summary</span></div>
+        <div id="autoPie" class="ch-240"></div>
       </div>
       <div class="card">
         <div class="card-hd"><span class="card-title">Automation Enablement</span></div>
-        <div class="prog-row"><span class="prog-label">Manual actions identified</span><div class="prog-bar"><div class="prog-fill" style="width:100%;background:var(--line2)"></div></div><span class="prog-val blue">228</span></div>
-        <div class="prog-row"><span class="prog-label">Automatable actions</span><div class="prog-bar"><div class="prog-fill" style="width:50%;background:var(--teal)"></div></div><span class="prog-val teal">114</span></div>
-        <div class="prog-row"><span class="prog-label">AAG / playbook matched</span><div class="prog-bar"><div class="prog-fill" style="width:35%;background:var(--blue)"></div></div><span class="prog-val blue">78</span></div>
-        <div class="prog-row"><span class="prog-label">Approval required</span><div class="prog-bar"><div class="prog-fill" style="width:16%;background:var(--orange)"></div></div><span class="prog-val orange">36</span></div>
+        <div style="margin-bottom:10px">
+          <div class="prog-row"><span class="prog-label">Manual actions identified</span><div class="prog-bar"><div class="prog-fill" style="width:100%;background:var(--line2)"></div></div><span class="prog-val blue">228</span></div>
+          <div class="prog-row"><span class="prog-label">Automatable actions</span><div class="prog-bar"><div class="prog-fill" style="width:50%;background:var(--teal)"></div></div><span class="prog-val teal">114</span></div>
+          <div class="prog-row"><span class="prog-label">AAG / playbook matched</span><div class="prog-bar"><div class="prog-fill" style="width:35%;background:var(--blue)"></div></div><span class="prog-val blue">78</span></div>
+          <div class="prog-row"><span class="prog-label">Executed this month</span><div class="prog-bar"><div class="prog-fill" style="width:22%;background:var(--green)"></div></div><span class="prog-val green">50</span></div>
+          <div class="prog-row"><span class="prog-label">Approval required</span><div class="prog-bar"><div class="prog-fill" style="width:16%;background:var(--orange)"></div></div><span class="prog-val orange">36</span></div>
+        </div>
+        <div class="divider"></div>
+        <div style="font-size:10px;color:var(--muted)">Coverage: <span class="green" style="font-weight:700">50%</span> of automatable actions have an AAG or playbook match</div>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-hd"><span class="card-title">Top Playbooks — Performance Trend</span></div>
-      <table>
-        <thead><tr><th>Playbook</th><th>Executions</th><th>Success</th><th>Time Saved</th><th>Trend</th><th></th></tr></thead>
-        <tbody>
-          <tr><td>ANS-MOVE-MONEY-APPPOOL</td><td>24</td><td class="green">96%</td><td>4.8 hrs</td><td class="green">↑</td><td><button class="btn btn-muted">Open</button></td></tr>
-          <tr><td>ANS-KAFKA-CONSUMER-RECOVERY</td><td>20</td><td class="green">95%</td><td>3.2 hrs</td><td class="green">↑</td><td><button class="btn btn-muted">Open</button></td></tr>
-          <tr><td>ANS-SQL-CONN-RESET</td><td>15</td><td class="green">93%</td><td>2.1 hrs</td><td class="yellow">→</td><td><button class="btn btn-muted">Open</button></td></tr>
-          <tr><td>ANS-DISK-CLEANUP</td><td>12</td><td class="yellow">88%</td><td>1.2 hrs</td><td class="yellow">→</td><td><button class="btn btn-muted">Open</button></td></tr>
-        </tbody>
-      </table>
+    <div class="g2">
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Top Playbooks</span></div>
+        <table>
+          <thead><tr><th>Playbook</th><th>Executions</th><th>Success</th><th>Time Saved</th><th>Trend</th><th></th></tr></thead>
+          <tbody>
+            <tr><td>ANS-MOVE-MONEY-APPPOOL</td><td>24</td><td class="green">96%</td><td>4.8 hrs</td><td class="green">↑</td><td><button class="btn btn-muted">Open</button></td></tr>
+            <tr><td>ANS-KAFKA-CONSUMER-RECOVERY</td><td>20</td><td class="green">95%</td><td>3.2 hrs</td><td class="green">↑</td><td><button class="btn btn-muted">Open</button></td></tr>
+            <tr><td>ANS-SQL-CONN-RESET</td><td>15</td><td class="green">93%</td><td>2.1 hrs</td><td class="yellow">→</td><td><button class="btn btn-muted">Open</button></td></tr>
+            <tr><td>ANS-DISK-CLEANUP</td><td>12</td><td class="yellow">88%</td><td>1.2 hrs</td><td class="yellow">→</td><td><button class="btn btn-muted">Open</button></td></tr>
+            <tr><td>ANS-F5-POOL-REENABLE</td><td>8</td><td class="orange">82%</td><td>0.9 hrs</td><td class="red">↓</td><td><button class="btn btn-muted">Open</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Automation Health — Integrations</span></div>
+        <div class="health-row"><span class="health-name"><span class="sdot sdot-green"></span>Ansible Tower</span><div class="health-status"><span class="badge b-green">Connected</span><span class="health-time">Updated: 10:24</span></div></div>
+        <div class="health-row"><span class="health-name"><span class="sdot sdot-green"></span>ServiceNow ITSM</span><div class="health-status"><span class="badge b-green">Connected</span><span class="health-time">Updated: 10:23</span></div></div>
+        <div class="health-row"><span class="health-name"><span class="sdot sdot-green"></span>Dynatrace API</span><div class="health-status"><span class="badge b-green">Connected</span><span class="health-time">Updated: 10:24</span></div></div>
+        <div class="health-row"><span class="health-name"><span class="sdot sdot-yellow"></span>Power Automate</span><div class="health-status"><span class="badge b-yellow">Degraded</span><span class="health-time">Updated: 09:58</span></div></div>
+        <div class="health-row"><span class="health-name"><span class="sdot sdot-green"></span>Rundeck</span><div class="health-status"><span class="badge b-green">Connected</span><span class="health-time">Updated: 10:21</span></div></div>
+        <div class="divider"></div>
+        <div class="card-hd" style="margin-top:4px"><span class="card-title">Recent Executions</span></div>
+        <table>
+          <thead><tr><th>Time</th><th>Playbook</th><th>Target</th><th>Result</th><th>By</th></tr></thead>
+          <tbody>
+            <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">10:18</td><td>ANS-DISK-CLEANUP</td><td>Node03</td><td><span class="badge b-green">Success</span></td><td>Auto</td></tr>
+            <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">09:52</td><td>ANS-KAFKA-CONSUMER</td><td>Kafka-02</td><td><span class="badge b-green">Success</span></td><td>T. Chen</td></tr>
+            <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">09:31</td><td>ANS-MOVE-MONEY-APPPOOL</td><td>MM-APP-01</td><td><span class="badge b-green">Success</span></td><td>J. Rivera</td></tr>
+            <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">08:44</td><td>ANS-SQL-CONN-RESET</td><td>SQLDB-04</td><td><span class="badge b-red">Failed</span></td><td>Auto</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
+
   </section>
 
   <!-- ══════════════════════════════════
        TAB 5: P-CARDS
   ══════════════════════════════════ -->
   <section id="pcards" class="hidden">
-    <div class="sec-hd">
-      <h2>P-CARD INTELLIGENCE WORKSPACE</h2>
-      <span class="sec-tag tag-rt">LIVE</span>
-      <span class="sec-tag tag-goal">Grouping · Correlation · Recurrence</span>
-    </div>
+    <div class="sec-hd"><h2>P-CARD WORKSPACE</h2><span class="sec-tag tag-rt">Real-Time</span></div>
 
-    <div class="infobox" style="margin-bottom:11px">
-      <span class="ib-icon">◎</span>
-      <span><b>Primary view:</b> quickly determine whether open P-Cards are related symptoms of the same event, differentiated events that need separate triage, or recurring issues that disappeared and returned. Incident linking is optional and should not imply a one-to-one P-Card → INC relationship.</span>
-    </div>
-
-    <div class="kpi-row kpi-6">
-      <div class="kpi"><div class="kpi-label">Open P-Cards</div><div class="kpi-val blue">42</div><div class="kpi-sub">Active DT problem cards</div></div>
-      <div class="kpi"><div class="kpi-label">Related Groups</div><div class="kpi-val yellow">5</div><div class="kpi-sub">Need grouped triage view</div></div>
-      <div class="kpi"><div class="kpi-label">Likely Same Event</div><div class="kpi-val orange">9</div><div class="kpi-sub">Dedup / attach candidates</div></div>
-      <div class="kpi"><div class="kpi-label">Distinct Events</div><div class="kpi-val blue">6</div><div class="kpi-sub">Similar timing, different root</div></div>
-      <div class="kpi"><div class="kpi-label">Recurring / Returning</div><div class="kpi-val red">8</div><div class="kpi-sub">Returned after clear / NRF</div></div>
-      <div class="kpi"><div class="kpi-label">INC Linked</div><div class="kpi-val blue">6</div><div class="kpi-sub">Optional association · not 1:1</div></div>
+    <div class="kpi-row kpi-4">
+      <div class="kpi"><div class="kpi-label">Open P-Cards</div><div class="kpi-val blue">42</div><div class="kpi-sub">▼ 6 vs yesterday</div></div>
+      <div class="kpi"><div class="kpi-label">Long Running (&gt;60m)</div><div class="kpi-val orange">7</div><div class="kpi-sub">Threshold: 60 min</div></div>
+      <div class="kpi"><div class="kpi-label">New This Shift</div><div class="kpi-val blue">14</div><div class="kpi-sub">▲ 3 vs last shift</div></div>
+      <div class="kpi"><div class="kpi-label">Converted to INC</div><div class="kpi-val red">6</div><div class="kpi-sub">14.2% conv. rate</div></div>
     </div>
 
     <div class="g2w">
       <div class="card">
-        <div class="card-hd"><span class="card-title">Related P-Card Groups — Triage View</span><span class="badge b-yellow">5 groups</span></div>
-        <div class="infobox" style="margin-bottom:9px">
-          <span class="ib-icon">↯</span>
-          <span>Use this first. It groups cards by overlapping topology, timestamps, comments, root/affected entities, service/VCT, severity path, and recurrence signature. The goal is faster triage and fewer redundant incidents.</span>
-        </div>
+        <div class="card-hd"><span class="card-title">Open P-Cards — Active Queue</span><span class="card-link">Filter ↓</span></div>
         <table>
-          <thead><tr><th>Group</th><th>P-Cards</th><th>Primary Signal</th><th>Decision</th><th>Confidence</th><th>INC Strategy</th><th>Action</th></tr></thead>
+          <thead><tr><th>P-Card ID</th><th>Title</th><th>Service / VCT</th><th>Age</th><th>Severity</th><th>Status</th><th>Incident</th></tr></thead>
           <tbody>
-            <tr><td><b>MM-POOL-0900</b></td><td>4</td><td>Move Money app pool + Kafka lag + SQL wait</td><td><span class="badge b-red">Likely same event</span></td><td class="green">92%</td><td>Attach to INC0042811</td><td><button class="btn btn-blue" onclick="openPcardTriage(event,'group')">Open Group</button></td></tr>
-            <tr><td><b>KAFKA-LAG-0930</b></td><td>3</td><td>Consumer lag across shared topic</td><td><span class="badge b-orange">Same dependency</span></td><td class="green">88%</td><td>One bridge / suppress dupes</td><td><button class="btn btn-blue" onclick="openPcardTriage(event,'group')">Open Group</button></td></tr>
-            <tr><td><b>SQL-TIMEOUT-1000</b></td><td>2</td><td>Same DB pool but different callers</td><td><span class="badge b-yellow">Differentiate</span></td><td class="yellow">71%</td><td>Keep separate watch</td><td><button class="btn btn-muted" onclick="openPcardTriage(event,'compare')">Compare</button></td></tr>
-            <tr><td><b>EMAIL-LAT-1040</b></td><td>2</td><td>Synthetic + SMTP latency, no backend error yet</td><td><span class="badge b-yellow">Watch correlation</span></td><td class="yellow">68%</td><td>No INC unless persistent</td><td><button class="btn btn-muted" onclick="openPcardTriage(event,'watch')">Watch</button></td></tr>
-            <tr><td><b>NODE03-DISK</b></td><td>1 + 5 returns</td><td>Auto-closed before ack, returns hourly</td><td><span class="badge b-orange">Recurring pattern</span></td><td class="green">90%</td><td>Automation candidate</td><td><button class="btn btn-blue" onclick="openAutomationReview(event)">Review</button></td></tr>
+            <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044211</td><td>Move Money app pool memory spike</td><td>Move Money</td><td class="red">82m</td><td><span class="badge b-red">Critical</span></td><td><span class="badge b-red">Open</span></td><td><span class="badge b-orange">INC0042811</span></td></tr>
+            <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044198</td><td>Kafka consumer group lag spike</td><td>Middleware</td><td class="red">71m</td><td><span class="badge b-red">Critical</span></td><td><span class="badge b-red">Open</span></td><td><span class="badge b-orange">INC0042803</span></td></tr>
+            <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044185</td><td>SQL DB connection pool exhausted</td><td>Database</td><td class="orange">64m</td><td><span class="badge b-red">Critical</span></td><td><span class="badge b-red">Open</span></td><td><span class="badge b-orange">INC0042789</span></td></tr>
+            <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044177</td><td>Client Mgmt service degraded response</td><td>Client Mgmt</td><td class="yellow">48m</td><td><span class="badge b-orange">High</span></td><td><span class="badge b-orange">Swarm</span></td><td>—</td></tr>
+            <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044165</td><td>F5 load balancer pool node down</td><td>Network</td><td class="yellow">38m</td><td><span class="badge b-orange">High</span></td><td><span class="badge b-yellow">Watch</span></td><td>—</td></tr>
+            <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044154</td><td>Advisor Email SMTP relay latency</td><td>Messaging</td><td>28m</td><td><span class="badge b-yellow">Medium</span></td><td><span class="badge b-orange">Swarm</span></td><td>—</td></tr>
+            <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044142</td><td>DataPower gateway slow response</td><td>Middleware</td><td>18m</td><td><span class="badge b-yellow">Medium</span></td><td><span class="badge b-yellow">Watch</span></td><td>—</td></tr>
+            <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044130</td><td>Linux Node03 disk usage 97%</td><td>Platform</td><td>12m</td><td><span class="badge b-muted">Low</span></td><td><span class="badge b-green">Auto-Queued</span></td><td>—</td></tr>
           </tbody>
         </table>
       </div>
       <div class="card">
-        <div class="card-hd"><span class="card-title">P-Card Group Map</span><span class="card-link">Same-event vs distinct</span></div>
-        <div id="pCardGroupGraph" class="ch-270"></div>
+        <div class="card-hd"><span class="card-title">Long-Running P-Card Detail</span><span class="badge b-red">7 &gt;60m</span></div>
+        <div id="pCardAge" class="ch-270"></div>
       </div>
     </div>
 
-    <div class="g2">
-      <div class="card">
-        <div class="card-hd"><span class="card-title">Open P-Cards — Grouped Active Queue</span><span class="card-link">Filter ↓</span></div>
-        <table>
-          <thead><tr><th>P-Card ID</th><th>Group</th><th>Title</th><th>Service / VCT</th><th>Age</th><th>Severity</th><th>Correlation</th><th>INC Link</th><th>Action</th></tr></thead>
-          <tbody>
-            <tr class="row-clickable" onclick="openPcardTriage(event,'row')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044211</td><td><span class="badge b-red">MM-POOL</span></td><td>Move Money app pool memory spike</td><td>Move Money</td><td class="red">82m</td><td><span class="badge b-red">Critical</span></td><td>Primary symptom</td><td><span class="badge b-orange">INC0042811</span></td><td><button class="btn btn-blue" onclick="openPcardTriage(event,'row')">Swarm</button></td></tr>
-            <tr class="row-clickable" onclick="openPcardTriage(event,'row')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044198</td><td><span class="badge b-red">MM-POOL</span></td><td>Kafka consumer group lag spike</td><td>Middleware</td><td class="red">71m</td><td><span class="badge b-red">Critical</span></td><td>Shared dependency</td><td><span class="badge b-orange">INC0042811</span></td><td><button class="btn btn-blue" onclick="openPcardTriage(event,'row')">Attach</button></td></tr>
-            <tr class="row-clickable" onclick="openPcardTriage(event,'row')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044185</td><td><span class="badge b-red">MM-POOL</span></td><td>SQL DB connection pool exhausted</td><td>Database</td><td class="orange">64m</td><td><span class="badge b-red">Critical</span></td><td>Downstream symptom</td><td><span class="badge b-orange">INC0042811</span></td><td><button class="btn btn-blue" onclick="openPcardTriage(event,'row')">Attach</button></td></tr>
-            <tr class="row-clickable" onclick="openPcardTriage(event,'row')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044177</td><td><span class="badge b-orange">CM-DEG</span></td><td>Client Mgmt service degraded response</td><td>Client Mgmt</td><td class="yellow">48m</td><td><span class="badge b-orange">High</span></td><td>P3 Major swarm candidate</td><td>—</td><td><button class="btn btn-blue" onclick="openPcardTriage(event,'row')">Swarm</button></td></tr>
-            <tr class="row-clickable" onclick="openPcardTriage(event,'row')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044165</td><td><span class="badge b-yellow">F5-NET</span></td><td>F5 load balancer pool node down</td><td>Network</td><td class="yellow">38m</td><td><span class="badge b-orange">High</span></td><td>Possible related edge</td><td>—</td><td><button class="btn btn-blue" onclick="openPcardTriage(event,'row')">Watch</button></td></tr>
-            <tr class="row-clickable" onclick="openPcardTriage(event,'row')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044154</td><td><span class="badge b-yellow">EMAIL-LAT</span></td><td>Advisor Email SMTP relay latency</td><td>Messaging</td><td>28m</td><td><span class="badge b-yellow">Medium</span></td><td>Synthetic + backend watch</td><td>—</td><td><button class="btn btn-blue" onclick="openPcardTriage(event,'row')">Watch</button></td></tr>
-            <tr class="row-clickable" onclick="openPcardTriage(event,'row')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044142</td><td><span class="badge b-muted">DP-GW</span></td><td>DataPower gateway slow response</td><td>Middleware</td><td>18m</td><td><span class="badge b-yellow">Medium</span></td><td>Distinct event likely</td><td>—</td><td><button class="btn btn-blue" onclick="openPcardTriage(event,'row')">Triage</button></td></tr>
-            <tr class="row-clickable" onclick="openPcardTriage(event,'row')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044130</td><td><span class="badge b-orange">NODE03</span></td><td>Linux Node03 disk usage 97%</td><td>Platform</td><td>12m</td><td><span class="badge b-muted">Low</span></td><td>Auto-closed returner</td><td>—</td><td><button class="btn btn-blue" onclick="openPcardTriage(event,'row')">Auto-Queue</button></td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="card">
-        <div class="card-hd"><span class="card-title">Recurring / Returning P-Cards</span><span class="badge b-orange">8</span></div>
-        <div class="signal-row"><div><div class="signal-name">Auto-closed before acknowledgement, then returned</div><div class="signal-meta">Often missed because each card looks resolved in isolation</div></div><div class="signal-count orange">5</div></div>
-        <div class="signal-row"><div><div class="signal-name">Triaged as “no root cause found,” then returned</div><div class="signal-meta">Needs recurrence signature and problem-management review</div></div><div class="signal-count red">3</div></div>
-        <div class="signal-row"><div><div class="signal-name">Similar issue, different manifestation</div><div class="signal-meta">Same dependency cluster but different symptom/title/entity</div></div><div class="signal-count yellow">4</div></div>
-        <div class="divider"></div>
-        <table>
-          <thead><tr><th>Pattern</th><th>Last Seen</th><th>Returns</th><th>Likely Action</th></tr></thead>
-          <tbody>
-            <tr><td>NODE03 disk pressure</td><td>12m ago</td><td>5x / 24h</td><td><span class="badge b-orange">Automate cleanup</span></td></tr>
-            <tr><td>Kafka lag after deploy window</td><td>71m ago</td><td>4x / 7d</td><td><span class="badge b-red">PRB candidate</span></td></tr>
-            <tr><td>Advisor Email intermittent latency</td><td>28m ago</td><td>3x / 48h</td><td><span class="badge b-yellow">Synthetic correlation</span></td></tr>
-          </tbody>
-        </table>
-      </div>
+    <div class="card">
+      <div class="card-hd"><span class="card-title">P-Card Lifecycle Timeline — PB-0044211 (Move Money)</span></div>
+      <ul class="timeline">
+        <li class="ok"><strong>P-Card Opened</strong><span class="t">09:01:22</span>Dynatrace detected app pool memory spike in Move Money service.</li>
+        <li class="ok"><strong>First NOC Comment</strong><span class="t">09:04:45</span>NOC engineer acknowledged. Initial triage started. Comment gap: 3m 23s.</li>
+        <li class="warn"><strong>Incident Created</strong><span class="t">09:14:10</span>INC0042811 opened. P-Card age at INC creation: 12m 48s.</li>
+        <li class="warn"><strong>Escalation to T2</strong><span class="t">09:26:30</span>App Dev team engaged. Escalation delay from INC creation: 12m 20s.</li>
+        <li class="active"><strong>Active Bridge — 42m</strong><span class="t">09:44:00 – Now</span>Bridge open. Kafka, SQL DB, Network, Linux, App Dev on call.</li>
+      </ul>
     </div>
 
-    <div class="g2" style="margin-top:11px">
-      <div class="card">
-        <div class="card-hd"><span class="card-title">Grouping Decision Logic</span></div>
-        <table>
-          <thead><tr><th>Signal</th><th>Weight</th><th>Same Event Meaning</th><th>Different Event Warning</th></tr></thead>
-          <tbody>
-            <tr><td>Topology overlap</td><td class="green">High</td><td>Same dependency or shared downstream impact</td><td>Only same VCT, different dependency</td></tr>
-            <tr><td>Time window overlap</td><td class="green">High</td><td>Cards opened within 5–15 minutes</td><td>Recurring pattern separated by recovery gap</td></tr>
-            <tr><td>Comment / work-note similarity</td><td class="orange">Med</td><td>Same triage notes, same fix path, same owners</td><td>Same language but different entities</td></tr>
-            <tr><td>Root / affected entity</td><td class="green">High</td><td>Same root entity or same first-hop dependency</td><td>Same app name, different entity path</td></tr>
-            <tr><td>Incident association</td><td class="yellow">Med</td><td>Attach related cards to one INC or bridge</td><td>Do not force 1:1 P-Card → INC logic</td></tr>
-          </tbody>
-        </table>
+    <div class="card" style="margin-top:11px">
+      <div class="card-hd"><span class="card-title">Comment Union Windows — Swarm Grouping Signal</span><span class="badge b-blue">4 windows</span></div>
+      <div class="infobox" style="margin-bottom:9px">
+        <span class="ib-icon">◎</span>
+        <span>Groups p-cards when comments, timestamps, entities, and incidents overlap inside the same operational window. This helps identify duplicates and active swarms earlier.</span>
       </div>
-      <div class="card">
-        <div class="card-hd"><span class="card-title">P-Card Lifecycle Detail</span><button class="btn btn-blue" onclick="openPcardLifecycle()">Open Timeline</button></div>
-        <div class="lifecycle-card">
-          <p>The detailed P-Card lifecycle is now opened in a modal/drawer so the P-Cards tab can stay focused on the grouping triage view. Use this for group context, comment timing, linked incident status, and swarm history.</p>
-          <button class="btn btn-blue" onclick="openPcardLifecycle()">View PB-0044211 Timeline →</button>
-        </div>
-      </div>
+      <table>
+        <thead><tr><th>Window</th><th>Grouped P-Cards</th><th>Primary VCT</th><th>Comment Signal</th><th>Swarm Action</th></tr></thead>
+        <tbody>
+          <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">09:00–09:15</td><td>4</td><td>Move Money</td><td><span class="badge b-red">Same fix path</span></td><td><button class="btn btn-blue">Group</button></td></tr>
+          <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">09:30–09:45</td><td>3</td><td>Kafka</td><td><span class="badge b-orange">Shared entities</span></td><td><button class="btn btn-blue">Swarm</button></td></tr>
+          <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">10:00–10:20</td><td>2</td><td>SQL Database</td><td><span class="badge b-yellow">Repeat notes</span></td><td><button class="btn btn-muted">Watch</button></td></tr>
+          <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">10:40–11:00</td><td>2</td><td>Advisor Email</td><td><span class="badge b-yellow">Latency pattern</span></td><td><button class="btn btn-muted">Watch</button></td></tr>
+        </tbody>
+      </table>
     </div>
 
   </section>
 
   <!-- ══════════════════════════════════
-       TAB 6: DELAY & MTTA (Goal 3)
+       TAB 6: DELAY PREVENTION (Goal 3)
   ══════════════════════════════════ -->
   <section id="analytics" class="hidden">
     <div class="sec-hd">
-      <h2>DELAY &amp; MTTA</h2>
+      <h2>DELAY PREVENTION</h2>
       <span class="sec-tag tag-goal">Goal 3 · Delay Prevention</span>
-      <span class="sec-tag" style="background:rgba(139,108,246,.1);color:var(--purple);border:1px solid rgba(139,108,246,.22)">HIST</span>
+      <span class="sec-tag" style="background:rgba(139,108,246,.1);color:var(--purple);border:1px solid rgba(139,108,246,.22)">Historical</span>
     </div>
 
     <div class="kpi-row kpi-6">
-      <div class="kpi"><div class="kpi-label">Avg MTTA</div><div class="kpi-val purple">4.2 min</div><div class="kpi-sub">▼ 0.6m vs last week</div></div>
-      <div class="kpi"><div class="kpi-label">Avg MTTR</div><div class="kpi-val purple">38 min</div><div class="kpi-sub">▼ 4m vs last week</div></div>
+      <div class="kpi"><div class="kpi-label">Avg MTTA (Acknowledge)</div><div class="kpi-val purple">4.2 min</div><div class="kpi-sub">▼ 0.6m vs last week</div></div>
+      <div class="kpi"><div class="kpi-label">Avg MTTR (Resolve)</div><div class="kpi-val purple">38 min</div><div class="kpi-sub">▼ 4m vs last week</div></div>
       <div class="kpi"><div class="kpi-label">First Comment Time</div><div class="kpi-val blue">3.8 min</div><div class="kpi-sub">Avg since P-Card open</div></div>
       <div class="kpi"><div class="kpi-label">Escalation Delays &gt;15m</div><div class="kpi-val orange">12</div><div class="kpi-sub">▲ 3 vs yesterday</div></div>
-      <div class="kpi"><div class="kpi-label">Comment Gap SLA Breaches</div><div class="kpi-val red">6</div><div class="kpi-sub">Gaps exceeded 15m</div></div>
-      <div class="kpi"><div class="kpi-label">P-Card Age at First Update</div><div class="kpi-val blue">3.8 min</div><div class="kpi-sub">Primary delay signal</div></div>
-    </div>
-
-    <div class="card" style="margin-bottom:11px">
-      <div class="card-hd"><span class="card-title">Shift-over-Shift Delay Comparison</span><span class="badge b-purple">This shift vs last</span></div>
-      <div class="shift-compare">
-        <div class="shift-card"><div class="l">First comment</div><div class="v blue">3.8m</div><div class="phase-note">Last: 4.4m · improved</div></div>
-        <div class="shift-card"><div class="l">Comment gap</div><div class="v yellow">14m</div><div class="phase-note">Last: 12m · worse</div></div>
-        <div class="shift-card"><div class="l">Escalation delay</div><div class="v orange">12</div><div class="phase-note">Last: 9 · worse</div></div>
-        <div class="shift-card"><div class="l">Handoff misses</div><div class="v red">3</div><div class="phase-note">Last: 4 · improved</div></div>
-      </div>
-    </div>
-
-    <div class="card" style="margin-bottom:11px">
-      <div class="card-hd"><span class="card-title">Major Incident Prevention — Analytics Highlight</span><span class="badge b-green">4 est.</span></div>
-      <div class="infobox"><span class="ib-icon">ℹ</span><span>Reporting signal only: estimated P2/P1-prevention outcomes from grouped p-cards, fast support engagement, topology correlation, and automation/playbook action. Drill into Incident Reduction for evidence.</span></div>
+      <div class="kpi"><div class="kpi-label">Avg Comment Gap</div><div class="kpi-val yellow">14 min</div><div class="kpi-sub">Time between updates</div></div>
+      <div class="kpi"><div class="kpi-label">P-Card Age at First Update</div><div class="kpi-val blue">3.8 min</div><div class="kpi-sub">Primary delay-prevention signal</div></div>
     </div>
 
     <div class="g2">
-      <div class="card"><div class="card-hd"><span class="card-title">MTTA / MTTR Performance Measures — 12 Weeks</span></div><div id="mttaTrend" class="ch-240"></div></div>
-      <div class="card"><div class="card-hd"><span class="card-title">Escalation Delay Analysis</span></div><div id="escalDelay" class="ch-240"></div></div>
+      <div class="card">
+        <div class="card-hd"><span class="card-title">MTTA / MTTR Performance Measures — 12 Weeks</span></div>
+        <div id="mttaTrend" class="ch-240"></div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Escalation Delay Analysis</span></div>
+        <div id="escalDelay" class="ch-240"></div>
+      </div>
     </div>
 
     <div class="g3e">
-      <div class="card"><div class="card-hd"><span class="card-title">Comment Gap Distribution</span></div><div id="commentGap" class="ch-200"></div></div>
-      <div class="card"><div class="card-hd"><span class="card-title">P-Card Age Milestones</span></div><div id="ageBox" class="ch-200"></div></div>
       <div class="card">
-        <div class="card-hd"><span class="card-title">Delay Prevention Ownership</span></div>
-        <div class="prog-row"><span class="prog-label">Open → First Comment</span><div class="prog-bar"><div class="prog-fill" style="width:25%;background:var(--blue)"></div></div><span class="prog-val blue">3.8m</span></div>
-        <div class="prog-row"><span class="prog-label">Open → INC Created</span><div class="prog-bar"><div class="prog-fill" style="width:55%;background:var(--purple)"></div></div><span class="prog-val purple">14.2m</span></div>
-        <div class="prog-row"><span class="prog-label">INC → Assignment</span><div class="prog-bar"><div class="prog-fill" style="width:45%;background:var(--purple)"></div></div><span class="prog-val purple">11.4m</span></div>
-        <div class="prog-row"><span class="prog-label">Assignment → Escalation</span><div class="prog-bar"><div class="prog-fill" style="width:70%;background:var(--orange)"></div></div><span class="prog-val orange">18.1m</span></div>
+        <div class="card-hd"><span class="card-title">Comment Gap Distribution</span></div>
+        <div id="commentGap" class="ch-200"></div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><span class="card-title">P-Card Age Milestones</span></div>
+        <div id="ageBox" class="ch-200"></div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Operational Timeline Steps</span></div>
+        <div style="font-size:10.5px">
+          <div class="prog-row"><span class="prog-label">Open → First Comment</span><div class="prog-bar"><div class="prog-fill" style="width:25%;background:var(--blue)"></div></div><span class="prog-val blue">3.8m</span></div>
+          <div class="prog-row"><span class="prog-label">Open → INC Created</span><div class="prog-bar"><div class="prog-fill" style="width:55%;background:var(--purple)"></div></div><span class="prog-val purple">14.2m</span></div>
+          <div class="prog-row"><span class="prog-label">INC → Assignment</span><div class="prog-bar"><div class="prog-fill" style="width:45%;background:var(--purple)"></div></div><span class="prog-val purple">11.4m</span></div>
+          <div class="prog-row"><span class="prog-label">Assignment → Escalation</span><div class="prog-bar"><div class="prog-fill" style="width:70%;background:var(--orange)"></div></div><span class="prog-val orange">18.1m</span></div>
+          <div class="prog-row"><span class="prog-label">Escalation → Resolution</span><div class="prog-bar"><div class="prog-fill" style="width:88%;background:var(--red)"></div></div><span class="prog-val red">38.0m</span></div>
+        </div>
         <div class="divider"></div>
-        <div class="infobox"><span class="ib-icon">ℹ</span><span>This tab owns time-series delay analytics. Realtime p-card lifecycle stays in the P-Cards drawer/workspace.</span></div>
+        <div class="infobox">
+          <span class="ib-icon">ℹ</span>
+          <span>Delay prevention target: reduce handoff, escalation, comment-gap, and communication delays. MTTA/MTTR remain supporting performance measures. CIO Teams update standard: initial post within 15m of bridge open.</span>
+        </div>
       </div>
     </div>
+
   </section>
 
   <!-- ══════════════════════════════════
        TAB 7: REPORTS
   ══════════════════════════════════ -->
   <section id="reports" class="hidden">
-    <div class="sec-hd"><h2>REPORTS</h2><span class="sec-tag tag-goal">Leadership · Exportable</span><span class="sec-tag" style="background:rgba(139,108,246,.1);color:var(--purple);border:1px solid rgba(139,108,246,.22)">HIST</span></div>
+    <div class="sec-hd"><h2>REPORTS</h2><span class="sec-tag tag-goal">Leadership · Exportable</span></div>
     <div class="kpi-row kpi-4">
       <div class="kpi"><div class="kpi-label">FCR vs Target</div><div class="kpi-val blue">34.2% / 44%</div><div class="kpi-sub">Goal 1 progress</div><div class="kpi-bar"><div class="kpi-bar-fill" style="width:78%;background:var(--blue)"></div></div></div>
       <div class="kpi"><div class="kpi-label">Incident Reduction YoY</div><div class="kpi-val green">−18.0%</div><div class="kpi-sub">Goal 2 on track</div></div>
       <div class="kpi"><div class="kpi-label">Delay Prevention</div><div class="kpi-val purple">12 delays</div><div class="kpi-sub">MTTA/MTTR measured for reporting</div></div>
       <div class="kpi"><div class="kpi-label">Automation Savings</div><div class="kpi-val yellow">12.4 hrs</div><div class="kpi-sub">Goal 4 this month</div></div>
     </div>
-    <div class="card" style="margin-bottom:11px">
-      <div class="card-hd"><span class="card-title">Major Incident Prevention Reporting Note</span><span class="badge b-green">Drilldown metric</span></div>
-      <div class="infobox">
-        <span class="ib-icon">↳</span>
-        <span><b>Prevented Major INCs</b> is retained as a reporting/analysis highlight, not a real-time landing metric. Evidence should come from Incident Reduction drilldowns: source path, severity path, topology cluster, response actions, and whether a P3 Non-Major/P3 Major was contained before escalation.</span>
-      </div>
-    </div>
-
     <div class="g2">
       <div class="card">
         <div class="card-hd"><span class="card-title">Goal Progress Summary</span><span class="card-link">Export PDF</span></div>
@@ -1261,24 +999,16 @@ tr:hover td{background:rgba(46,174,232,.04)}
       <div class="card">
         <div class="card-hd"><span class="card-title">Available Reports</span></div>
         <table>
-          <thead><tr><th>Report</th><th>Frequency</th><th>Last Run</th><th>Status</th><th>Action</th></tr></thead>
+          <thead><tr><th>Report</th><th>Frequency</th><th>Last Run</th><th>Action</th></tr></thead>
           <tbody>
-            <tr><td><b>Weekly Ops Scorecard</b></td><td>Weekly</td><td>Jun 1</td><td><span class="report-status ready">Ready</span></td><td><button class="btn btn-blue" onclick="previewReport(event,'Weekly Ops Scorecard')">Preview</button></td></tr>
-            <tr><td><b>FCR Deep Dive</b></td><td>Bi-Weekly</td><td>May 25</td><td><span class="report-status ready">Ready</span></td><td><button class="btn btn-blue" onclick="previewReport(event,'FCR Deep Dive')">Preview</button></td></tr>
-            <tr><td><b>Incident Reduction Summary</b></td><td>Monthly</td><td>May 31</td><td><span class="report-status gen">Generating</span></td><td><button class="btn btn-blue" onclick="previewReport(event,'Incident Reduction Summary')">Preview</button></td></tr>
-            <tr><td><b>Major Incident Prevention Evidence</b></td><td>Monthly</td><td>May 31</td><td><span class="report-status ready">Ready</span></td><td><button class="btn btn-blue" onclick="previewReport(event,'Major Incident Prevention Evidence')">Preview</button></td></tr>
-            <tr><td><b>Automation Efficiency Report</b></td><td>Monthly</td><td>May 31</td><td><span class="report-status ready">Ready</span></td><td><button class="btn btn-blue" onclick="previewReport(event,'Automation Efficiency Report')">Preview</button></td></tr>
-            <tr><td><b>Executive CIO Dashboard</b></td><td>Weekly</td><td>Jun 1</td><td><span class="report-status ready">Ready</span></td><td><button class="btn btn-blue" onclick="previewReport(event,'Executive CIO Dashboard')">Preview</button></td></tr>
-            <tr><td><b>Postmortem — Move Money</b></td><td>Ad Hoc</td><td>Today</td><td><span class="report-status err">Needs Data</span></td><td><button class="btn btn-muted" onclick="previewReport(event,'Postmortem — Move Money')">Preview</button></td></tr>
+            <tr><td><b>Weekly Ops Scorecard</b></td><td>Weekly</td><td>Jun 1</td><td><button class="btn btn-blue">Generate</button></td></tr>
+            <tr><td><b>FCR Deep Dive</b></td><td>Bi-Weekly</td><td>May 25</td><td><button class="btn btn-blue">Generate</button></td></tr>
+            <tr><td><b>Incident Reduction Summary</b></td><td>Monthly</td><td>May 31</td><td><button class="btn btn-blue">Generate</button></td></tr>
+            <tr><td><b>Automation Efficiency Report</b></td><td>Monthly</td><td>May 31</td><td><button class="btn btn-blue">Generate</button></td></tr>
+            <tr><td><b>Executive CIO Dashboard</b></td><td>Weekly</td><td>Jun 1</td><td><button class="btn btn-blue">Generate</button></td></tr>
+            <tr><td><b>Postmortem — Move Money</b></td><td>Ad Hoc</td><td>Today</td><td><button class="btn btn-blue">Generate</button></td></tr>
           </tbody>
         </table>
-      </div>
-    </div>
-    <div class="card" style="margin-top:11px">
-      <div class="card-hd"><span class="card-title">Report Preview Pane</span><span class="badge b-blue">Mock workflow</span></div>
-      <div id="reportPreview" class="report-preview">
-        <h3>Select a report</h3>
-        Choose Preview to show a draft summary, readiness state, and next action before generating or exporting.
       </div>
     </div>
   </section>
@@ -1286,114 +1016,6 @@ tr:hover td{background:rgba(46,174,232,.04)}
   </div><!-- /content -->
 </main>
 </div><!-- /app -->
-
-
-
-
-<!-- ══════════ PHASE 4: P-CARD TRIAGE DRAWER ══════════ -->
-<div id="pcardTriageDrawer" class="modal-backdrop" aria-hidden="true">
-  <div class="drawer-shell" role="dialog" aria-modal="true" aria-label="P-Card triage drawer">
-    <div class="drawer-hd">
-      <div>
-        <div class="drawer-title">P-Card Triage Action</div>
-        <div class="drawer-sub">Operational action layer for grouped P-Cards. Actions are mock states for prototype validation.</div>
-      </div>
-      <button class="risk-modal-btn" onclick="closePcardTriage()">Close ✕</button>
-    </div>
-    <div class="drawer-body">
-      <div class="drawer-kv"><b>Selected</b><span id="triageSelected">MM-POOL-0900 / PB-0044211</span></div>
-      <div class="drawer-kv"><b>Group</b><span>Likely same event · 92% confidence · Attach to INC0042811</span></div>
-      <div class="drawer-kv"><b>Risk</b><span>P3 Major swarm candidate; topology overlap across Move Money, Kafka, SQL DB</span></div>
-      <div class="drawer-kv"><b>Next owner</b><span>ICC T2 Onshore → App Dev + Middleware + DB as needed</span></div>
-      <div class="drawer-actions">
-        <div class="drawer-action-card"><div class="h">Watch</div><div class="d">Keep grouped and monitor persistence before incident creation or escalation.</div><button class="btn btn-muted" onclick="setMockState('Watching group')">Watch</button></div>
-        <div class="drawer-action-card"><div class="h">Swarm</div><div class="d">Open breakout room and route the grouped event to the right support teams.</div><button class="btn btn-blue" onclick="setMockState('Swarm opened')">Swarm</button></div>
-        <div class="drawer-action-card"><div class="h">Auto-Queue</div><div class="d">Queue safe remediation if AAG/playbook match and blast radius guardrails are satisfied.</div><button class="btn btn-green" onclick="setMockState('Automation queued')">Auto-Queue</button></div>
-        <div class="drawer-action-card"><div class="h">Close P-Card</div><div class="d">Use only when the signal is resolved and recurrence watch is applied.</div><button class="btn btn-red" onclick="setMockState('Close requested')">Close</button></div>
-      </div>
-      <div id="triageState" class="infobox"><span class="ib-icon">↳</span><span>Select an action to preview the operator workflow state.</span></div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════ PHASE 4: SHIFT HANDOFF MODAL ══════════ -->
-<div id="shiftHandoffModal" class="modal-backdrop" aria-hidden="true">
-  <div class="handoff-modal" role="dialog" aria-modal="true" aria-label="Shift handoff summary">
-    <div class="drawer-hd">
-      <div><div class="drawer-title">Current Shift Handoff Draft</div><div class="drawer-sub">Mock generated summary from realtime Command Center signals.</div></div>
-      <button class="risk-modal-btn" onclick="closeShiftHandoff()">Close ✕</button>
-    </div>
-    <div class="handoff-body">
-      <div class="handoff-preview">ICC Shift Handoff — Current Draft
-
-LIVE STATE
-• Open P-Cards: 42; related groups: 5; likely same-event candidates: 9
-• Oldest unacknowledged P-Card: PB-0044229 / Advisor Email; first comment missing &gt; 5m
-• Open incidents: 28 total — Manual 9, Dynatrace 13, AlertSite 6
-• Active swarms: 3; major incident risk: Moderate / 63
-
-ACTION ITEMS
-• Review MM-POOL-0900 group and attach related cards to INC0042811.
-• Confirm likely FCR candidates INC0042811, INC0042798, INC0042756 if ServiceNow evidence supports it.
-• Watch Advisor Email synthetic + backend latency for persistence before incident creation.
-• Review Power Automate degraded state before running automation recommendations.
-
-NEXT SHIFT WATCH
-• Recurring NODE03 disk pressure: 5 returns / 24h; automation candidate.
-• Kafka lag after deploy window: PRB candidate if recurrence continues.</div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════ PHASE 4: FCR RECOVERY MODAL ══════════ -->
-<div id="fcrRecoveryModal" class="modal-backdrop" aria-hidden="true">
-  <div class="drawer-shell" role="dialog" aria-modal="true" aria-label="FCR confirmation workflow">
-    <div class="drawer-hd"><div><div class="drawer-title">Confirm FCR Candidate</div><div class="drawer-sub">Mock recovery workflow for evidence capture before official ServiceNow reporting update.</div></div><button class="risk-modal-btn" onclick="closeFcrRecovery()">Close ✕</button></div>
-    <div class="drawer-body">
-      <div class="drawer-kv"><b>Candidate</b><span>INC0042811 · Move Money app pool recovered by ICC action</span></div>
-      <div class="drawer-kv"><b>Evidence</b><span>No reassignment · known playbook · closure note present · short duration</span></div>
-      <div class="drawer-kv"><b>Guardrail</b><span>Validate no child task, no external escalation, and official FCR flag/logic alignment.</span></div>
-      <div class="drawer-actions"><button class="btn btn-green" onclick="setFcrState('Confirmed for recovery review')">Confirm</button><button class="btn btn-muted" onclick="setFcrState('Needs ServiceNow evidence check')">Needs Evidence</button></div>
-      <div id="fcrState" class="infobox"><span class="ib-icon">◎</span><span>Choose a recovery action.</span></div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════ PHASE 4: AUTOMATION REVIEW MODAL ══════════ -->
-<div id="automationReviewModal" class="modal-backdrop" aria-hidden="true">
-  <div class="drawer-shell" role="dialog" aria-modal="true" aria-label="Automation review">
-    <div class="drawer-hd"><div><div class="drawer-title">Automation Review</div><div class="drawer-sub">Mock approval review with confidence, safety, and expected outcome.</div></div><button class="risk-modal-btn" onclick="closeAutomationReview()">Close ✕</button></div>
-    <div class="drawer-body">
-      <div class="drawer-kv"><b>Opportunity</b><span>Move Money App Pool Restart</span></div>
-      <div class="drawer-kv"><b>Confidence</b><span>94% · recurring group + AAG/playbook matched</span></div>
-      <div class="drawer-kv"><b>Safety</b><span>Manual approval required because Power Automate integration is degraded.</span></div>
-      <div class="drawer-actions"><button class="btn btn-green" onclick="setAutomationState('Approved for controlled run')">Approve</button><button class="btn btn-red" onclick="setAutomationState('Rejected / hold')">Reject</button><button class="btn btn-muted" onclick="setAutomationState('Needs owner review')">Route Review</button></div>
-      <div id="automationState" class="infobox"><span class="ib-icon">⚡</span><span>Choose an automation review action.</span></div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════ P-CARD LIFECYCLE MODAL / DRAWER ══════════ -->
-<div id="pcardLifecycleModal" class="modal-backdrop" aria-hidden="true">
-  <div class="pcard-modal" role="dialog" aria-modal="true" aria-label="P-Card lifecycle timeline">
-    <div class="pcard-modal-hd">
-      <div>
-        <div class="pcard-modal-title">P-Card Lifecycle — PB-0044211 / MM-POOL-0900</div>
-        <div class="pcard-modal-sub">Group context, linked incident status, and swarm timeline. This detail view is intentionally separate from the P-Cards grouping workspace.</div>
-      </div>
-      <button class="risk-modal-btn" onclick="closePcardLifecycle()">Close ✕</button>
-    </div>
-    <div class="pcard-modal-body">
-      <ul class="timeline">
-        <li class="ok"><strong>Primary P-Card Opened</strong><span class="t">09:01:22</span>Move Money app pool memory spike opened.</li>
-        <li class="warn"><strong>Related Cards Detected</strong><span class="t">09:04–09:12</span>Kafka lag and SQL pool exhaustion appeared inside the same topology/time window.</li>
-        <li class="ok"><strong>Group Created</strong><span class="t">09:13:30</span>MM-POOL-0900 created with 92% same-event confidence.</li>
-        <li class="warn"><strong>Incident Linked</strong><span class="t">09:14:10</span>INC0042811 linked to the group. The dashboard does not assume every P-Card creates its own incident.</li>
-        <li class="active"><strong>Swarm / Bridge Context</strong><span class="t">09:44 – Now</span>One bridge focuses on the shared dependency path instead of redundant card-by-card triage.</li>
-      </ul>
-    </div>
-  </div>
-</div>
 
 <!-- ══════════ MOBILE-FRIENDLY RISK MAP POPOUT ══════════ -->
 <div id="riskMapModal" class="modal-backdrop" aria-hidden="true">
@@ -1823,49 +1445,6 @@ function initAutoCharts(){
    P-CARD CHARTS
 ══════════════════════════════════════ */
 function initPCardCharts(){
-  const pCardGroupGraphEl = document.getElementById('pCardGroupGraph');
-  if(pCardGroupGraphEl){
-    const groupGraph = regChart(echarts.init(pCardGroupGraphEl,'dark'));
-    const groupNodes = [
-      {name:'MM-POOL-0900', type:'group', x:260, y:110, risk:'high', count:4},
-      {name:'PB-0044211', type:'pcard', x:80, y:45, risk:'high'},
-      {name:'PB-0044198', type:'pcard', x:80, y:110, risk:'high'},
-      {name:'PB-0044185', type:'pcard', x:80, y:175, risk:'high'},
-      {name:'INC0042811', type:'inc', x:455, y:110, risk:'high'},
-      {name:'KAFKA-LAG-0930', type:'group', x:260, y:250, risk:'moderate', count:3},
-      {name:'PB-0044177', type:'pcard', x:80, y:245, risk:'moderate'},
-      {name:'PB-0044165', type:'pcard', x:80, y:310, risk:'moderate'},
-      {name:'Watch / Swarm', type:'action', x:455, y:250, risk:'moderate'},
-      {name:'NODE03 Returner', type:'group', x:260, y:375, risk:'recurring', count:5},
-      {name:'PB-0044130', type:'pcard', x:80, y:375, risk:'recurring'},
-      {name:'Automation Review', type:'action', x:455, y:375, risk:'recurring'}
-    ];
-    function nodeColor(n){return n.risk==='high'?T.red:n.risk==='moderate'?T.orange:n.risk==='recurring'?T.yellow:T.blue}
-    groupGraph.setOption({
-      backgroundColor:'transparent',
-      tooltip:{...T.tooltip,formatter(p){
-        if(p.dataType==='edge') return `<b>${p.data.source}</b> → <b>${p.data.target}</b><br/>${p.data.label||'correlated'}`;
-        const d=p.data.raw; return `<b>${d.name}</b><br/>Type: ${d.type}<br/>Signal: ${d.risk}${d.count?`<br/>Cards / returns: ${d.count}`:''}`;
-      }},
-      series:[{
-        type:'graph',layout:'none',roam:true,edgeSymbol:['none','arrow'],edgeSymbolSize:[0,7],
-        emphasis:{focus:'adjacency'},
-        data:groupNodes.map(n=>({name:n.name,raw:n,x:n.x,y:n.y,symbol:n.type==='group'?'roundRect':'circle',symbolSize:n.type==='group'?[135,48]:n.type==='inc'?[96,38]:n.type==='action'?[120,38]:40,itemStyle:{color:'#071827',borderColor:nodeColor(n),borderWidth:2,shadowBlur:n.risk==='high'?12:6,shadowColor:nodeColor(n)},label:{show:true,color:T.text,fontSize:10,formatter:n.name}})),
-        links:[
-          {source:'PB-0044211',target:'MM-POOL-0900',label:'time + entity'},
-          {source:'PB-0044198',target:'MM-POOL-0900',label:'shared dependency'},
-          {source:'PB-0044185',target:'MM-POOL-0900',label:'downstream symptom'},
-          {source:'MM-POOL-0900',target:'INC0042811',label:'single linked incident'},
-          {source:'PB-0044177',target:'KAFKA-LAG-0930',label:'same window'},
-          {source:'PB-0044165',target:'KAFKA-LAG-0930',label:'possible edge'},
-          {source:'KAFKA-LAG-0930',target:'Watch / Swarm',label:'triage action'},
-          {source:'PB-0044130',target:'NODE03 Returner',label:'returned 5x'},
-          {source:'NODE03 Returner',target:'Automation Review',label:'candidate'}
-        ].map(l=>({...l,lineStyle:{color:l.label&&l.label.includes('single')?T.green:l.label&&l.label.includes('returned')?T.yellow:T.orange,width:2,opacity:.65,curveness:.08}}))
-      }]
-    });
-  }
-
   const pCardAge = regChart(echarts.init(document.getElementById('pCardAge'),'dark'));
   pCardAge.setOption({
     backgroundColor:'transparent',tooltip:{...T.tooltip,trigger:'axis'},
@@ -2000,53 +1579,8 @@ document.querySelectorAll('.goal-card').forEach((el,i) => {
   });
 });
 
-
-function openPcardLifecycle(){
-  const m=document.getElementById('pcardLifecycleModal');
-  if(!m) return;
-  m.classList.add('open');
-  m.setAttribute('aria-hidden','false');
-}
-function closePcardLifecycle(){
-  const m=document.getElementById('pcardLifecycleModal');
-  if(!m) return;
-  m.classList.remove('open');
-  m.setAttribute('aria-hidden','true');
-}
-
-
-
-function stopBubble(e){ if(e){ e.stopPropagation(); e.preventDefault(); } }
-function openPcardTriage(e,mode){ stopBubble(e); const m=document.getElementById('pcardTriageDrawer'); if(!m)return; const selected=document.getElementById('triageSelected'); if(selected){ selected.textContent = mode==='compare'?'SQL-TIMEOUT-1000 comparison':mode==='watch'?'EMAIL-LAT-1040 watch candidate':'MM-POOL-0900 / PB-0044211'; } m.classList.add('open'); m.setAttribute('aria-hidden','false'); }
-function closePcardTriage(){ const m=document.getElementById('pcardTriageDrawer'); if(!m)return; m.classList.remove('open'); m.setAttribute('aria-hidden','true'); }
-function setMockState(text){ const el=document.getElementById('triageState'); if(el){ el.innerHTML=`<span class="ib-icon">✓</span><span><b>${text}</b>. Prototype state only — later this would write to workflow fields such as watch/swarm/auto_queue/closure_requested.</span>`; } }
-function openShiftHandoff(){ const m=document.getElementById('shiftHandoffModal'); if(!m)return; m.classList.add('open'); m.setAttribute('aria-hidden','false'); }
-function closeShiftHandoff(){ const m=document.getElementById('shiftHandoffModal'); if(!m)return; m.classList.remove('open'); m.setAttribute('aria-hidden','true'); }
-function openFcrRecovery(e){ stopBubble(e); const m=document.getElementById('fcrRecoveryModal'); if(!m)return; m.classList.add('open'); m.setAttribute('aria-hidden','false'); }
-function closeFcrRecovery(){ const m=document.getElementById('fcrRecoveryModal'); if(!m)return; m.classList.remove('open'); m.setAttribute('aria-hidden','true'); }
-function setFcrState(text){ const el=document.getElementById('fcrState'); if(el){ el.innerHTML=`<span class="ib-icon">✓</span><span><b>${text}</b>. Next phase can persist this as a recovery queue state and link to ServiceNow evidence.</span>`; } }
-function openAutomationReview(e){ stopBubble(e); const m=document.getElementById('automationReviewModal'); if(!m)return; m.classList.add('open'); m.setAttribute('aria-hidden','false'); }
-function closeAutomationReview(){ const m=document.getElementById('automationReviewModal'); if(!m)return; m.classList.remove('open'); m.setAttribute('aria-hidden','true'); }
-function setAutomationState(text){ const el=document.getElementById('automationState'); if(el){ el.innerHTML=`<span class="ib-icon">✓</span><span><b>${text}</b>. This mock state previews the approval workflow before any real automation integration.</span>`; } }
-function approveAutomation(e){ stopBubble(e); openAutomationReview(e); setAutomationState('Approved for controlled run'); }
-function holdAutomation(e){ stopBubble(e); openAutomationReview(e); setAutomationState('Held for owner review'); }
-function previewReport(e,name){ stopBubble(e); const el=document.getElementById('reportPreview'); if(!el)return; el.innerHTML=`<h3>${name}</h3><b>Status:</b> Draft preview generated from current mock data.<ul><li>Includes source-aware incident context and goal alignment.</li><li>Separates realtime awareness from historical evidence.</li><li>Recommended next action: validate data freshness, then export or send to leadership view.</li></ul>`; }
-
-function tickOldestUnack(){
-  const el=document.getElementById('oldestUnackTimer');
-  if(!el) return;
-  const start=8*60+42;
-  const elapsed=Math.floor((Date.now()/1000))%3600;
-  const total=start+Math.floor(elapsed/6);
-  const m=String(Math.floor(total/60)).padStart(2,'0');
-  const sec=String(total%60).padStart(2,'0');
-  el.textContent=`${m}:${sec}`;
-}
-tickOldestUnack(); setInterval(tickOldestUnack,1000);
-
 // ── Resize ──
 window.addEventListener('resize', () => CHARTS.forEach(c => { try{c.resize()}catch(e){} }));
-window.addEventListener('keydown', (e) => { if(e.key === 'Escape'){ closePcardLifecycle(); closeRiskMap(); closePcardTriage(); closeShiftHandoff(); closeFcrRecovery(); closeAutomationReview(); } });
 </script>
 </body>
 </html
