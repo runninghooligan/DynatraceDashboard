@@ -506,6 +506,38 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
 .progress-step.todo{background:rgba(245,176,20,.08);border-color:rgba(245,176,20,.28)}
 @media(max-width:900px){.compare-row{grid-template-columns:1fr 1fr}.kpi-arc{flex-direction:column;align-items:flex-start}.feature-tile{align-items:flex-start;flex-direction:column}.feature-meta{text-align:left}}
 
+/* ══════════════════════════════════════════
+   PHASE 4: WORKFLOW & ACTION LAYER
+══════════════════════════════════════════ */
+.pcard-row{cursor:pointer}
+.pcard-row:hover td{background:rgba(46,174,232,.08)!important}
+.drawer-backdrop{position:fixed;inset:0;z-index:10000;display:none;background:rgba(1,6,11,.45)}
+.drawer-backdrop.open{display:block}
+.triage-drawer{position:absolute;right:0;top:0;height:100%;width:min(430px,92vw);background:linear-gradient(160deg,#071827,#030a12);border-left:1px solid rgba(46,174,232,.28);box-shadow:-18px 0 40px rgba(0,0,0,.35);display:flex;flex-direction:column}
+.drawer-hd{padding:13px 14px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.drawer-title{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:800;letter-spacing:.08em;color:var(--text)}
+.drawer-sub{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.35}
+.drawer-body{padding:13px 14px;overflow-y:auto;display:flex;flex-direction:column;gap:11px}
+.drawer-kv{display:grid;grid-template-columns:110px 1fr;gap:6px;font-size:11px;border-bottom:1px solid rgba(21,46,68,.45);padding-bottom:8px}
+.drawer-kv span:nth-child(odd){color:var(--muted);font-weight:700;text-transform:uppercase;font-size:9px;letter-spacing:.07em}
+.drawer-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
+.drawer-actions .btn{padding:8px 9px;font-size:11px}
+.approval-list{display:flex;flex-direction:column;gap:7px}
+.approval-row{border:1px solid var(--line);border-radius:7px;background:rgba(6,18,30,.8);padding:8px 9px;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
+.approval-title{font-size:11px;font-weight:800;color:var(--text)}
+.approval-meta{font-size:9.5px;color:var(--muted);margin-top:2px}
+.approval-actions{display:flex;gap:4px}
+.shift-modal{width:min(720px,94vw);max-height:90dvh;background:linear-gradient(160deg,#071827,#030a12);border:1px solid rgba(46,174,232,.28);border-radius:10px;display:flex;flex-direction:column;margin:auto;align-self:center}
+.shift-modal-hd{padding:12px 14px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.shift-modal-body{padding:14px;overflow-y:auto}
+.handoff-copy{width:100%;min-height:230px;background:rgba(3,13,22,.82);border:1px solid var(--line2);border-radius:8px;color:var(--text);padding:10px;font-family:'JetBrains Mono',monospace;font-size:10.5px;line-height:1.55;resize:vertical}
+.report-row{cursor:pointer}
+.report-row.active td,.report-row:hover td{background:rgba(46,174,232,.08)!important}
+.report-preview{margin-top:11px;border:1px solid rgba(46,174,232,.22);border-radius:8px;background:rgba(46,174,232,.04);padding:11px;display:none}
+.report-preview.open{display:block}
+.report-preview-title{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--text);margin-bottom:6px}
+.report-preview-body{font-size:11px;color:var(--muted);line-height:1.45}
+
 </style>
 </head>
 <body>
@@ -584,6 +616,7 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
       <span id="clock"></span>
       <div class="live-pill"><span class="pulse"></span>LIVE</div>
       <button class="tb-pill">Shift: Day</button>
+      <button class="tb-pill" onclick="openShiftHandoffModal()">Shift Handoff →</button>
       <button class="tb-pill" onclick="window.location.href='incident_reduction_prevention.html'">Goal 2 Lab ↗</button>
       <button class="tb-pill">⊟ Filters</button>
       <button class="tb-pill" id="wallModeBtn" onclick="toggleWallMode()">▣ Wall Mode</button>
@@ -945,6 +978,16 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
           </tbody>
         </table>
       </div>
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Automation Approval Queue</span><span class="badge b-orange">36 pending approvals</span></div>
+        <div class="approval-list">
+          <div class="approval-row"><div><div class="approval-title">ANS-MOVE-MONEY-APPPOOL</div><div class="approval-meta">Move Money · High impact · 94% confidence</div></div><div class="approval-actions"><button class="btn btn-green" onclick="markApproval(this,'approved')">Approve</button><button class="btn btn-red" onclick="markApproval(this,'rejected')">Reject</button></div></div>
+          <div class="approval-row"><div><div class="approval-title">ANS-KAFKA-CONSUMER-RECOVERY</div><div class="approval-meta">Kafka Lag Group · High impact · 88% confidence</div></div><div class="approval-actions"><button class="btn btn-green" onclick="markApproval(this,'approved')">Approve</button><button class="btn btn-red" onclick="markApproval(this,'rejected')">Reject</button></div></div>
+          <div class="approval-row"><div><div class="approval-title">ANS-DISK-CLEANUP</div><div class="approval-meta">Node03 · Medium impact · 91% confidence</div></div><div class="approval-actions"><button class="btn btn-green" onclick="markApproval(this,'approved')">Approve</button><button class="btn btn-red" onclick="markApproval(this,'rejected')">Reject</button></div></div>
+          <div class="approval-row"><div><div class="approval-title">ANS-SQL-CONN-RESET</div><div class="approval-meta">SQL Timeout Cluster · Medium impact · 79% confidence</div></div><div class="approval-actions"><button class="btn btn-green" onclick="markApproval(this,'approved')">Approve</button><button class="btn btn-red" onclick="markApproval(this,'rejected')">Reject</button></div></div>
+          <div class="approval-row"><div><div class="approval-title">ANS-F5-POOL-REENABLE</div><div class="approval-meta">Network Latency Set · Low impact · 82% confidence</div></div><div class="approval-actions"><button class="btn btn-green" onclick="markApproval(this,'approved')">Approve</button><button class="btn btn-red" onclick="markApproval(this,'rejected')">Reject</button></div></div>
+        </div>
+      </div>
     </div>
 
     <div class="section-band performance">PERFORMANCE</div>
@@ -1035,14 +1078,14 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
         <table>
           <thead><tr><th>P-Card ID</th><th>Title</th><th>Service / VCT</th><th>Age</th><th>Severity</th><th>Status</th><th>Incident</th></tr></thead>
           <tbody>
-            <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044211</td><td>Move Money app pool memory spike</td><td>Move Money</td><td class="red">82m</td><td><span class="badge b-red">Critical</span></td><td><span class="badge b-red">Open</span></td><td><span class="badge b-orange">INC0042811</span></td></tr>
-            <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044198</td><td>Kafka consumer group lag spike</td><td>Middleware</td><td class="red">71m</td><td><span class="badge b-red">Critical</span></td><td><span class="badge b-red">Open</span></td><td><span class="badge b-orange">INC0042803</span></td></tr>
-            <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044185</td><td>SQL DB connection pool exhausted</td><td>Database</td><td class="orange">64m</td><td><span class="badge b-red">Critical</span></td><td><span class="badge b-red">Open</span></td><td><span class="badge b-orange">INC0042789</span></td></tr>
-            <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044177</td><td>Client Mgmt service degraded response</td><td>Client Mgmt</td><td class="yellow">48m</td><td><span class="badge b-orange">High</span></td><td><span class="badge b-orange">Swarm</span></td><td>—</td></tr>
-            <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044165</td><td>F5 load balancer pool node down</td><td>Network</td><td class="yellow">38m</td><td><span class="badge b-orange">High</span></td><td><span class="badge b-yellow">Watch</span></td><td>—</td></tr>
-            <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044154</td><td>Advisor Email SMTP relay latency</td><td>Messaging</td><td>28m</td><td><span class="badge b-yellow">Medium</span></td><td><span class="badge b-orange">Swarm</span></td><td>—</td></tr>
-            <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044142</td><td>DataPower gateway slow response</td><td>Middleware</td><td>18m</td><td><span class="badge b-yellow">Medium</span></td><td><span class="badge b-yellow">Watch</span></td><td>—</td></tr>
-            <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044130</td><td>Linux Node03 disk usage 97%</td><td>Platform</td><td>12m</td><td><span class="badge b-muted">Low</span></td><td><span class="badge b-green">Auto-Queued</span></td><td>—</td></tr>
+            <tr class="pcard-row" onclick="openPCardDrawer('PB-0044211','Move Money app pool memory spike','Move Money','82m','Critical','Open','INC0042811')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044211</td><td>Move Money app pool memory spike</td><td>Move Money</td><td class="red">82m</td><td><span class="badge b-red">Critical</span></td><td><span class="badge b-red">Open</span></td><td><span class="badge b-orange">INC0042811</span></td></tr>
+            <tr class="pcard-row" onclick="openPCardDrawer('PB-0044198','Kafka consumer group lag spike','Middleware','71m','Critical','Open','INC0042803')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044198</td><td>Kafka consumer group lag spike</td><td>Middleware</td><td class="red">71m</td><td><span class="badge b-red">Critical</span></td><td><span class="badge b-red">Open</span></td><td><span class="badge b-orange">INC0042803</span></td></tr>
+            <tr class="pcard-row" onclick="openPCardDrawer('PB-0044185','SQL DB connection pool exhausted','Database','64m','Critical','Open','INC0042789')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044185</td><td>SQL DB connection pool exhausted</td><td>Database</td><td class="orange">64m</td><td><span class="badge b-red">Critical</span></td><td><span class="badge b-red">Open</span></td><td><span class="badge b-orange">INC0042789</span></td></tr>
+            <tr class="pcard-row" onclick="openPCardDrawer('PB-0044177','Client Mgmt service degraded response','Client Mgmt','48m','High','Swarm','—')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044177</td><td>Client Mgmt service degraded response</td><td>Client Mgmt</td><td class="yellow">48m</td><td><span class="badge b-orange">High</span></td><td><span class="badge b-orange">Swarm</span></td><td>—</td></tr>
+            <tr class="pcard-row" onclick="openPCardDrawer('PB-0044165','F5 load balancer pool node down','Network','38m','High','Watch','—')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044165</td><td>F5 load balancer pool node down</td><td>Network</td><td class="yellow">38m</td><td><span class="badge b-orange">High</span></td><td><span class="badge b-yellow">Watch</span></td><td>—</td></tr>
+            <tr class="pcard-row" onclick="openPCardDrawer('PB-0044154','Advisor Email SMTP relay latency','Messaging','28m','Medium','Swarm','—')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044154</td><td>Advisor Email SMTP relay latency</td><td>Messaging</td><td>28m</td><td><span class="badge b-yellow">Medium</span></td><td><span class="badge b-orange">Swarm</span></td><td>—</td></tr>
+            <tr class="pcard-row" onclick="openPCardDrawer('PB-0044142','DataPower gateway slow response','Middleware','18m','Medium','Watch','—')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044142</td><td>DataPower gateway slow response</td><td>Middleware</td><td>18m</td><td><span class="badge b-yellow">Medium</span></td><td><span class="badge b-yellow">Watch</span></td><td>—</td></tr>
+            <tr class="pcard-row" onclick="openPCardDrawer('PB-0044130','Linux Node03 disk usage 97%','Platform','12m','Low','Auto-Queued','—')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044130</td><td>Linux Node03 disk usage 97%</td><td>Platform</td><td>12m</td><td><span class="badge b-muted">Low</span></td><td><span class="badge b-green">Auto-Queued</span></td><td>—</td></tr>
           </tbody>
         </table>
       </div>
@@ -1167,16 +1210,20 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
       <div class="card">
         <div class="card-hd"><span class="card-title">Available Reports</span></div>
         <table>
-          <thead><tr><th>Report</th><th>Frequency</th><th>Last Run</th><th>Action</th></tr></thead>
+          <thead><tr><th>Report</th><th>Frequency</th><th>Last Run</th><th>Status</th><th>Action</th></tr></thead>
           <tbody>
-            <tr><td><b>Weekly Ops Scorecard</b></td><td>Weekly</td><td>Jun 1</td><td><button class="btn btn-blue">Generate</button></td></tr>
-            <tr><td><b>FCR Deep Dive</b></td><td>Bi-Weekly</td><td>May 25</td><td><button class="btn btn-blue">Generate</button></td></tr>
-            <tr><td><b>Incident Reduction Summary</b></td><td>Monthly</td><td>May 31</td><td><button class="btn btn-blue">Generate</button></td></tr>
-            <tr><td><b>Automation Efficiency Report</b></td><td>Monthly</td><td>May 31</td><td><button class="btn btn-blue">Generate</button></td></tr>
-            <tr><td><b>Executive CIO Dashboard</b></td><td>Weekly</td><td>Jun 1</td><td><button class="btn btn-blue">Generate</button></td></tr>
-            <tr><td><b>Postmortem — Move Money</b></td><td>Ad Hoc</td><td>Today</td><td><button class="btn btn-blue">Generate</button></td></tr>
+            <tr class="report-row" onclick="showReportPreview(this,'Weekly Ops Scorecard','Ready','Weekly leadership summary covering FCR, incident reduction, delay prevention, automation savings, and current goal progress.')"><td><b>Weekly Ops Scorecard</b></td><td>Weekly</td><td>Jun 1</td><td><span class="badge b-green">Ready</span></td><td><button class="btn btn-blue" onclick="event.stopPropagation()">Generate</button></td></tr>
+            <tr class="report-row" onclick="showReportPreview(this,'FCR Deep Dive','Generating','Bi-weekly FCR review with official FCR percentage, resolved-by-ICC counts, missed FCR patterns, and candidate validation notes.')"><td><b>FCR Deep Dive</b></td><td>Bi-Weekly</td><td>May 25</td><td><span class="badge b-yellow">Generating</span></td><td><button class="btn btn-blue" onclick="event.stopPropagation()">Generate</button></td></tr>
+            <tr class="report-row" onclick="showReportPreview(this,'Incident Reduction Summary','Ready','Monthly incident prevention and reduction report including repeat offenders, P-Card to incident conversion, and prevented incidents acknowledgement.')"><td><b>Incident Reduction Summary</b></td><td>Monthly</td><td>May 31</td><td><span class="badge b-green">Ready</span></td><td><button class="btn btn-blue" onclick="event.stopPropagation()">Generate</button></td></tr>
+            <tr class="report-row" onclick="showReportPreview(this,'Automation Efficiency Report','Ready','Automation report showing executions, approval queue throughput, success rate, time saved, and new automations against goal.')"><td><b>Automation Efficiency Report</b></td><td>Monthly</td><td>May 31</td><td><span class="badge b-green">Ready</span></td><td><button class="btn btn-blue" onclick="event.stopPropagation()">Generate</button></td></tr>
+            <tr class="report-row" onclick="showReportPreview(this,'Executive CIO Dashboard','Error','Executive dashboard export encountered an error on the last generation attempt and needs retry or collector validation.')"><td><b>Executive CIO Dashboard</b></td><td>Weekly</td><td>Jun 1</td><td><span class="badge b-red">Error</span></td><td><button class="btn btn-blue" onclick="event.stopPropagation()">Generate</button></td></tr>
+            <tr class="report-row" onclick="showReportPreview(this,'Postmortem — Move Money','Ready','Ad hoc postmortem summary focused on Move Money incident timeline, swarm participation, automation opportunity, and prevention actions.')"><td><b>Postmortem — Move Money</b></td><td>Ad Hoc</td><td>Today</td><td><span class="badge b-green">Ready</span></td><td><button class="btn btn-blue" onclick="event.stopPropagation()">Generate</button></td></tr>
           </tbody>
         </table>
+        <div id="reportPreview" class="report-preview">
+          <div class="report-preview-title">Select a report row to preview</div>
+          <div class="report-preview-body">A summary preview will appear here before generation.</div>
+        </div>
       </div>
     </div>
   </section>
@@ -1227,12 +1274,128 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
   </div>
 </div>
 
+
+<!-- ══════════ P-CARD TRIAGE DRAWER ══════════ -->
+<div id="pcardDrawerBackdrop" class="drawer-backdrop" aria-hidden="true" onclick="closePCardDrawer(event)">
+  <div class="triage-drawer" role="dialog" aria-modal="true" aria-label="P-Card triage drawer" onclick="event.stopPropagation()">
+    <div class="drawer-hd">
+      <div>
+        <div id="drawerTitle" class="drawer-title">P-Card Triage</div>
+        <div id="drawerSub" class="drawer-sub">Select a row from the P-Card queue.</div>
+      </div>
+      <button class="modal-close-btn" onclick="closePCardDrawer()">Close ✕</button>
+    </div>
+    <div class="drawer-body">
+      <div class="drawer-kv">
+        <span>Service / VCT</span><span id="drawerService">—</span>
+        <span>Age</span><span id="drawerAge">—</span>
+        <span>Severity</span><span id="drawerSeverity">—</span>
+        <span>Status</span><span id="drawerStatus">—</span>
+        <span>Incident</span><span id="drawerIncident">—</span>
+      </div>
+      <div class="infobox"><span class="ib-icon">◎</span><span>Use these actions for active triage without leaving the P-Card queue.</span></div>
+      <div class="drawer-actions">
+        <button class="btn btn-muted">Watch</button>
+        <button class="btn btn-blue">Swarm</button>
+        <button class="btn btn-green">Auto-Queue</button>
+        <button class="btn btn-red">Close</button>
+      </div>
+      <div class="card" style="padding:10px">
+        <div class="card-title" style="margin-bottom:8px">Triage Notes</div>
+        <ul class="timeline">
+          <li class="ok"><strong>Detected</strong><span class="t">09:01</span>Dynatrace problem card opened.</li>
+          <li class="warn"><strong>Needs action</strong><span class="t">Now</span>Confirm ownership, swarm need, or automation queue path.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SHIFT HANDOFF MODAL ══════════ -->
+<div id="shiftHandoffModal" class="modal-backdrop" aria-hidden="true">
+  <div class="shift-modal" role="dialog" aria-modal="true" aria-label="Shift handoff summary">
+    <div class="shift-modal-hd">
+      <div>
+        <div class="risk-modal-title">Shift Handoff Summary</div>
+        <div class="risk-modal-sub">Current shift snapshot prepared for copy/paste into Teams or handoff notes.</div>
+      </div>
+      <div class="risk-modal-actions">
+        <button class="risk-modal-btn" onclick="copyShiftHandoff()">Copy</button>
+        <button class="risk-modal-btn" onclick="closeShiftHandoffModal()">Close ✕</button>
+      </div>
+    </div>
+    <div class="shift-modal-body">
+<textarea id="shiftHandoffText" class="handoff-copy" readonly>ICC Shift Handoff — Day Shift
+
+LIVE STATE
+• Open P-Cards: 42
+• Long Running P-Cards: 7
+• Active Swarms: 3
+• Major Incident Risk: Moderate, 63/100
+
+SHIFT SUMMARY
+• Handoff Chain: 42 open P-Cards → 31 first comments → 6 INCs created → 5 assigned → 3 escalated
+• FCR Candidates Action Required: 18 total, top candidates visible on Command Center
+• Oldest Unacknowledged P-Card: 12m 14s
+
+WATCH ITEMS
+• Move Money incident swarm remains active
+• Kafka consumer lag recovery is queued for automation review
+• Power Automate integration degraded; automation Goal 4 KPI warning is active</textarea>
+      <div id="handoffCopyStatus" style="margin-top:8px;font-size:10px;color:var(--muted)">Ready to copy.</div>
+    </div>
+  </div>
+</div>
 <script>
 /* ══════════════════════════════════════
    UTILITIES
 ══════════════════════════════════════ */
 const CHARTS = [];
 function regChart(c){ CHARTS.push(c); return c; }
+function openPCardDrawer(id,title,service,age,severity,status,incident){
+  document.getElementById('drawerTitle').textContent = id + ' — ' + title;
+  document.getElementById('drawerSub').textContent = 'P-Card triage drawer · workflow actions';
+  document.getElementById('drawerService').textContent = service;
+  document.getElementById('drawerAge').textContent = age;
+  document.getElementById('drawerSeverity').textContent = severity;
+  document.getElementById('drawerStatus').textContent = status;
+  document.getElementById('drawerIncident').textContent = incident;
+  const d=document.getElementById('pcardDrawerBackdrop');
+  d.classList.add('open'); d.setAttribute('aria-hidden','false');
+}
+function closePCardDrawer(evt){
+  if(evt && evt.target && evt.target.id !== 'pcardDrawerBackdrop') return;
+  const d=document.getElementById('pcardDrawerBackdrop');
+  d.classList.remove('open'); d.setAttribute('aria-hidden','true');
+}
+function markApproval(btn,state){
+  const row = btn.closest('.approval-row');
+  row.style.opacity = '.58';
+  row.querySelector('.approval-actions').innerHTML = '<span class="badge '+(state==='approved'?'b-green':'b-red')+'">'+state.toUpperCase()+'</span>';
+}
+function openShiftHandoffModal(){
+  const m=document.getElementById('shiftHandoffModal');
+  m.classList.add('open'); m.setAttribute('aria-hidden','false');
+}
+function closeShiftHandoffModal(){
+  const m=document.getElementById('shiftHandoffModal');
+  m.classList.remove('open'); m.setAttribute('aria-hidden','true');
+}
+function copyShiftHandoff(){
+  const t=document.getElementById('shiftHandoffText');
+  t.select(); t.setSelectionRange(0,99999);
+  const done=()=>{document.getElementById('handoffCopyStatus').textContent='Copied to clipboard.'};
+  if(navigator.clipboard){ navigator.clipboard.writeText(t.value).then(done).catch(()=>document.execCommand('copy') && done()); }
+  else { document.execCommand('copy'); done(); }
+}
+function showReportPreview(row,title,status,body){
+  document.querySelectorAll('.report-row').forEach(r=>r.classList.remove('active'));
+  row.classList.add('active');
+  const p=document.getElementById('reportPreview');
+  p.classList.add('open');
+  p.querySelector('.report-preview-title').textContent = title + ' · ' + status;
+  p.querySelector('.report-preview-body').textContent = body;
+}
 
 function openLifecycleModal(){
   const modal = document.getElementById('lifecycleModal');
