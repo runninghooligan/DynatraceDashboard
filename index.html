@@ -578,6 +578,29 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
 @media(max-width:1200px){.signal-row,.live-queue-grid{grid-template-columns:1fr}.snapshot-group-grid{grid-template-columns:1fr}.snapshot-group{border-right:0;border-bottom:1px solid rgba(29,61,87,.72)}.snapshot-group:last-child{border-bottom:0}}
 @media(max-width:760px){.snapshot-mini-grid,.snapshot-group.incidents .snapshot-mini-grid,.snapshot-group.escalations .snapshot-mini-grid{grid-template-columns:1fr 1fr}.signal-value{font-size:26px}}
 
+
+/* ══════════════════════════════════════════
+   PART 4 PROMPT A: COMMAND CENTER DE-DUP + RESTRUCTURE
+══════════════════════════════════════════ */
+.shift-live-label{
+  display:flex;align-items:center;gap:10px;margin:0 0 9px;
+  font-family:'JetBrains Mono',monospace;font-size:9.5px;font-weight:800;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--muted);
+}
+.shift-live-label::after{content:'';height:1px;background:linear-gradient(90deg,var(--line2),transparent);flex:1}
+.goal-card{position:relative}
+.goal-card .goal-status{position:absolute;right:8px;top:7px;margin-left:0;font-size:8px;padding:2px 6px}
+.signal-tile.simple{min-height:112px;cursor:pointer}
+.signal-tile.fcr{border-left-color:var(--yellow);background:linear-gradient(160deg,rgba(234,179,8,.07),#040d18)}
+.signal-tile.warn-state{border-color:rgba(234,179,8,.38);border-left-color:var(--yellow);background:linear-gradient(160deg,rgba(234,179,8,.06),#040d18)}
+.signal-tile.critical-state{border-color:rgba(239,68,68,.52);border-left-color:var(--red);background:linear-gradient(160deg,rgba(239,68,68,.10),#040d18)}
+.snapshot-risk-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:92px}
+.snapshot-risk-gauge{width:100%;height:64px}
+.snapshot-risk-label{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:800;letter-spacing:.08em;color:var(--yellow);margin-top:-6px}
+.snapshot-group.risk .snapshot-mini-grid{grid-template-columns:1fr}
+.snapshot-group-grid{grid-template-columns:1.08fr 1.08fr .84fr .62fr}
+@media(max-width:1200px){.snapshot-group-grid{grid-template-columns:1fr}.snapshot-group.risk{border-bottom:0}}
+
 </style>
 </head>
 <body>
@@ -670,12 +693,14 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
   ══════════════════════════════════ -->
   <section id="command">
 
+    <div class="shift-live-label">CURRENT SHIFT — LIVE STATE</div>
+
     <!-- Goal Banner -->
     <div class="goal-banner">
       <div class="goal-card g1" onclick="showTab('fcr',document.querySelector('[data-tab=fcr]'))">
         <span class="goal-icon">◎</span>
         <div class="goal-info">
-          <div class="gl">Goal 1 · FCR <span class="goal-status on">✓ on-track</span></div>
+          <div class="gl">Goal 1 · FCR <span class="goal-status risk">AT RISK</span></div>
           <div class="gv blue">34.2%</div>
           <div class="gs">Target: +30% → 44%</div>
         </div>
@@ -683,7 +708,7 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
       <div class="goal-card g2" onclick="showTab('incidents',document.querySelector('[data-tab=incidents]'))">
         <span class="goal-icon">⬇</span>
         <div class="goal-info">
-          <div class="gl">Goal 2 · Incidents <span class="goal-status on">✓ on-track</span></div>
+          <div class="gl">Goal 2 · Incidents <span class="goal-status on">ON TRACK</span></div>
           <div class="gv teal">−18.0%</div>
           <div class="gs">YoY · 4 prevented</div>
         </div>
@@ -691,22 +716,40 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
       <div class="goal-card g3" onclick="showTab('analytics',document.querySelector('[data-tab=analytics]'))">
         <span class="goal-icon">⏱</span>
         <div class="goal-info">
-          <div class="gl">Goal 3 · Delay Prevention <span class="goal-status risk">⚠ at-risk</span></div>
+          <div class="gl">Goal 3 · Delay Prevention <span class="goal-status risk">AT RISK</span></div>
           <div class="gv purple">12 delays</div>
-          <div class="gs">3.8m first comment</div>
+          <div class="gs">3.8m first comment · delays ▲3 yesterday</div>
         </div>
       </div>
       <div class="goal-card g4" onclick="showTab('automation',document.querySelector('[data-tab=automation]'))">
         <span class="goal-icon">⚡</span>
         <div class="goal-info">
-          <div class="gl">Goal 4 · Automation <span class="goal-status risk">⚠ at-risk</span></div>
+          <div class="gl">Goal 4 · Automation <span class="goal-status on">ON TRACK</span></div>
           <div class="gv yellow">3 opps</div>
-          <div class="gs integration-warn">⚠ 1 integration degraded</div>
+          <div class="gs">12.4 hrs saved MTD</div>
         </div>
       </div>
     </div>
 
-    <div class="phase-divider"><span class="divider-pill">LIVE STATE — Current Shift</span></div>
+    <!-- Signal Strip: replaces redundant secondary KPI row -->
+    <div class="signal-row">
+      <div id="oldestUnackTile" class="card signal-tile simple warn-state">
+        <div class="signal-top"><span class="signal-label">Oldest Unacknowledged</span><span class="badge b-orange">LIVE</span></div>
+        <div id="oldestUnackTimer" class="signal-value yellow">12m 14s</div>
+        <div class="signal-meta">P-Card without NOC comment</div>
+      </div>
+      <div class="card signal-tile simple fcr" onclick="showTabByName('fcr')">
+        <div class="signal-top"><span class="signal-label">FCR Candidates</span><span class="badge b-yellow">ACTION</span></div>
+        <div class="signal-value yellow">18</div>
+        <div class="signal-meta">Likely FCR — awaiting validation</div>
+      </div>
+      <div class="card signal-tile simple danger">
+        <div class="signal-top"><span class="signal-label">Comment Gap Breaches</span><span class="badge b-red">SLA</span></div>
+        <div class="signal-value red">4</div>
+        <div class="signal-meta">P-Cards exceeded 15m comment SLA this shift</div>
+      </div>
+    </div>
+
 
     <div class="collector-strip" aria-label="Collector poll freshness">
       <div class="collector-card" data-last-updated="2" data-stale-minutes="15">
@@ -720,35 +763,6 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
       </div>
       <div class="collector-card warn" data-last-updated="11" data-stale-minutes="10">
         <div class="collector-left"><span class="collector-name">SolarWinds DPA</span><span class="collector-meta">DB health · last poll</span></div><div><div class="collector-age">11m ago</div><span class="collector-status warn">WARN</span></div>
-      </div>
-    </div>
-
-    <!-- Signal Strip: replaces redundant secondary KPI row -->
-    <div class="signal-row">
-      <div class="card signal-tile urgent">
-        <div>
-          <div class="signal-top"><span class="signal-label">Oldest Unacknowledged P-Card</span><span class="badge b-orange">LIVE</span></div>
-          <div id="oldestUnackTimer" class="signal-value orange">12m 14s</div>
-          <div class="signal-meta">PB-0044298 · Advisor Email<br/>amber &gt;10m · red &gt;15m</div>
-        </div>
-        <div class="signal-actions"><button class="btn btn-blue" onclick="showTabByName('pcards')">Open Queue</button><span class="signal-meta">Operator attention signal</span></div>
-      </div>
-      <div class="card signal-tile">
-        <div>
-          <div class="signal-top"><span class="signal-label">FCR Candidates — Action Required</span><span class="badge b-blue">18</span></div>
-          <div class="compact-ticket"><span><b>INC0042811</b> Move Money restart</span><button class="btn btn-green">Confirm FCR</button></div>
-          <div class="compact-ticket"><span><b>INC0042798</b> Kafka lag playbook</span><button class="btn btn-green">Confirm FCR</button></div>
-          <div class="compact-ticket"><span><b>INC0042756</b> SQL timeout closed</span><button class="btn btn-green">Confirm FCR</button></div>
-        </div>
-        <div class="signal-actions"><span class="card-link" onclick="showTabByName('fcr')">View All →</span><span class="signal-meta">Likely FCR awaiting validation</span></div>
-      </div>
-      <div class="card signal-tile danger">
-        <div>
-          <div class="signal-top"><span class="signal-label">Comment Gap SLA Breaches</span><span class="badge b-red">4</span></div>
-          <div class="signal-value red">4</div>
-          <div class="signal-meta">P-Cards this shift exceeded the 15-minute comment gap threshold.</div>
-        </div>
-        <div class="signal-actions"><button class="btn btn-red" onclick="showTabByName('analytics')">Review Gaps</button><span class="signal-meta">Delay prevention signal</span></div>
       </div>
     </div>
 
@@ -816,6 +830,16 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
             <div class="snap"><div class="snap-lbl">Unassigned</div><div class="snap-num yellow">2</div><div class="snap-sub">—</div></div>
           </div>
         </div>
+        <div class="snapshot-group risk">
+          <div class="snapshot-group-title">Risk</div>
+          <div class="snapshot-mini-grid">
+            <div class="snap snapshot-risk-tile">
+              <div class="snap-lbl">Major Inc. Risk</div>
+              <div id="miniRiskGauge" class="snapshot-risk-gauge"></div>
+              <div class="snapshot-risk-label">MODERATE</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -853,6 +877,8 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
         </div>
       </div>
     </div>
+
+    <div class="phase-divider"><span class="divider-pill">FOCUS AREAS &amp; ESCALATION</span></div>
 
     <div class="card handoff-row">
       <div class="card-hd"><span class="card-title">Current Shift Handoff Chain</span></div>
@@ -1502,13 +1528,20 @@ tick(); setInterval(tick, 1000);
 const oldestUnackStartedAt = Date.now() - ((12 * 60 + 14) * 1000);
 function tickOldestUnack(){
   const el = document.getElementById('oldestUnackTimer');
+  const tile = document.getElementById('oldestUnackTile');
   if(!el) return;
   const elapsed = Math.max(0, Math.floor((Date.now() - oldestUnackStartedAt) / 1000));
   const mins = Math.floor(elapsed / 60);
   const secs = elapsed % 60;
   el.textContent = `${mins}m ${String(secs).padStart(2,'0')}s`;
-  el.classList.toggle('red', elapsed >= 15 * 60);
-  el.classList.toggle('amber', elapsed < 15 * 60 && elapsed >= 10 * 60);
+  const isRed = elapsed > 20 * 60;
+  const isAmber = elapsed > 10 * 60 && !isRed;
+  el.classList.toggle('red', isRed);
+  el.classList.toggle('yellow', isAmber);
+  if(tile){
+    tile.classList.toggle('critical-state', isRed);
+    tile.classList.toggle('warn-state', isAmber);
+  }
 }
 tickOldestUnack(); setInterval(tickOldestUnack, 1000);
 
@@ -1548,7 +1581,7 @@ if(miniRiskGaugeEl){
     backgroundColor:'transparent',
     series:[{
       type:'gauge',min:0,max:100,startAngle:180,endAngle:0,radius:'118%',center:['50%','76%'],
-      axisLine:{lineStyle:{width:9,color:[[.4,T.green],[.7,T.yellow],[1,T.red]]}},
+      axisLine:{lineStyle:{width:9,color:[[0,'#22c55e'],[0.4,'#22c55e'],[0.7,'#eab308'],[1,'#ef4444']]}},
       pointer:{show:false},progress:{show:true,width:9,itemStyle:{color:T.yellow}},
       axisTick:{show:false},splitLine:{show:false},axisLabel:{show:false},
       anchor:{show:false},title:{show:false},
