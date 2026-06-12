@@ -864,21 +864,6 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
         <div class="handoff-step"><div class="handoff-label">Escalated</div><div class="handoff-count red">5</div><div class="handoff-sub">pending owner</div></div>
       </div>
     </div>
-        <div class="focus-grid">
-          <div class="focus-c"><div class="focus-name">Move Money</div><div class="focus-score red">92</div><div class="focus-meta">7 P-Cards · 2 INCs</div></div>
-          <div class="focus-c"><div class="focus-name">Client Mgmt</div><div class="focus-score orange">84</div><div class="focus-meta">6 P-Cards · 1 INC</div></div>
-          <div class="focus-c"><div class="focus-name">Trading</div><div class="focus-score green">71</div><div class="focus-meta">3 P-Cards</div></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-hd"><span class="card-title">Escalation Flow</span></div>
-        <div id="sankey" class="ch-220"></div>
-      </div>
-      <div class="card">
-        <div class="card-hd"><span class="card-title">Major Incident Risk Score</span></div>
-        <div id="gauge" class="ch-220"></div>
-      </div>
-    </div>
 
   </section>
 
@@ -1683,36 +1668,8 @@ risk.setOption({
 }
 document.querySelectorAll('.map-collapsed').forEach(d => d.addEventListener('toggle', () => setTimeout(() => { try{ risk && risk.resize(); }catch(e){} }, 80)));
 
-// ── Sankey ──
-const sankeyEl = document.getElementById('sankey');
-if(sankeyEl){
-const sankey = regChart(echarts.init(sankeyEl,'dark'));
-sankey.setOption({
-  backgroundColor:'transparent',
-  tooltip:{...T.tooltip},
-  series:[{
-    type:'sankey',nodeAlign:'left',nodeGap:16,nodeWidth:16,
-    emphasis:{focus:'adjacency'},
-    data:[
-      {name:'ICC NOC',itemStyle:{color:T.blue}},
-      {name:'T2/T3 Teams',itemStyle:{color:T.purple}},
-      {name:'Automation',itemStyle:{color:T.teal}},
-      {name:'Resolved FCR',itemStyle:{color:T.green}},
-      {name:'Resolved T2',itemStyle:{color:T.green}},
-      {name:'Escalated IM',itemStyle:{color:T.red}}
-    ],
-    links:[
-      {source:'ICC NOC',target:'Resolved FCR',value:34},
-      {source:'ICC NOC',target:'T2/T3 Teams',value:42},
-      {source:'T2/T3 Teams',target:'Resolved T2',value:42},
-      {source:'ICC NOC',target:'Escalated IM',value:18},
-      {source:'Automation',target:'Resolved FCR',value:12}
-    ],
-    label:{color:T.muted,fontFamily:'Syne,sans-serif',fontSize:10},
-    lineStyle:{color:'gradient',opacity:.38}
-  }]
-});
-}
+// ── Command Center escalation sankey removed per redundancy audit; no floating orphan chart.
+
 
 // ── Gauge ──
 const gaugeEl = document.getElementById('gauge');
