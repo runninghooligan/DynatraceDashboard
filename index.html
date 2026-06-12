@@ -471,6 +471,41 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
 .oldest-label{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:800}.oldest-time{font-family:'JetBrains Mono',monospace;font-size:31px;font-weight:800;margin:8px 0 4px}.oldest-time.amber{color:var(--yellow)}.oldest-time.red{color:var(--red)}.oldest-meta{font-size:10px;color:var(--muted);line-height:1.35}
 @media(max-width:1100px){.phase2-summary-grid{grid-template-columns:1fr}.handoff-chain{grid-template-columns:repeat(5,minmax(115px,1fr));overflow-x:auto}}
 
+
+/* ══════════════════════════════════════════
+   PHASE 3: GOAL TAB REFINEMENT
+══════════════════════════════════════════ */
+.kpi-arc{display:flex;gap:9px;align-items:center;min-height:104px}
+.kpi-arc-chart{width:92px;height:78px;flex-shrink:0}
+.kpi-arc-copy{flex:1;min-width:0}
+.kpi-arc-copy .kpi-val{margin-top:4px}
+.one-line-link{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid rgba(46,174,232,.18);background:rgba(46,174,232,.05);border-radius:7px;padding:10px 11px;color:var(--muted);font-size:11px}
+.feature-tile{border:1px solid rgba(15,204,116,.32);background:linear-gradient(160deg,rgba(15,204,116,.12),rgba(7,24,39,.78));border-radius:10px;padding:14px;margin-bottom:11px;display:flex;align-items:center;justify-content:space-between;gap:14px;position:relative;overflow:hidden}
+.feature-tile::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 8% 20%,rgba(15,204,116,.15),transparent 36%);pointer-events:none}
+.feature-left{display:flex;align-items:center;gap:12px;position:relative;z-index:1}
+.feature-icon{font-size:30px;color:var(--green);filter:drop-shadow(0 0 8px rgba(15,204,116,.25))}
+.feature-label{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.feature-value{font-family:'JetBrains Mono',monospace;font-size:30px;font-weight:800;color:var(--green);line-height:1;margin:4px 0 2px}
+.feature-ack{font-size:11px;color:var(--text);font-weight:700}
+.feature-meta{position:relative;z-index:1;text-align:right;font-size:10px;color:var(--muted);line-height:1.55}
+.spark-cell{width:86px;height:24px}
+.compare-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:11px}
+.compare-card{border:1px solid var(--line);background:rgba(6,18,30,.82);border-radius:8px;padding:9px 10px}
+.compare-label{font-size:9px;color:var(--muted);font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.compare-main{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:800;margin:4px 0 2px;color:var(--text)}
+.compare-sub{font-size:9.5px;color:var(--muted)}
+.compare-delta{font-weight:800;margin-left:5px}
+.kpi-breach{border-color:rgba(232,53,53,.38);background:linear-gradient(160deg,rgba(232,53,53,.12),#040d18)}
+.section-band{display:flex;align-items:center;gap:10px;margin:12px 0 9px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.section-band::before,.section-band::after{content:'';height:1px;background:var(--line);flex:1}
+.section-band.live{color:var(--green)}
+.section-band.performance{color:var(--blue)}
+.new-auto-progress{display:flex;align-items:center;gap:6px;margin-top:10px}
+.progress-step{height:8px;flex:1;border-radius:5px;border:1px solid rgba(94,138,170,.22);background:rgba(94,138,170,.08)}
+.progress-step.done{background:rgba(15,204,116,.55);border-color:rgba(15,204,116,.45)}
+.progress-step.todo{background:rgba(245,176,20,.08);border-color:rgba(245,176,20,.28)}
+@media(max-width:900px){.compare-row{grid-template-columns:1fr 1fr}.kpi-arc{flex-direction:column;align-items:flex-start}.feature-tile{align-items:flex-start;flex-direction:column}.feature-meta{text-align:left}}
+
 </style>
 </head>
 <body>
@@ -749,7 +784,7 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
     </div>
 
     <div class="kpi-row kpi-6">
-      <div class="kpi"><div class="kpi-label">FCR % Official</div><div class="kpi-val green">34.2%</div><div class="kpi-sub">Target: 44%</div><div class="kpi-bar"><div class="kpi-bar-fill" style="width:78%;background:var(--blue)"></div></div></div>
+      <div class="kpi kpi-arc"><div id="fcrProgressArc" class="kpi-arc-chart"></div><div class="kpi-arc-copy"><div class="kpi-label">FCR % Official</div><div class="kpi-val green">34.2%</div><div class="kpi-sub">61 of 178 tickets resolved by ICC</div><div class="kpi-sub">Target: 44%</div></div></div>
       <div class="kpi"><div class="kpi-label">Likely FCR Candidates</div><div class="kpi-val blue">18</div><div class="kpi-sub">Awaiting validation</div></div>
       <div class="kpi"><div class="kpi-label">Missed FCR (est.)</div><div class="kpi-val orange">9</div><div class="kpi-sub">Escalated without attempt</div></div>
       <div class="kpi"><div class="kpi-label">Resolved by ICC</div><div class="kpi-val green">61</div><div class="kpi-sub">▲ 7 vs last shift</div></div>
@@ -770,18 +805,10 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
 
     <div class="g2">
       <div class="card">
-        <div class="card-hd"><span class="card-title">Likely FCR Candidates</span><span class="badge b-blue">18</span></div>
-        <div class="infobox" style="margin-bottom:9px">
-          <span class="ib-icon">ℹ</span>
-          <span>Tickets where ICC may have resolved the issue but the FCR flag was not set. Review queue for training opportunities and official FCR recovery.</span>
-        </div>
-        <div class="scroll-panel">
-          <div class="cand-row"><span class="cand-num">INC0042811</span><span class="cand-title">Move Money – App Pool restart performed, no escalation</span><span class="cand-tag"><span class="badge b-green">Likely FCR</span></span></div>
-          <div class="cand-row"><span class="cand-num">INC0042798</span><span class="cand-title">Kafka consumer lag – ICC resolved via playbook</span><span class="cand-tag"><span class="badge b-green">Likely FCR</span></span></div>
-          <div class="cand-row"><span class="cand-num">INC0042756</span><span class="cand-title">SQL timeout – ICC issued DB team restart, closed within 12m</span><span class="cand-tag"><span class="badge b-green">Likely FCR</span></span></div>
-          <div class="cand-row"><span class="cand-num">INC0042744</span><span class="cand-title">F5 pool node offline – ICC rerouted, no T2 engage</span><span class="cand-tag"><span class="badge b-green">Likely FCR</span></span></div>
-          <div class="cand-row"><span class="cand-num">INC0042731</span><span class="cand-title">Advisor Email – SMTP relay flush by ICC</span><span class="cand-tag"><span class="badge b-green">Likely FCR</span></span></div>
-          <div class="cand-row"><span class="cand-num">INC0042720</span><span class="cand-title">DataPower – Gateway restart handled by ICC team</span><span class="cand-tag"><span class="badge b-green">Likely FCR</span></span></div>
+        <div class="card-hd"><span class="card-title">Likely FCR Candidates</span><span class="badge b-blue">Moved</span></div>
+        <div class="one-line-link">
+          <span>FCR candidate action queue now lives on Command Center for live shift review.</span>
+          <span class="card-link" onclick="showTabByName('command')">View Command Center →</span>
         </div>
       </div>
       <div class="card">
@@ -817,12 +844,26 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
     </div>
 
     <div class="kpi-row kpi-6">
-      <div class="kpi"><div class="kpi-label">Incidents YoY Change</div><div class="kpi-val green">−18.0%</div><div class="kpi-sub">vs same period LY</div></div>
+      <div class="kpi"><div class="kpi-label">Incidents YoY Change</div><div class="kpi-val green">−18.0%</div><div class="kpi-sub">510 this period vs 622 last year</div></div>
       <div class="kpi"><div class="kpi-label">P-Card → INC Conv. Rate</div><div class="kpi-val orange">14.2%</div><div class="kpi-sub">▼ 1.8% vs last month</div></div>
-      <div class="kpi"><div class="kpi-label">Prevented / Avoided</div><div class="kpi-val green">4</div><div class="kpi-sub">This week</div></div>
       <div class="kpi"><div class="kpi-label">Repeat Offender Apps</div><div class="kpi-val red">6</div><div class="kpi-sub">3+ recurrences / 30d</div></div>
       <div class="kpi"><div class="kpi-label">Duplicate / Clustered</div><div class="kpi-val yellow">11</div><div class="kpi-sub">Grouped this shift</div></div>
       <div class="kpi"><div class="kpi-label">Long-Running P-Cards</div><div class="kpi-val orange">7</div><div class="kpi-sub">&gt;60 min threshold</div></div>
+    </div>
+
+    <div class="feature-tile">
+      <div class="feature-left">
+        <div class="feature-icon">🛡</div>
+        <div>
+          <div class="feature-label">Prevented Incidents</div>
+          <div class="feature-value">4</div>
+          <div class="feature-ack">Acknowledged as avoided / prevented this week</div>
+        </div>
+      </div>
+      <div class="feature-meta">
+        <div>Linked to grouped P-Cards and early ICC action</div>
+        <div class="green" style="font-weight:800">Goal 2 contribution</div>
+      </div>
     </div>
 
     <div class="g3e">
@@ -844,14 +885,14 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
       <div class="card">
         <div class="card-hd"><span class="card-title">Top Repeat Offender Apps / Services</span><span class="badge b-red">6</span></div>
         <table>
-          <thead><tr><th>App / Service</th><th>Recurrences</th><th>P-Cards</th><th>INCs</th><th>Last Seen</th><th>Risk</th></tr></thead>
+          <thead><tr><th>App / Service</th><th>Recurrences</th><th>P-Cards</th><th>INCs</th><th>Last Seen</th><th>Risk</th><th>Trend</th></tr></thead>
           <tbody>
-            <tr><td><b>Move Money</b></td><td class="red">9</td><td>7</td><td>2</td><td>Today 10:12</td><td><span class="badge b-red">High</span></td></tr>
-            <tr><td><b>Kafka Cluster</b></td><td class="red">7</td><td>10</td><td>3</td><td>Today 09:44</td><td><span class="badge b-red">High</span></td></tr>
-            <tr><td><b>SQL Database</b></td><td class="orange">6</td><td>8</td><td>2</td><td>Today 08:55</td><td><span class="badge b-red">High</span></td></tr>
-            <tr><td><b>Client Mgmt</b></td><td class="orange">5</td><td>6</td><td>1</td><td>Yesterday</td><td><span class="badge b-orange">Mod</span></td></tr>
-            <tr><td><b>F5 Load Balancer</b></td><td class="yellow">4</td><td>5</td><td>1</td><td>2 days ago</td><td><span class="badge b-orange">Mod</span></td></tr>
-            <tr><td><b>Advisor Email</b></td><td class="yellow">3</td><td>4</td><td>1</td><td>Today 11:00</td><td><span class="badge b-yellow">Low</span></td></tr>
+            <tr><td><b>Move Money</b></td><td class="red">9</td><td>7</td><td>2</td><td>Today 10:12</td><td><span class="badge b-red">High</span></td><td><div id="offSpark1" class="spark-cell"></div></td></tr>
+            <tr><td><b>Kafka Cluster</b></td><td class="red">7</td><td>10</td><td>3</td><td>Today 09:44</td><td><span class="badge b-red">High</span></td><td><div id="offSpark2" class="spark-cell"></div></td></tr>
+            <tr><td><b>SQL Database</b></td><td class="orange">6</td><td>8</td><td>2</td><td>Today 08:55</td><td><span class="badge b-red">High</span></td><td><div id="offSpark3" class="spark-cell"></div></td></tr>
+            <tr><td><b>Client Mgmt</b></td><td class="orange">5</td><td>6</td><td>1</td><td>Yesterday</td><td><span class="badge b-orange">Mod</span></td><td><div id="offSpark4" class="spark-cell"></div></td></tr>
+            <tr><td><b>F5 Load Balancer</b></td><td class="yellow">4</td><td>5</td><td>1</td><td>2 days ago</td><td><span class="badge b-orange">Mod</span></td><td><div id="offSpark5" class="spark-cell"></div></td></tr>
+            <tr><td><b>Advisor Email</b></td><td class="yellow">3</td><td>4</td><td>1</td><td>Today 11:00</td><td><span class="badge b-yellow">Low</span></td><td><div id="offSpark6" class="spark-cell"></div></td></tr>
           </tbody>
         </table>
       </div>
@@ -889,7 +930,8 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
       <div class="kpi"><div class="kpi-label">High Impact Opps</div><div class="kpi-val green">6</div></div>
     </div>
 
-    <div class="g3e">
+    <div class="section-band live">LIVE QUEUE</div>
+    <div class="g2w">
       <div class="card">
         <div class="card-hd"><span class="card-title">Automation Opportunities</span></div>
         <table>
@@ -903,6 +945,10 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
           </tbody>
         </table>
       </div>
+    </div>
+
+    <div class="section-band performance">PERFORMANCE</div>
+    <div class="g3e">
       <div class="card">
         <div class="card-hd"><span class="card-title">Execution Summary</span></div>
         <div id="autoPie" class="ch-240"></div>
@@ -918,6 +964,18 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
         </div>
         <div class="divider"></div>
         <div style="font-size:10px;color:var(--muted)">Coverage: <span class="green" style="font-weight:700">50%</span> of automatable actions have an AAG or playbook match</div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><span class="card-title">New Automations This Month</span><span class="badge b-yellow">1 of 3 goal</span></div>
+        <div class="kpi-val green" style="font-size:28px">1 / 3</div>
+        <div class="kpi-sub">Pipeline progress toward monthly automation goal</div>
+        <div class="new-auto-progress">
+          <span class="progress-step done"></span>
+          <span class="progress-step todo"></span>
+          <span class="progress-step todo"></span>
+        </div>
+        <div class="divider"></div>
+        <div style="font-size:10px;color:var(--muted)">Current candidate: <span class="blue" style="font-weight:800">Kafka Consumer Lag Recovery</span></div>
       </div>
     </div>
 
@@ -1034,12 +1092,20 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
       <span class="sec-tag" style="background:rgba(139,108,246,.1);color:var(--purple);border:1px solid rgba(139,108,246,.22)">Historical</span>
     </div>
 
+    <div class="compare-row">
+      <div class="compare-card"><div class="compare-label">MTTA · This Shift vs Last</div><div class="compare-main">4.2m <span class="compare-delta green">▼ 0.6m</span></div><div class="compare-sub">Last shift: 4.8m</div></div>
+      <div class="compare-card"><div class="compare-label">MTTR · This Shift vs Last</div><div class="compare-main">38m <span class="compare-delta green">▼ 4m</span></div><div class="compare-sub">Last shift: 42m</div></div>
+      <div class="compare-card"><div class="compare-label">First Comment · This Shift vs Last</div><div class="compare-main">3.8m <span class="compare-delta green">▼ 0.9m</span></div><div class="compare-sub">Last shift: 4.7m</div></div>
+      <div class="compare-card"><div class="compare-label">Escalation Delays · This Shift vs Last</div><div class="compare-main">12 <span class="compare-delta orange">▲ 3</span></div><div class="compare-sub">Last shift: 9</div></div>
+    </div>
+
     <div class="kpi-row kpi-6">
       <div class="kpi"><div class="kpi-label">Avg MTTA (Acknowledge)</div><div class="kpi-val purple">4.2 min</div><div class="kpi-sub">▼ 0.6m vs last week</div></div>
       <div class="kpi"><div class="kpi-label">Avg MTTR (Resolve)</div><div class="kpi-val purple">38 min</div><div class="kpi-sub">▼ 4m vs last week</div></div>
       <div class="kpi"><div class="kpi-label">First Comment Time</div><div class="kpi-val blue">3.8 min</div><div class="kpi-sub">Avg since P-Card open</div></div>
       <div class="kpi"><div class="kpi-label">Escalation Delays &gt;15m</div><div class="kpi-val orange">12</div><div class="kpi-sub">▲ 3 vs yesterday</div></div>
       <div class="kpi"><div class="kpi-label">Avg Comment Gap</div><div class="kpi-val yellow">14 min</div><div class="kpi-sub">Time between updates</div></div>
+      <div class="kpi kpi-breach"><div class="kpi-label">Comment Gap SLA Breaches</div><div class="kpi-val red">4</div><div class="kpi-sub">Red when breach count &gt; 0</div></div>
       <div class="kpi"><div class="kpi-label">P-Card Age at First Update</div><div class="kpi-val blue">3.8 min</div><div class="kpi-sub">Primary delay-prevention signal</div></div>
     </div>
 
@@ -1267,6 +1333,37 @@ if(miniRiskGaugeEl){
     }]
   });
 }
+
+
+// ── Phase 3: FCR progress arc toward target ──
+const fcrProgressArcEl = document.getElementById('fcrProgressArc');
+if(fcrProgressArcEl){
+  const fcrProgressArc = regChart(echarts.init(fcrProgressArcEl,'dark'));
+  fcrProgressArc.setOption({
+    backgroundColor:'transparent',
+    series:[{
+      type:'gauge',min:0,max:44,startAngle:210,endAngle:-30,radius:'92%',center:['50%','58%'],
+      axisLine:{lineStyle:{width:8,color:[[0.777,T.green],[1,'rgba(94,138,170,.18)']]}},
+      pointer:{show:false},progress:{show:true,width:8,itemStyle:{color:T.green}},
+      axisTick:{show:false},splitLine:{show:false},axisLabel:{show:false},anchor:{show:false},title:{show:false},
+      detail:{valueAnimation:true,formatter:'34.2%',offsetCenter:[0,'4%'],fontSize:15,fontWeight:800,color:T.green,fontFamily:'JetBrains Mono,monospace'},
+      data:[{value:34.2}]
+    }]
+  });
+}
+
+// ── Phase 3: Repeat offender sparklines ──
+function initSpark(id, data, color){
+  const el=document.getElementById(id); if(!el) return;
+  const c=regChart(echarts.init(el,'dark'));
+  c.setOption({backgroundColor:'transparent',grid:{left:0,right:0,top:4,bottom:2},xAxis:{type:'category',show:false,data:data.map((_,i)=>i)},yAxis:{type:'value',show:false,min:0},series:[{type:'line',data,showSymbol:false,smooth:true,lineStyle:{width:2,color},areaStyle:{opacity:.08,color},animation:false}]});
+}
+initSpark('offSpark1',[2,3,3,5,6,7,9],T.red);
+initSpark('offSpark2',[1,2,4,4,5,6,7],T.red);
+initSpark('offSpark3',[1,2,2,3,5,5,6],T.orange);
+initSpark('offSpark4',[1,1,2,3,3,4,5],T.orange);
+initSpark('offSpark5',[1,1,2,2,3,4,4],T.yellow);
+initSpark('offSpark6',[0,1,1,2,2,2,3],T.yellow);
 
 // ── Risk Map ──
 const riskNodes=[
