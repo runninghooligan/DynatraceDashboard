@@ -610,6 +610,11 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
 .snapshot-group-grid{grid-template-columns:1.08fr 1.08fr .84fr .62fr}
 @media(max-width:1200px){.snapshot-group-grid{grid-template-columns:1fr}.snapshot-group.risk{border-bottom:0}}
 
+
+/* Build Prompt B visibility guard: Current Shift Handoff Chain stays in normal page flow */
+#currentShiftHandoffChain{display:block;width:100%;position:relative;clear:both;margin:0 0 11px 0}
+#currentShiftHandoffChain .handoff-chain{display:flex;flex-wrap:nowrap}
+
 </style>
 </head>
 <body>
@@ -853,7 +858,7 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
 
     <div class="phase-divider"><span class="divider-pill">LIVE QUEUE</span></div>
 
-    <div class="card handoff-row">
+    <div id="currentShiftHandoffChain" class="card handoff-row">
       <div class="handoff-head">
         <span class="card-title">Shift Handoff Chain</span>
         <span class="handoff-shift">Day Shift · Started 06:00</span>
