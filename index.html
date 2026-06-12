@@ -547,6 +547,37 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
 .report-preview-title{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--text);margin-bottom:6px}
 .report-preview-body{font-size:11px;color:var(--muted);line-height:1.45}
 
+
+
+/* ══════════════════════════════════════════
+   PART 3: COMMAND CENTER REDUNDANCY AUDIT
+══════════════════════════════════════════ */
+.goal-status{
+  display:inline-flex;align-items:center;gap:4px;margin-left:6px;
+  font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:800;letter-spacing:.06em;
+  border-radius:999px;padding:1px 6px;border:1px solid;text-transform:uppercase;vertical-align:middle;
+}
+.goal-status.on{color:var(--green);border-color:rgba(15,204,116,.26);background:rgba(15,204,116,.08)}
+.goal-status.risk{color:var(--yellow);border-color:rgba(234,179,8,.28);background:rgba(234,179,8,.08)}
+.goal-status.off{color:var(--red);border-color:rgba(239,68,68,.28);background:rgba(239,68,68,.08)}
+.signal-row{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:11px}
+.signal-tile{
+  min-height:128px;display:flex;flex-direction:column;justify-content:space-between;
+  border-left:4px solid rgba(46,174,232,.6);
+}
+.signal-tile.urgent{border-left-color:var(--orange)}
+.signal-tile.danger{border-left-color:var(--red);background:linear-gradient(160deg,rgba(239,68,68,.08),#040d18)}
+.signal-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px}
+.signal-label{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text);line-height:1.35}
+.signal-value{font-family:'JetBrains Mono',monospace;font-size:30px;font-weight:800;line-height:1;margin:5px 0}.signal-meta{font-size:10px;color:var(--muted);line-height:1.4}.signal-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px}
+.compact-ticket{display:flex;justify-content:space-between;gap:8px;border-top:1px solid rgba(21,46,68,.6);padding:6px 0;font-size:10.5px;color:var(--muted)}.compact-ticket b{color:var(--text)}
+.map-collapsed{margin-bottom:11px}.map-collapsed summary{list-style:none;cursor:pointer}.map-collapsed summary::-webkit-details-marker{display:none}.map-summary{display:flex;align-items:center;justify-content:space-between;gap:10px}.map-summary-left{display:flex;flex-direction:column;gap:2px}.map-summary-title{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--text)}.map-summary-sub{font-size:10px;color:var(--muted)}.map-collapsed[open] .map-body{margin-top:10px}.map-collapsed .ch-360{height:330px}
+.snapshot-group-grid{display:grid;grid-template-columns:1.08fr 1.08fr .84fr;gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:rgba(6,18,30,.58)}
+.snapshot-group{padding:8px;border-right:1px solid rgba(29,61,87,.72)}.snapshot-group:last-child{border-right:0}.snapshot-group-title{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 7px}.snapshot-mini-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.snapshot-group.incidents .snapshot-mini-grid{grid-template-columns:repeat(3,1fr)}.snapshot-group.escalations .snapshot-mini-grid{grid-template-columns:repeat(2,1fr)}
+.live-queue-grid{display:grid;grid-template-columns:1fr .85fr;gap:11px;margin-bottom:11px}.handoff-row{margin-bottom:11px}.handoff-row .handoff-chain{grid-template-columns:repeat(5,1fr)}
+@media(max-width:1200px){.signal-row,.live-queue-grid{grid-template-columns:1fr}.snapshot-group-grid{grid-template-columns:1fr}.snapshot-group{border-right:0;border-bottom:1px solid rgba(29,61,87,.72)}.snapshot-group:last-child{border-bottom:0}}
+@media(max-width:760px){.snapshot-mini-grid,.snapshot-group.incidents .snapshot-mini-grid,.snapshot-group.escalations .snapshot-mini-grid{grid-template-columns:1fr 1fr}.signal-value{font-size:26px}}
+
 </style>
 </head>
 <body>
@@ -644,7 +675,7 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
       <div class="goal-card g1" onclick="showTab('fcr',document.querySelector('[data-tab=fcr]'))">
         <span class="goal-icon">◎</span>
         <div class="goal-info">
-          <div class="gl">Goal 1 · FCR</div>
+          <div class="gl">Goal 1 · FCR <span class="goal-status on">✓ on-track</span></div>
           <div class="gv blue">34.2%</div>
           <div class="gs">Target: +30% → 44%</div>
         </div>
@@ -652,7 +683,7 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
       <div class="goal-card g2" onclick="showTab('incidents',document.querySelector('[data-tab=incidents]'))">
         <span class="goal-icon">⬇</span>
         <div class="goal-info">
-          <div class="gl">Goal 2 · Incidents</div>
+          <div class="gl">Goal 2 · Incidents <span class="goal-status on">✓ on-track</span></div>
           <div class="gv teal">−18.0%</div>
           <div class="gs">YoY · 4 prevented</div>
         </div>
@@ -660,7 +691,7 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
       <div class="goal-card g3" onclick="showTab('analytics',document.querySelector('[data-tab=analytics]'))">
         <span class="goal-icon">⏱</span>
         <div class="goal-info">
-          <div class="gl">Goal 3 · Delay Prevention</div>
+          <div class="gl">Goal 3 · Delay Prevention <span class="goal-status risk">⚠ at-risk</span></div>
           <div class="gv purple">12 delays</div>
           <div class="gs">3.8m first comment</div>
         </div>
@@ -668,7 +699,7 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
       <div class="goal-card g4" onclick="showTab('automation',document.querySelector('[data-tab=automation]'))">
         <span class="goal-icon">⚡</span>
         <div class="goal-info">
-          <div class="gl">Goal 4 · Automation</div>
+          <div class="gl">Goal 4 · Automation <span class="goal-status risk">⚠ at-risk</span></div>
           <div class="gv yellow">3 opps</div>
           <div class="gs integration-warn">⚠ 1 integration degraded</div>
         </div>
@@ -692,16 +723,33 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
       </div>
     </div>
 
-    <!-- KPI Strip -->
-    <div class="kpi-row kpi-8">
-      <div class="kpi" data-last-updated="2" data-stale-minutes="15"><div class="kpi-label">FCR % Official</div><div class="kpi-val green">34.2%</div><div class="kpi-sub">▲ 5.6% vs 8wk avg</div><div class="kpi-bar"><div class="kpi-bar-fill" style="width:34%;background:var(--green)"></div></div></div>
-      <div class="kpi" data-last-updated="4" data-stale-minutes="15"><div class="kpi-label">Incident Reduction YoY</div><div class="kpi-val green">−18.0%</div><div class="kpi-sub">▼ vs prior year</div></div>
-      <div class="kpi" data-last-updated="2" data-stale-minutes="15"><div class="kpi-label">Long Running P-Cards</div><div class="kpi-val orange">7</div><div class="kpi-sub">▼ 2 vs yesterday</div></div>
-      <div class="kpi" data-last-updated="2" data-stale-minutes="15"><div class="kpi-label">Active Swarms</div><div class="kpi-val red">3</div><div class="kpi-sub">▼ 1 vs yesterday</div></div>
-      <div class="kpi risk-tile" data-last-updated="2" data-stale-minutes="15"><div class="kpi-label">Major Inc. Risk</div><div id="miniRiskGauge" class="kpi-mini-gauge"></div><div class="kpi-risk-label">MODERATE · 63/100</div></div>
-      <div class="kpi stale" data-last-updated="18" data-stale-minutes="15"><div class="kpi-label">Automation Savings MTD</div><div class="kpi-val green">12.4 hrs</div><div class="kpi-sub">▲ 2.1 hrs vs last mo.</div></div>
-      <div class="kpi" data-last-updated="3" data-stale-minutes="15"><div class="kpi-label">Delay Prevention Signals</div><div class="kpi-val orange">12 / 3.8m</div><div class="kpi-sub">Delays &gt;15m · first comment avg</div></div>
-      <div class="kpi" data-last-updated="4" data-stale-minutes="15"><div class="kpi-label">Prevented Major Inc.</div><div class="kpi-val green">4</div><div class="kpi-sub">▲ 2 vs last 7 days</div></div>
+    <!-- Signal Strip: replaces redundant secondary KPI row -->
+    <div class="signal-row">
+      <div class="card signal-tile urgent">
+        <div>
+          <div class="signal-top"><span class="signal-label">Oldest Unacknowledged P-Card</span><span class="badge b-orange">LIVE</span></div>
+          <div id="oldestUnackTimer" class="signal-value orange">12m 14s</div>
+          <div class="signal-meta">PB-0044298 · Advisor Email<br/>amber &gt;10m · red &gt;15m</div>
+        </div>
+        <div class="signal-actions"><button class="btn btn-blue" onclick="showTabByName('pcards')">Open Queue</button><span class="signal-meta">Operator attention signal</span></div>
+      </div>
+      <div class="card signal-tile">
+        <div>
+          <div class="signal-top"><span class="signal-label">FCR Candidates — Action Required</span><span class="badge b-blue">18</span></div>
+          <div class="compact-ticket"><span><b>INC0042811</b> Move Money restart</span><button class="btn btn-green">Confirm FCR</button></div>
+          <div class="compact-ticket"><span><b>INC0042798</b> Kafka lag playbook</span><button class="btn btn-green">Confirm FCR</button></div>
+          <div class="compact-ticket"><span><b>INC0042756</b> SQL timeout closed</span><button class="btn btn-green">Confirm FCR</button></div>
+        </div>
+        <div class="signal-actions"><span class="card-link" onclick="showTabByName('fcr')">View All →</span><span class="signal-meta">Likely FCR awaiting validation</span></div>
+      </div>
+      <div class="card signal-tile danger">
+        <div>
+          <div class="signal-top"><span class="signal-label">Comment Gap SLA Breaches</span><span class="badge b-red">4</span></div>
+          <div class="signal-value red">4</div>
+          <div class="signal-meta">P-Cards this shift exceeded the 15-minute comment gap threshold.</div>
+        </div>
+        <div class="signal-actions"><button class="btn btn-red" onclick="showTabByName('analytics')">Review Gaps</button><span class="signal-meta">Delay prevention signal</span></div>
+      </div>
     </div>
 
     <details class="topology-accordion">
@@ -725,68 +773,66 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
 
     <div class="phase-divider"><span class="divider-pill">SHIFT SUMMARY</span></div>
 
-    <div class="phase2-summary-grid">
-      <div class="card">
-        <div class="card-hd"><span class="card-title">FCR Candidates — Action Required</span><span class="badge b-blue">18</span></div>
-        <table class="fcr-watch-table">
-          <thead><tr><th>Ticket</th><th>Candidate Reason</th><th>Action</th></tr></thead>
-          <tbody>
-            <tr><td><b>INC0042811</b></td><td>Move Money restart · no escalation</td><td><button class="btn btn-green">Confirm FCR</button></td></tr>
-            <tr><td><b>INC0042798</b></td><td>Kafka lag resolved via ICC playbook</td><td><button class="btn btn-green">Confirm FCR</button></td></tr>
-            <tr><td><b>INC0042756</b></td><td>SQL timeout closed within 12m</td><td><button class="btn btn-green">Confirm FCR</button></td></tr>
-          </tbody>
-        </table>
-        <div class="card-link" style="margin-top:8px;display:block" onclick="showTabByName('fcr')">View All →</div>
-      </div>
-      <div class="card">
-        <div class="card-hd"><span class="card-title">Current Shift Handoff Chain</span></div>
-        <div class="handoff-chain">
-          <div class="handoff-step"><div class="handoff-label">Open P-Cards</div><div class="handoff-count blue">42</div><div class="handoff-sub">live queue</div></div>
-          <div class="handoff-step"><div class="handoff-label">First Comment</div><div class="handoff-count green">36</div><div class="handoff-sub">6 pending</div></div>
-          <div class="handoff-step"><div class="handoff-label">INC Created</div><div class="handoff-count yellow">14</div><div class="handoff-sub">conversion</div></div>
-          <div class="handoff-step"><div class="handoff-label">Assigned</div><div class="handoff-count orange">11</div><div class="handoff-sub">3 unassigned</div></div>
-          <div class="handoff-step"><div class="handoff-label">Escalated</div><div class="handoff-count red">5</div><div class="handoff-sub">pending owner</div></div>
-        </div>
-      </div>
-      <div class="card oldest-timer-card">
-        <div class="oldest-label">Oldest Unacknowledged</div>
-        <div id="oldestUnackTimer" class="oldest-time amber">12m 14s</div>
-        <div class="oldest-meta">PB-0044298 · Advisor Email<br/>amber &gt;10m · red &gt;15m</div>
-      </div>
-    </div>
+    <!-- Command Center summary follows: risk map, grouped operations snapshot, live queue, and handoff chain. -->
 
-    <!-- Row 1: Risk Map | Snapshot+Automation | Swarms -->
-    <div class="g3">
-      <div class="card">
-        <div class="card-hd"><span class="card-title">Operational Risk Map</span><button class="risk-popout-trigger" onclick="openRiskMap()">Expand Map ⤢</button></div>
-        <div id="riskGraph" class="ch-360"></div>
-      </div>
-      <div class="gcol">
-        <div class="card">
-          <div class="card-hd"><span class="card-title">Operations Snapshot</span><span class="card-link" onclick="showTabByName('pcards')">View All ↗</span></div>
-          <div class="snap-grid">
-            <div class="snap" onclick="showTabByName('pcards')"><div class="snap-lbl">Open P-Cards</div><div class="snap-num blue">42</div><div class="snap-sub">▼ 6</div></div>
+    <!-- Operational Risk Map: collapsed by default -->
+    <details class="card map-collapsed">
+      <summary>
+        <div class="map-summary">
+          <div class="map-summary-left">
+            <span class="map-summary-title">Operational Risk Map</span>
+            <span class="map-summary-sub">Collapsed by default · expand for topology blast radius and dependency view</span>
+          </div>
+          <button class="risk-popout-trigger" type="button" onclick="event.preventDefault();openRiskMap()">Expand Map ⤢</button>
+        </div>
+      </summary>
+      <div class="map-body"><div id="riskGraph" class="ch-360"></div></div>
+    </details>
+
+    <!-- Operations Snapshot: grouped by domain -->
+    <div class="card" style="margin-bottom:11px">
+      <div class="card-hd"><span class="card-title">Operations Snapshot</span><span class="card-link" onclick="showTabByName('pcards')">View All ↗</span></div>
+      <div class="snapshot-group-grid">
+        <div class="snapshot-group pcards">
+          <div class="snapshot-group-title">P-Cards</div>
+          <div class="snapshot-mini-grid">
+            <div class="snap" onclick="showTabByName('pcards')"><div class="snap-lbl">Open</div><div class="snap-num blue">42</div><div class="snap-sub">▼ 6</div></div>
             <div class="snap"><div class="snap-lbl">Long Running</div><div class="snap-num orange">7</div><div class="snap-sub">▼ 2</div></div>
             <div class="snap"><div class="snap-lbl">New Today</div><div class="snap-num blue">14</div><div class="snap-sub">▲ 3</div></div>
-            <div class="snap"><div class="snap-lbl">Open Incidents</div><div class="snap-num blue">28</div><div class="snap-sub">▼ 4</div></div>
-            <div class="snap"><div class="snap-lbl">Major Incidents</div><div class="snap-num red">1</div><div class="snap-sub">—</div></div>
+          </div>
+        </div>
+        <div class="snapshot-group incidents">
+          <div class="snapshot-group-title">Incidents</div>
+          <div class="snapshot-mini-grid">
+            <div class="snap"><div class="snap-lbl">Open</div><div class="snap-num blue">28</div><div class="snap-sub">▼ 4</div></div>
+            <div class="snap"><div class="snap-lbl">Major</div><div class="snap-num red">1</div><div class="snap-sub">—</div></div>
             <div class="snap"><div class="snap-lbl">Active Bridges</div><div class="snap-num red">3</div><div class="snap-sub">▼ 1</div></div>
-            <div class="snap"><div class="snap-lbl">Escalations Pending</div><div class="snap-num yellow">5</div><div class="snap-sub">▲ 1</div></div>
+          </div>
+        </div>
+        <div class="snapshot-group escalations">
+          <div class="snapshot-group-title">Escalations</div>
+          <div class="snapshot-mini-grid">
+            <div class="snap"><div class="snap-lbl">Pending</div><div class="snap-num yellow">5</div><div class="snap-sub">▲ 1</div></div>
             <div class="snap"><div class="snap-lbl">Unassigned</div><div class="snap-num yellow">2</div><div class="snap-sub">—</div></div>
           </div>
         </div>
-        <div class="card">
-          <div class="card-hd"><span class="card-title">Automation — Attention Required</span><span class="badge b-red">3</span></div>
-          <table>
-            <thead><tr><th>Opportunity</th><th>Conf</th><th>Impact</th><th>Action</th></tr></thead>
-            <tbody>
-              <tr><td>Move Money App Pool Restart</td><td>94%</td><td><span class="badge b-red">High</span></td><td><div style="display:flex;gap:4px"><button class="btn btn-blue">Review</button><button class="btn btn-red">Run</button></div></td></tr>
-              <tr><td>Kafka Consumer Lag</td><td>88%</td><td><span class="badge b-red">High</span></td><td><div style="display:flex;gap:4px"><button class="btn btn-blue">Review</button><button class="btn btn-red">Run</button></div></td></tr>
-              <tr><td>Disk Cleanup – Node03</td><td>91%</td><td><span class="badge b-orange">Med</span></td><td><div style="display:flex;gap:4px"><button class="btn btn-blue">Review</button><button class="btn btn-red">Run</button></div></td></tr>
-            </tbody>
-          </table>
-          <div class="card-link" style="margin-top:8px;display:block" onclick="showTabByName('automation')">Open Automation Tab →</div>
-        </div>
+      </div>
+    </div>
+
+    <div class="phase-divider"><span class="divider-pill">LIVE QUEUE</span></div>
+
+    <div class="live-queue-grid">
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Automation — Attention Required</span><span class="badge b-red">3</span></div>
+        <table>
+          <thead><tr><th>Opportunity</th><th>Conf</th><th>Impact</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td>Move Money App Pool Restart</td><td>94%</td><td><span class="badge b-red">High</span></td><td><div style="display:flex;gap:4px"><button class="btn btn-blue">Review</button><button class="btn btn-red">Run</button></div></td></tr>
+            <tr><td>Kafka Consumer Lag</td><td>88%</td><td><span class="badge b-red">High</span></td><td><div style="display:flex;gap:4px"><button class="btn btn-blue">Review</button><button class="btn btn-red">Run</button></div></td></tr>
+            <tr><td>Disk Cleanup – Node03</td><td>91%</td><td><span class="badge b-orange">Med</span></td><td><div style="display:flex;gap:4px"><button class="btn btn-blue">Review</button><button class="btn btn-red">Run</button></div></td></tr>
+          </tbody>
+        </table>
+        <div class="card-link" style="margin-top:8px;display:block" onclick="showTabByName('automation')">Open Automation Tab →</div>
       </div>
       <div class="card">
         <div class="card-hd"><span class="card-title">Active Swarms</span><span class="card-link">View All ↗</span></div>
@@ -808,10 +854,16 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
       </div>
     </div>
 
-    <!-- Row 2: Focus | Sankey | Gauge -->
-    <div class="g3b">
-      <div class="card">
-        <div class="card-hd"><span class="card-title">Current Focus Areas</span></div>
+    <div class="card handoff-row">
+      <div class="card-hd"><span class="card-title">Current Shift Handoff Chain</span></div>
+      <div class="handoff-chain">
+        <div class="handoff-step"><div class="handoff-label">Open P-Cards</div><div class="handoff-count blue">42</div><div class="handoff-sub">live queue</div></div>
+        <div class="handoff-step"><div class="handoff-label">First Comment</div><div class="handoff-count green">36</div><div class="handoff-sub">6 pending</div></div>
+        <div class="handoff-step"><div class="handoff-label">INC Created</div><div class="handoff-count yellow">14</div><div class="handoff-sub">conversion</div></div>
+        <div class="handoff-step"><div class="handoff-label">Assigned</div><div class="handoff-count orange">11</div><div class="handoff-sub">3 unassigned</div></div>
+        <div class="handoff-step"><div class="handoff-label">Escalated</div><div class="handoff-count red">5</div><div class="handoff-sub">pending owner</div></div>
+      </div>
+    </div>
         <div class="focus-grid">
           <div class="focus-c"><div class="focus-name">Move Money</div><div class="focus-score red">92</div><div class="focus-meta">7 P-Cards · 2 INCs</div></div>
           <div class="focus-c"><div class="focus-name">Client Mgmt</div><div class="focus-score orange">84</div><div class="focus-meta">6 P-Cards · 1 INC</div></div>
@@ -1584,7 +1636,9 @@ const riskLinks=[
 function riskCol(r){return{high:T.red,moderate:T.orange,low:T.green}[r]||T.blue}
 function trendI(t){return t==='up'?'↗':t==='down'?'↘':'→'}
 
-const risk = regChart(echarts.init(document.getElementById('riskGraph'),'dark'));
+const riskGraphEl = document.getElementById('riskGraph');
+const risk = riskGraphEl ? regChart(echarts.init(riskGraphEl,'dark')) : null;
+if(risk){
 risk.setOption({
   backgroundColor:'transparent',
   tooltip:{...T.tooltip,
@@ -1626,9 +1680,13 @@ risk.setOption({
     }))
   }]
 });
+}
+document.querySelectorAll('.map-collapsed').forEach(d => d.addEventListener('toggle', () => setTimeout(() => { try{ risk && risk.resize(); }catch(e){} }, 80)));
 
 // ── Sankey ──
-const sankey = regChart(echarts.init(document.getElementById('sankey'),'dark'));
+const sankeyEl = document.getElementById('sankey');
+if(sankeyEl){
+const sankey = regChart(echarts.init(sankeyEl,'dark'));
 sankey.setOption({
   backgroundColor:'transparent',
   tooltip:{...T.tooltip},
@@ -1654,9 +1712,12 @@ sankey.setOption({
     lineStyle:{color:'gradient',opacity:.38}
   }]
 });
+}
 
 // ── Gauge ──
-const gauge = regChart(echarts.init(document.getElementById('gauge'),'dark'));
+const gaugeEl = document.getElementById('gauge');
+if(gaugeEl){
+const gauge = regChart(echarts.init(gaugeEl,'dark'));
 gauge.setOption({
   backgroundColor:'transparent',
   series:[{
@@ -1678,6 +1739,7 @@ gauge.setOption({
     data:[{value:63,name:'MODERATE RISK'}]
   }]
 });
+}
 
 
 /* ══════════════════════════════════════
