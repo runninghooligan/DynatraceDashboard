@@ -19,12 +19,13 @@
   --text:#cfe8f7;
   --muted:#5e8aaa;
   --green:#0fcc74;
-  --yellow:#f5b014;
-  --orange:#f57c1f;
-  --red:#e83535;
+  --yellow:#EAB308;
+  --orange:#F97316;
+  --red:#EF4444;
   --blue:#2eaee8;
   --teal:#1ac9b0;
   --purple:#8b6cf6;
+  --severity-muted:#6B7280;
   --sidebar-w:192px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -436,17 +437,25 @@ tr:hover td{background:rgba(46,174,232,.04)}
 /* ══════════════════════════════════════════
    PHASE 5: VISUAL POLISH + INTELLIGENCE LAYER
 ══════════════════════════════════════════ */
-.sev-critical,.sev-p1{color:#ff8a8a!important;border-color:rgba(232,53,53,.35)!important;background:rgba(232,53,53,.14)!important}
-.sev-high,.sev-p2{color:#ffb070!important;border-color:rgba(245,124,31,.35)!important;background:rgba(245,124,31,.14)!important}
-.sev-moderate,.sev-p3major{color:#ffd166!important;border-color:rgba(245,176,20,.35)!important;background:rgba(245,176,20,.14)!important}
-.sev-low,.sev-p3nonmajor,.sev-p4{color:#9fb8cc!important;border-color:rgba(94,138,170,.25)!important;background:rgba(94,138,170,.12)!important}
-.kpi-freshness{position:absolute;right:8px;top:7px;font-family:'JetBrains Mono',monospace;font-size:8px;border:1px solid rgba(94,138,170,.22);border-radius:10px;padding:1px 5px;color:var(--muted);background:rgba(6,18,30,.72)}
-.kpi-freshness.warn{color:var(--yellow);border-color:rgba(245,176,20,.28);background:rgba(245,176,20,.06)}
-.kpi-freshness.stale{color:#ff8888;border-color:rgba(232,53,53,.28);background:rgba(232,53,53,.06)}
+/* Semantic severity palette: Critical #EF4444, High #F97316, Moderate #EAB308, Low #6B7280 */
+.sev-critical,.sev-p1,.badge.b-red{color:#fff!important;border-color:rgba(239,68,68,.48)!important;background:rgba(239,68,68,.22)!important}
+.sev-high,.sev-p2,.badge.b-orange{color:#ffedd5!important;border-color:rgba(249,115,22,.48)!important;background:rgba(249,115,22,.20)!important}
+.sev-moderate,.sev-p3major,.badge.b-yellow{color:#fef3c7!important;border-color:rgba(234,179,8,.48)!important;background:rgba(234,179,8,.18)!important}
+.sev-low,.sev-p3nonmajor,.sev-p4,.badge.b-muted{color:#d1d5db!important;border-color:rgba(107,114,128,.42)!important;background:rgba(107,114,128,.18)!important}
+tr.sev-critical td,tr.sev-p1 td{border-left:3px solid #EF4444}tr.sev-high td,tr.sev-p2 td{border-left:3px solid #F97316}tr.sev-moderate td,tr.sev-p3major td{border-left:3px solid #EAB308}tr.sev-low td,tr.sev-p3nonmajor td{border-left:3px solid #6B7280}
+.swarm{position:relative;border-left-width:4px}.swarm.high{border-left-color:#EF4444!important}.swarm.mod{border-left-color:#F97316!important}.swarm.low{border-left-color:#EAB308!important}
+.risk-tile,.kpi:has(#miniRiskGauge){border-color:rgba(249,115,22,.42);box-shadow:inset 0 0 0 1px rgba(249,115,22,.08)}
+.kpi[data-last-updated],.card[data-last-updated],.collector-card[data-last-updated]{transition:opacity .18s,filter .18s,border-color .18s}.kpi.stale,.card.stale{opacity:.58;filter:saturate(.72)}
+.freshness-badge,.kpi-freshness{position:absolute;right:8px;top:7px;font-family:'JetBrains Mono',monospace;font-size:8px;border:1px solid rgba(94,138,170,.22);border-radius:10px;padding:1px 5px;color:var(--muted);background:rgba(6,18,30,.72);z-index:2}
+.freshness-badge.warn,.kpi-freshness.warn{color:var(--yellow);border-color:rgba(234,179,8,.38);background:rgba(234,179,8,.08)}
+.freshness-badge.stale,.kpi-freshness.stale{color:#fecaca;border-color:rgba(239,68,68,.42);background:rgba(239,68,68,.10)}
+.stale-icon{font-weight:800;margin-right:3px}.stale .stale-icon{animation:staleSpin 1.4s linear infinite}@keyframes staleSpin{to{transform:rotate(360deg)}}
 .collector-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 0 11px}
-.collector-card{background:rgba(6,18,30,.82);border:1px solid var(--line);border-radius:8px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:46px}
+.collector-card{background:rgba(6,18,30,.82);border:1px solid var(--line);border-radius:8px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:50px;position:relative;overflow:hidden}
+.collector-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--green)}.collector-card.warn::before{background:var(--yellow)}.collector-card.stale::before{background:var(--red)}
 .collector-left{display:flex;flex-direction:column;gap:2px}.collector-name{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text)}.collector-meta{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted)}
-.collector-status{font-size:9px;font-weight:800;border-radius:12px;padding:2px 6px;border:1px solid}.collector-status.ok{color:var(--green);border-color:rgba(15,204,116,.28);background:rgba(15,204,116,.08)}.collector-status.warn{color:var(--yellow);border-color:rgba(245,176,20,.28);background:rgba(245,176,20,.08)}
+.collector-age{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:800;color:var(--text)}
+.collector-status{font-size:9px;font-weight:800;border-radius:12px;padding:2px 6px;border:1px solid}.collector-status.ok{color:var(--green);border-color:rgba(15,204,116,.28);background:rgba(15,204,116,.08)}.collector-status.warn{color:var(--yellow);border-color:rgba(234,179,8,.32);background:rgba(234,179,8,.08)}.collector-status.stale{color:#fecaca;border-color:rgba(239,68,68,.42);background:rgba(239,68,68,.10)}
 .spark-mini{width:78px;height:22px;display:inline-block;vertical-align:middle;margin-left:6px}.spark-mini polyline{fill:none;stroke:currentColor;stroke-width:2;opacity:.9}.spark-mini circle{fill:currentColor;opacity:.95}
 .wall-progress{position:fixed;left:0;right:0;bottom:0;height:3px;background:rgba(46,174,232,.08);z-index:99998;display:none}.wall-progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--teal));transition:width .2s linear}
 body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.wall-mode aside{display:none}body.wall-mode .app{grid-template-columns:1fr}body.wall-mode .topbar{padding:12px 22px}body.wall-mode .content{padding:16px 20px}body.wall-mode .kpi-val{font-size:25px}body.wall-mode .card{border-radius:12px}body.wall-mode .goal-banner{grid-template-columns:repeat(4,1fr)}body.wall-mode .g3{grid-template-columns:1.55fr .95fr .95fr}
@@ -599,8 +608,8 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
     </div>
   </div>
   <div class="sidebar-footer">
-    <span class="pulse"></span>All collectors online<br>
-    <span style="opacity:.45;font-size:8.5px">DT · SNOW · AlertSite · DPA</span><br>
+    <span class="pulse"></span>Collectors: DT 2m · SNOW 4m<br>
+    <span style="opacity:.45;font-size:8.5px">AlertSite 1m · DPA 11m ⚠</span><br>
     <span style="opacity:.35;font-size:8px">Phase 5 · Visual Intelligence</span>
   </div>
 </aside>
@@ -668,16 +677,31 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
 
     <div class="phase-divider"><span class="divider-pill">LIVE STATE — Current Shift</span></div>
 
+    <div class="collector-strip" aria-label="Collector poll freshness">
+      <div class="collector-card" data-last-updated="2" data-stale-minutes="15">
+        <div class="collector-left"><span class="collector-name">Dynatrace</span><span class="collector-meta">Problems API · last poll</span></div><div><div class="collector-age">2m ago</div><span class="collector-status ok">OK</span></div>
+      </div>
+      <div class="collector-card" data-last-updated="4" data-stale-minutes="15">
+        <div class="collector-left"><span class="collector-name">ServiceNow</span><span class="collector-meta">INC / PRB lookup · last poll</span></div><div><div class="collector-age">4m ago</div><span class="collector-status ok">OK</span></div>
+      </div>
+      <div class="collector-card" data-last-updated="1" data-stale-minutes="15">
+        <div class="collector-left"><span class="collector-name">AlertSite</span><span class="collector-meta">Synthetic checks · last poll</span></div><div><div class="collector-age">1m ago</div><span class="collector-status ok">OK</span></div>
+      </div>
+      <div class="collector-card warn" data-last-updated="11" data-stale-minutes="10">
+        <div class="collector-left"><span class="collector-name">SolarWinds DPA</span><span class="collector-meta">DB health · last poll</span></div><div><div class="collector-age">11m ago</div><span class="collector-status warn">WARN</span></div>
+      </div>
+    </div>
+
     <!-- KPI Strip -->
     <div class="kpi-row kpi-8">
-      <div class="kpi"><div class="kpi-label">FCR % Official</div><div class="kpi-val green">34.2%</div><div class="kpi-sub">▲ 5.6% vs 8wk avg</div><div class="kpi-bar"><div class="kpi-bar-fill" style="width:34%;background:var(--green)"></div></div></div>
-      <div class="kpi"><div class="kpi-label">Incident Reduction YoY</div><div class="kpi-val green">−18.0%</div><div class="kpi-sub">▼ vs prior year</div></div>
-      <div class="kpi"><div class="kpi-label">Long Running P-Cards</div><div class="kpi-val orange">7</div><div class="kpi-sub">▼ 2 vs yesterday</div></div>
-      <div class="kpi"><div class="kpi-label">Active Swarms</div><div class="kpi-val red">3</div><div class="kpi-sub">▼ 1 vs yesterday</div></div>
-      <div class="kpi"><div class="kpi-label">Major Inc. Risk</div><div id="miniRiskGauge" class="kpi-mini-gauge"></div><div class="kpi-risk-label">MODERATE · 63/100</div></div>
-      <div class="kpi"><div class="kpi-label">Automation Savings MTD</div><div class="kpi-val green">12.4 hrs</div><div class="kpi-sub">▲ 2.1 hrs vs last mo.</div></div>
-      <div class="kpi"><div class="kpi-label">Delay Prevention Signals</div><div class="kpi-val orange">12 / 3.8m</div><div class="kpi-sub">Delays &gt;15m · first comment avg</div></div>
-      <div class="kpi"><div class="kpi-label">Prevented Major Inc.</div><div class="kpi-val green">4</div><div class="kpi-sub">▲ 2 vs last 7 days</div></div>
+      <div class="kpi" data-last-updated="2" data-stale-minutes="15"><div class="kpi-label">FCR % Official</div><div class="kpi-val green">34.2%</div><div class="kpi-sub">▲ 5.6% vs 8wk avg</div><div class="kpi-bar"><div class="kpi-bar-fill" style="width:34%;background:var(--green)"></div></div></div>
+      <div class="kpi" data-last-updated="4" data-stale-minutes="15"><div class="kpi-label">Incident Reduction YoY</div><div class="kpi-val green">−18.0%</div><div class="kpi-sub">▼ vs prior year</div></div>
+      <div class="kpi" data-last-updated="2" data-stale-minutes="15"><div class="kpi-label">Long Running P-Cards</div><div class="kpi-val orange">7</div><div class="kpi-sub">▼ 2 vs yesterday</div></div>
+      <div class="kpi" data-last-updated="2" data-stale-minutes="15"><div class="kpi-label">Active Swarms</div><div class="kpi-val red">3</div><div class="kpi-sub">▼ 1 vs yesterday</div></div>
+      <div class="kpi risk-tile" data-last-updated="2" data-stale-minutes="15"><div class="kpi-label">Major Inc. Risk</div><div id="miniRiskGauge" class="kpi-mini-gauge"></div><div class="kpi-risk-label">MODERATE · 63/100</div></div>
+      <div class="kpi stale" data-last-updated="18" data-stale-minutes="15"><div class="kpi-label">Automation Savings MTD</div><div class="kpi-val green">12.4 hrs</div><div class="kpi-sub">▲ 2.1 hrs vs last mo.</div></div>
+      <div class="kpi" data-last-updated="3" data-stale-minutes="15"><div class="kpi-label">Delay Prevention Signals</div><div class="kpi-val orange">12 / 3.8m</div><div class="kpi-sub">Delays &gt;15m · first comment avg</div></div>
+      <div class="kpi" data-last-updated="4" data-stale-minutes="15"><div class="kpi-label">Prevented Major Inc.</div><div class="kpi-val green">4</div><div class="kpi-sub">▲ 2 vs last 7 days</div></div>
     </div>
 
     <details class="topology-accordion">
@@ -1078,14 +1102,14 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
         <table>
           <thead><tr><th>P-Card ID</th><th>Title</th><th>Service / VCT</th><th>Age</th><th>Severity</th><th>Status</th><th>Incident</th></tr></thead>
           <tbody>
-            <tr class="pcard-row" onclick="openPCardDrawer('PB-0044211','Move Money app pool memory spike','Move Money','82m','Critical','Open','INC0042811')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044211</td><td>Move Money app pool memory spike</td><td>Move Money</td><td class="red">82m</td><td><span class="badge b-red">Critical</span></td><td><span class="badge b-red">Open</span></td><td><span class="badge b-orange">INC0042811</span></td></tr>
-            <tr class="pcard-row" onclick="openPCardDrawer('PB-0044198','Kafka consumer group lag spike','Middleware','71m','Critical','Open','INC0042803')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044198</td><td>Kafka consumer group lag spike</td><td>Middleware</td><td class="red">71m</td><td><span class="badge b-red">Critical</span></td><td><span class="badge b-red">Open</span></td><td><span class="badge b-orange">INC0042803</span></td></tr>
-            <tr class="pcard-row" onclick="openPCardDrawer('PB-0044185','SQL DB connection pool exhausted','Database','64m','Critical','Open','INC0042789')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044185</td><td>SQL DB connection pool exhausted</td><td>Database</td><td class="orange">64m</td><td><span class="badge b-red">Critical</span></td><td><span class="badge b-red">Open</span></td><td><span class="badge b-orange">INC0042789</span></td></tr>
-            <tr class="pcard-row" onclick="openPCardDrawer('PB-0044177','Client Mgmt service degraded response','Client Mgmt','48m','High','Swarm','—')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044177</td><td>Client Mgmt service degraded response</td><td>Client Mgmt</td><td class="yellow">48m</td><td><span class="badge b-orange">High</span></td><td><span class="badge b-orange">Swarm</span></td><td>—</td></tr>
-            <tr class="pcard-row" onclick="openPCardDrawer('PB-0044165','F5 load balancer pool node down','Network','38m','High','Watch','—')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044165</td><td>F5 load balancer pool node down</td><td>Network</td><td class="yellow">38m</td><td><span class="badge b-orange">High</span></td><td><span class="badge b-yellow">Watch</span></td><td>—</td></tr>
-            <tr class="pcard-row" onclick="openPCardDrawer('PB-0044154','Advisor Email SMTP relay latency','Messaging','28m','Medium','Swarm','—')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044154</td><td>Advisor Email SMTP relay latency</td><td>Messaging</td><td>28m</td><td><span class="badge b-yellow">Medium</span></td><td><span class="badge b-orange">Swarm</span></td><td>—</td></tr>
-            <tr class="pcard-row" onclick="openPCardDrawer('PB-0044142','DataPower gateway slow response','Middleware','18m','Medium','Watch','—')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044142</td><td>DataPower gateway slow response</td><td>Middleware</td><td>18m</td><td><span class="badge b-yellow">Medium</span></td><td><span class="badge b-yellow">Watch</span></td><td>—</td></tr>
-            <tr class="pcard-row" onclick="openPCardDrawer('PB-0044130','Linux Node03 disk usage 97%','Platform','12m','Low','Auto-Queued','—')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044130</td><td>Linux Node03 disk usage 97%</td><td>Platform</td><td>12m</td><td><span class="badge b-muted">Low</span></td><td><span class="badge b-green">Auto-Queued</span></td><td>—</td></tr>
+            <tr class="pcard-row sev-critical" onclick="openPCardDrawer('PB-0044211','Move Money app pool memory spike','Move Money','82m','Critical','Open','INC0042811')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044211</td><td>Move Money app pool memory spike</td><td>Move Money</td><td class="red">82m</td><td><span class="badge b-red">Critical</span></td><td><span class="badge b-red">Open</span></td><td><span class="badge b-orange">INC0042811</span></td></tr>
+            <tr class="pcard-row sev-critical" onclick="openPCardDrawer('PB-0044198','Kafka consumer group lag spike','Middleware','71m','Critical','Open','INC0042803')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044198</td><td>Kafka consumer group lag spike</td><td>Middleware</td><td class="red">71m</td><td><span class="badge b-red">Critical</span></td><td><span class="badge b-red">Open</span></td><td><span class="badge b-orange">INC0042803</span></td></tr>
+            <tr class="pcard-row sev-critical" onclick="openPCardDrawer('PB-0044185','SQL DB connection pool exhausted','Database','64m','Critical','Open','INC0042789')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044185</td><td>SQL DB connection pool exhausted</td><td>Database</td><td class="orange">64m</td><td><span class="badge b-red">Critical</span></td><td><span class="badge b-red">Open</span></td><td><span class="badge b-orange">INC0042789</span></td></tr>
+            <tr class="pcard-row sev-high" onclick="openPCardDrawer('PB-0044177','Client Mgmt service degraded response','Client Mgmt','48m','High','Swarm','—')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044177</td><td>Client Mgmt service degraded response</td><td>Client Mgmt</td><td class="yellow">48m</td><td><span class="badge b-orange">High</span></td><td><span class="badge b-orange">Swarm</span></td><td>—</td></tr>
+            <tr class="pcard-row sev-high" onclick="openPCardDrawer('PB-0044165','F5 load balancer pool node down','Network','38m','High','Watch','—')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044165</td><td>F5 load balancer pool node down</td><td>Network</td><td class="yellow">38m</td><td><span class="badge b-orange">High</span></td><td><span class="badge b-yellow">Watch</span></td><td>—</td></tr>
+            <tr class="pcard-row sev-moderate" onclick="openPCardDrawer('PB-0044154','Advisor Email SMTP relay latency','Messaging','28m','Medium','Swarm','—')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044154</td><td>Advisor Email SMTP relay latency</td><td>Messaging</td><td>28m</td><td><span class="badge b-yellow">Medium</span></td><td><span class="badge b-orange">Swarm</span></td><td>—</td></tr>
+            <tr class="pcard-row sev-moderate" onclick="openPCardDrawer('PB-0044142','DataPower gateway slow response','Middleware','18m','Medium','Watch','—')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044142</td><td>DataPower gateway slow response</td><td>Middleware</td><td>18m</td><td><span class="badge b-yellow">Medium</span></td><td><span class="badge b-yellow">Watch</span></td><td>—</td></tr>
+            <tr class="pcard-row sev-low" onclick="openPCardDrawer('PB-0044130','Linux Node03 disk usage 97%','Platform','12m','Low','Auto-Queued','—')"><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044130</td><td>Linux Node03 disk usage 97%</td><td>Platform</td><td>12m</td><td><span class="badge b-muted">Low</span></td><td><span class="badge b-green">Auto-Queued</span></td><td>—</td></tr>
           </tbody>
         </table>
       </div>
@@ -1455,8 +1479,8 @@ tickOldestUnack(); setInterval(tickOldestUnack, 1000);
 const T = {
   bg:'transparent', text:'#cfe8f7', muted:'#5e8aaa',
   line:'#152e44', line2:'#1d3d57',
-  green:'#0fcc74', yellow:'#f5b014', orange:'#f57c1f',
-  red:'#e83535', blue:'#2eaee8', teal:'#1ac9b0', purple:'#8b6cf6',
+  green:'#0fcc74', yellow:'#EAB308', orange:'#F97316',
+  red:'#EF4444', blue:'#2eaee8', teal:'#1ac9b0', purple:'#8b6cf6',
   tooltip:{
     backgroundColor:'#071827', borderColor:'#1d3d57',
     textStyle:{color:'#cfe8f7', fontFamily:'Syne,sans-serif', fontSize:11},
@@ -1547,6 +1571,7 @@ const riskNodes=[
   {name:'Linux',         layer:'Platform',          x:580, y:290, risk:'low',      pcards:1, incidents:0, swarm:0, trend:'flat'},
   {name:'Network',       layer:'Network',           x:720, y:290, risk:'moderate', pcards:6, incidents:2, swarm:0, trend:'up'}
 ];
+riskNodes.forEach(n => { n.blastScore = Math.min(100, (n.pcards * 7) + (n.incidents * 12) + (n.swarm ? 14 : 0)); });
 const riskLinks=[
   {s:'Move Money',t:'Kafka',w:9},{s:'Move Money',t:'SQL Database',w:8},{s:'Move Money',t:'F5',w:5},
   {s:'Client Mgmt',t:'TIBCO',w:8},{s:'Client Mgmt',t:'SQL Database',w:7},
@@ -1566,7 +1591,7 @@ risk.setOption({
     formatter(p){
       if(p.dataType==='edge') return `<b>${p.data.source}</b> → <b>${p.data.target}</b><br/>Weight: ${p.data.weight}/10`;
       const d=p.data.raw;
-      return `<b style="font-size:12px">${d.name}</b><br/>Layer: ${d.layer}<br/>Risk: <span style="color:${riskCol(d.risk)};font-weight:700">${d.risk.toUpperCase()}</span><br/>P-Cards: <b>${d.pcards}</b> · Incidents: <b>${d.incidents}</b><br/>Swarm: ${d.swarm?'<span style="color:#e83535">Active</span>':'None'} · Trend: ${trendI(d.trend)}`;
+      return `<b style="font-size:12px">${d.name}</b><br/>Layer: ${d.layer}<br/>Risk: <span style="color:${riskCol(d.risk)};font-weight:700">${d.risk.toUpperCase()}</span><br/>P-Cards: <b>${d.pcards}</b> · Incidents: <b>${d.incidents}</b><br/>Blast score: <b>${d.blastScore}</b><br/>Swarm: ${d.swarm?'<span style="color:#e83535">Active</span>':'None'} · Trend: ${trendI(d.trend)}`;
     }
   },
   legend:{bottom:0,left:'center',textStyle:{color:T.muted,fontSize:10},
@@ -1676,17 +1701,18 @@ function buildRiskGraphOption(nodes, expanded=false){
     },
     legend:{bottom:expanded?10:0,left:'center',textStyle:{color:T.muted,fontSize:10},data:['High Risk','Moderate Risk','Low Risk']},
     series:[{
-      type:'graph',layout:'none',roam:true,draggable:true,
+      type:'graph',layout:expanded?'force':'none',roam:true,draggable:true,
+      force: expanded ? {repulsion:520,edgeLength:[120,260],gravity:.08,layoutAnimation:true,friction:.58} : undefined,
       edgeSymbol:['none','arrow'],edgeSymbolSize:[0,expanded?9:7],
       emphasis:{focus:'adjacency',lineStyle:{width:expanded?5:4}},
       categories:[{name:'High Risk'},{name:'Moderate Risk'},{name:'Low Risk'}],
       data:nodes.map(n=>({
         name:n.name,raw:n,category:n.risk==='high'?0:n.risk==='moderate'?1:2,
-        x:n.x,y:n.y,symbol:'roundRect',
-        symbolSize:expanded?[118+(n.pcards*5),64+(n.pcards*1.8)]:[90+(n.pcards*4),52+(n.pcards*1.5)],
-        itemStyle:{color:'#071827',borderColor:riskCol(n.risk),borderWidth:n.risk==='high'?2.8:1.9,shadowBlur:n.risk==='high'?18:9,shadowColor:riskCol(n.risk)},
+        x:n.x,y:n.y,symbol:expanded?'circle':'roundRect',
+        symbolSize: expanded ? Math.max(48, Math.min(112, 28 + n.blastScore * .72)) : [90+(n.pcards*4),52+(n.pcards*1.5)],
+        itemStyle:{color: expanded ? riskCol(n.risk) : '#071827',borderColor:riskCol(n.risk),borderWidth:n.risk==='high'?2.8:1.9,shadowBlur:n.risk==='high'?18:9,shadowColor:riskCol(n.risk)},
         label:{show:true,color:T.text,fontSize:expanded?12:10.5,lineHeight:expanded?17:15,
-          formatter(p){const d=p.data.raw; return `{nm|${d.name}}\n{pc|${d.pcards} P} {inc|${d.incidents} INC} {tr|${trendI(d.trend)}}`;},
+          formatter(p){const d=p.data.raw; return expanded ? `{nm|${d.name}}\n{pc|Blast ${d.blastScore}} {inc|${d.incidents} INC}` : `{nm|${d.name}}\n{pc|${d.pcards} P} {inc|${d.incidents} INC} {tr|${trendI(d.trend)}}`;},
           rich:{nm:{fontWeight:800,color:T.text,fontSize:expanded?12:10.5},pc:{fontWeight:800,color:riskCol(n.risk),fontSize:expanded?12:11},inc:{fontWeight:800,color:T.blue,fontSize:expanded?11:10},tr:{fontWeight:800,color:riskCol(n.risk),fontSize:expanded?13:12}}
         }
       })),
@@ -2005,6 +2031,78 @@ document.querySelectorAll('.goal-card').forEach((el,i) => {
     showTab(tabs[i], b);
   });
 });
+
+
+
+/* ══════════════════════════════════════
+   PHASE 5: STALENESS + WALL MODE
+══════════════════════════════════════ */
+function applyFreshnessBadges(){
+  document.querySelectorAll('[data-last-updated]').forEach(el => {
+    const age = Number(el.dataset.lastUpdated || 0);
+    const staleAt = Number(el.dataset.staleMinutes || 15);
+    const badge = el.querySelector('.freshness-badge') || document.createElement('span');
+    badge.className = 'freshness-badge';
+    if(age >= staleAt){
+      el.classList.add('stale');
+      badge.classList.add('stale');
+      badge.innerHTML = '<span class="stale-icon">⟳</span> stale';
+    } else if(age >= staleAt * .66){
+      el.classList.remove('stale');
+      badge.classList.add('warn');
+      badge.innerHTML = '<span class="stale-icon">⟳</span> ' + age + 'm';
+    } else {
+      el.classList.remove('stale');
+      badge.innerHTML = age + 'm';
+    }
+    if(!el.querySelector('.freshness-badge')) el.appendChild(badge);
+  });
+}
+applyFreshnessBadges();
+
+let wallInterval = null;
+let wallProgressInterval = null;
+let wallStartedAt = Date.now();
+const wallTabs = ['command','fcr','incidents','analytics','automation','reports'];
+function setWallProgress(){
+  const bar = document.getElementById('wallProgressBar');
+  if(!bar) return;
+  const pct = Math.min(100, ((Date.now() - wallStartedAt) / 30000) * 100);
+  bar.style.width = pct + '%';
+}
+function cycleWallTab(){
+  const active = document.querySelector('main section:not(.hidden)')?.id || 'command';
+  const next = wallTabs[(wallTabs.indexOf(active) + 1) % wallTabs.length];
+  showTabByName(next);
+  wallStartedAt = Date.now();
+  setWallProgress();
+}
+function startWallMode(){
+  document.body.classList.add('wall-mode');
+  sessionStorage.setItem('iccWallMode','on');
+  const btn = document.getElementById('wallModeBtn');
+  if(btn) btn.textContent = '▣ Exit Wall Mode';
+  wallStartedAt = Date.now();
+  clearInterval(wallInterval); clearInterval(wallProgressInterval);
+  wallInterval = setInterval(cycleWallTab, 30000);
+  wallProgressInterval = setInterval(setWallProgress, 250);
+  setWallProgress();
+  setTimeout(() => CHARTS.forEach(c => { try{c.resize()}catch(e){} }), 120);
+}
+function stopWallMode(){
+  document.body.classList.remove('wall-mode');
+  sessionStorage.setItem('iccWallMode','off');
+  const btn = document.getElementById('wallModeBtn');
+  if(btn) btn.textContent = '▣ Wall Mode';
+  clearInterval(wallInterval); clearInterval(wallProgressInterval);
+  const bar = document.getElementById('wallProgressBar');
+  if(bar) bar.style.width = '0%';
+  setTimeout(() => CHARTS.forEach(c => { try{c.resize()}catch(e){} }), 120);
+}
+function toggleWallMode(){
+  document.body.classList.contains('wall-mode') ? stopWallMode() : startWallMode();
+}
+if(sessionStorage.getItem('iccWallMode') === 'on') startWallMode();
 
 // ── Resize ──
 
