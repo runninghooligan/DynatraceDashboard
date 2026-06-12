@@ -615,6 +615,29 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
 #currentShiftHandoffChain{display:block;width:100%;position:relative;clear:both;margin:0 0 11px 0}
 #currentShiftHandoffChain .handoff-chain{display:flex;flex-wrap:nowrap}
 
+
+/* Build Prompt C — Phase 1 structural fixes */
+.nav-live-dot{
+  width:6px;height:6px;border-radius:50%;background:#22c55e;
+  display:inline-block;margin-left:2px;flex-shrink:0;
+  box-shadow:0 0 0 rgba(34,197,94,.55);
+  animation:phase1NavLivePulse 2s infinite;
+}
+@keyframes phase1NavLivePulse{
+  0%{opacity:.55;box-shadow:0 0 0 0 rgba(34,197,94,.45)}
+  50%{opacity:1;box-shadow:0 0 0 5px rgba(34,197,94,0)}
+  100%{opacity:.55;box-shadow:0 0 0 0 rgba(34,197,94,0)}
+}
+.nav-badge.hist{
+  color:#9ca3af!important;border-color:rgba(107,114,128,.34)!important;
+  background:rgba(107,114,128,.12)!important;animation:none!important;
+}
+.topology-accordion.phase1-bottom{margin-top:11px}
+.topology-accordion.phase1-bottom .topology-body{overflow:hidden;transition:max-height .22s ease,opacity .18s ease}
+.topology-accordion.phase1-bottom:not([open]) .topology-body{max-height:0;opacity:0;padding-top:0;padding-bottom:0}
+.topology-accordion.phase1-bottom[open] .topology-body{max-height:520px;opacity:1}
+.topology-note.phase1-note{margin-bottom:9px}
+
 </style>
 </head>
 <body>
@@ -634,17 +657,19 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
       <div class="nav-label">Real-Time</div>
       <button class="active" data-tab="command" onclick="showTab('command',this)">
         <span class="ico">⬡</span>Command Center
-        <span class="nav-badge live">LIVE</span>
+        <span class="nav-live-dot" title="LIVE"></span>
       </button>
     </div>
     <div class="nav-group">
       <div class="nav-label">Goals</div>
       <button data-tab="fcr" onclick="showTab('fcr',this)">
         <span class="ico">◎</span>FCR &amp; Resolution
+        <span class="nav-badge hist">HIST</span>
         <span class="goal-dot" style="background:var(--blue)"></span>
       </button>
       <button data-tab="incidents" onclick="showTab('incidents',this)">
         <span class="ico">⚠</span>Incident Reduction
+        <span class="nav-badge hist">HIST</span>
         <span class="goal-dot" style="background:var(--teal)"></span>
       </button>
       <button onclick="window.location.href='incident_reduction_prevention.html'">
@@ -660,7 +685,7 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
       <div class="nav-label">Operations</div>
       <button data-tab="pcards" onclick="showTab('pcards',this)">
         <span class="ico">◫</span>P-Cards
-        <span class="nav-badge live">LIVE</span>
+        <span class="nav-live-dot" title="LIVE"></span>
       </button>
       <button data-tab="analytics" onclick="showTab('analytics',this)">
         <span class="ico">〜</span>Delay &amp; MTTA
@@ -779,24 +804,6 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
       </div>
     </div>
 
-    <details class="topology-accordion">
-      <summary>Topology Enrichment — Moved from Removed Tab</summary>
-      <div class="topology-body">
-        <div class="topology-note">Phase 1 keeps Topology Enrichment out of the left nav, but preserves the operational content on Command Center as a collapsible enrichment layer tied to the risk map.</div>
-        <div class="topology-table-wrap">
-          <table>
-            <thead><tr><th>Layer</th><th>Entity / Service</th><th>Enrichment Source</th><th>Signals Added</th><th>Current Use</th></tr></thead>
-            <tbody>
-              <tr><td>Business Service</td><td><b>Move Money</b></td><td>Dynatrace tags + ServiceNow CMDB</td><td>VCT, app owner, active INC, p-card cluster</td><td><span class="badge b-red">Risk Map</span></td></tr>
-              <tr><td>Middleware</td><td><b>Kafka</b></td><td>Dynatrace topology + AAG keywords</td><td>Consumer lag pattern, playbook match, support group</td><td><span class="badge b-orange">Swarm Routing</span></td></tr>
-              <tr><td>Database</td><td><b>SQL Database</b></td><td>SolarWinds DPA + ServiceNow assignment</td><td>DB health, timeout pattern, related PTASK/PRB</td><td><span class="badge b-orange">Escalation Context</span></td></tr>
-              <tr><td>Network / Edge</td><td><b>F5 / Network</b></td><td>Dynatrace entities + SNOW CI relations</td><td>Pool node status, upstream dependency, incident links</td><td><span class="badge b-yellow">Dependency Context</span></td></tr>
-              <tr><td>Platform</td><td><b>Linux / AWS PODS</b></td><td>Dynatrace host group + tags</td><td>Host group, tier, environment, automation candidate</td><td><span class="badge b-green">Automation Routing</span></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </details>
 
     <div class="phase-divider"><span class="divider-pill">SHIFT SUMMARY</span></div>
 
@@ -906,6 +913,25 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
     </div>
 
     <div class="phase-divider"><span class="divider-pill">FOCUS AREAS &amp; ESCALATION</span></div>
+
+    <details class="topology-accordion phase1-bottom">
+      <summary>Topology Enrichment — Phase 1 Mock Data ▼</summary>
+      <div class="topology-body">
+        <div class="topology-note phase1-note">Phase 1 mock enrichment — Phase 2 live DQL query planned</div>
+        <div class="topology-table-wrap">
+          <table>
+            <thead><tr><th>P-Card</th><th>Root Entity</th><th>Blast Score</th><th>Nearby Dependencies</th><th>Recommended Group</th></tr></thead>
+            <tbody>
+              <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044211</td><td><b>Move Money App Pool</b></td><td><span class="badge b-red">92</span></td><td>Kafka, SQL Database, F5 Pool, App Dev</td><td><span class="badge b-red">Move Money Swarm</span></td></tr>
+              <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044198</td><td><b>Kafka Consumer Group</b></td><td><span class="badge b-red">88</span></td><td>Move Money, Trading, Client Mgmt</td><td><span class="badge b-orange">Middleware / Kafka</span></td></tr>
+              <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044185</td><td><b>SQL Database Cluster</b></td><td><span class="badge b-orange">84</span></td><td>Move Money, Client Mgmt, Reporting</td><td><span class="badge b-orange">Cloud DB / SQL</span></td></tr>
+              <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044142</td><td><b>DataPower Gateway</b></td><td><span class="badge b-yellow">71</span></td><td>TIBCO, F5, ClientWorks Login</td><td><span class="badge b-yellow">Middleware / DataPower</span></td></tr>
+              <tr><td class="blue" style="font-family:'JetBrains Mono',monospace;font-size:10px">PB-0044130</td><td><b>Linux Node03</b></td><td><span class="badge b-muted">53</span></td><td>AWS PODS, Automation Operators, Disk Cleanup</td><td><span class="badge b-green">Platform / Automation</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </details>
 
   </section>
 
@@ -1205,7 +1231,7 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
           <strong>PB-0044211 — Move Money app pool memory spike</strong>
           Timeline details are available as a modal so the P-Cards workspace stays focused on queue triage.
         </div>
-        <button class="btn btn-blue" onclick="openLifecycleModal()">View Lifecycle Timeline →</button>
+        <button class="btn btn-blue" onclick="openLifecycleModal()">View Lifecycle Timeline — PB-0044211 →</button>
       </div>
     </div>
 
@@ -1233,7 +1259,7 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
   ══════════════════════════════════ -->
   <section id="analytics" class="hidden">
     <div class="sec-hd">
-      <h2>DELAY &amp; MTTA</h2>
+      <h2>DELAY &amp; MTTA — Goal 3 Performance</h2>
       <span class="sec-tag tag-goal">Goal 3 · Delay Prevention</span>
       <span class="sec-tag" style="background:rgba(139,108,246,.1);color:var(--purple);border:1px solid rgba(139,108,246,.22)">Historical</span>
     </div>
