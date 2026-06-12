@@ -406,6 +406,34 @@ tr:hover td{background:rgba(46,174,232,.04)}
 
 
 /* ══════════════════════════════════════════
+   PHASE 1: STRUCTURE & LAYER CLARITY
+══════════════════════════════════════════ */
+.nav-badge{
+  margin-left:auto;display:inline-flex;align-items:center;gap:4px;
+  font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:800;
+  letter-spacing:.08em;border-radius:999px;padding:2px 6px;border:1px solid;
+  text-transform:uppercase;line-height:1;
+}
+.nav-badge.live{color:var(--green);border-color:rgba(15,204,116,.3);background:rgba(15,204,116,.08);animation:navLivePulse 2.2s infinite}
+.nav-badge.hist{color:var(--purple);border-color:rgba(139,108,246,.3);background:rgba(139,108,246,.08)}
+.nav-badge.live::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(15,204,116,.7)}
+@keyframes navLivePulse{0%,100%{box-shadow:0 0 0 rgba(15,204,116,0)}50%{box-shadow:0 0 12px rgba(15,204,116,.28)}}
+.phase-divider{
+  display:flex;align-items:center;gap:10px;margin:12px 0 10px;
+  font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:800;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
+}
+.phase-divider::before,.phase-divider::after{content:'';height:1px;background:linear-gradient(90deg,transparent,var(--line2));flex:1}.phase-divider::after{background:linear-gradient(90deg,var(--line2),transparent)}
+.phase-divider .divider-pill{border:1px solid rgba(46,174,232,.24);background:rgba(46,174,232,.06);border-radius:999px;padding:4px 10px;color:var(--blue)}
+.topology-accordion{margin:0 0 11px;background:linear-gradient(160deg,#071c2e,#040d18);border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.topology-accordion summary{cursor:pointer;list-style:none;padding:11px 13px;display:flex;align-items:center;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--text)}
+.topology-accordion summary::-webkit-details-marker{display:none}.topology-accordion summary::after{content:'Expand';font-family:'Syne',sans-serif;font-size:10px;color:var(--blue);letter-spacing:.02em;text-transform:none}.topology-accordion[open] summary::after{content:'Collapse'}
+.topology-body{padding:0 13px 13px}.topology-note{font-size:11px;color:var(--muted);line-height:1.45;margin-bottom:9px}.topology-table-wrap{overflow-x:auto}
+.lifecycle-launch{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;background:rgba(46,174,232,.04);border:1px solid rgba(46,174,232,.16);border-radius:8px}.lifecycle-launch-copy{font-size:11px;color:var(--muted);line-height:1.45}.lifecycle-launch-copy strong{display:block;color:var(--text);font-size:12px;margin-bottom:2px}
+.lifecycle-modal{width:min(720px,94vw);max-height:88vh;overflow:auto;background:linear-gradient(160deg,#071c2e,#030b13);border:1px solid rgba(46,174,232,.25);border-radius:12px;box-shadow:0 20px 80px rgba(0,0,0,.55);padding:0}.lifecycle-modal-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);background:rgba(3,13,22,.82)}.lifecycle-modal-title{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text)}.lifecycle-modal-sub{font-size:10px;color:var(--muted);margin-top:3px}.lifecycle-modal-body{padding:15px 16px 6px}.modal-close-btn{border:1px solid var(--line2);background:rgba(7,24,39,.9);color:var(--text);border-radius:6px;padding:6px 9px;font-size:11px;font-weight:800;cursor:pointer}.modal-close-btn:hover{border-color:var(--blue);color:var(--blue)}
+
+
+/* ══════════════════════════════════════════
    PHASE 5: VISUAL POLISH + INTELLIGENCE LAYER
 ══════════════════════════════════════════ */
 .sev-critical,.sev-p1{color:#ff8a8a!important;border-color:rgba(232,53,53,.35)!important;background:rgba(232,53,53,.14)!important}
@@ -444,7 +472,7 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
       <div class="nav-label">Real-Time</div>
       <button class="active" data-tab="command" onclick="showTab('command',this)">
         <span class="ico">⬡</span>Command Center
-        <span class="goal-dot" style="background:var(--green)"></span>
+        <span class="nav-badge live">LIVE</span>
       </button>
     </div>
     <div class="nav-group">
@@ -470,15 +498,18 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
       <div class="nav-label">Operations</div>
       <button data-tab="pcards" onclick="showTab('pcards',this)">
         <span class="ico">◫</span>P-Cards
+        <span class="nav-badge live">LIVE</span>
       </button>
       <button data-tab="analytics" onclick="showTab('analytics',this)">
-        <span class="ico">〜</span>Analytics / MTTA
+        <span class="ico">〜</span>Delay &amp; MTTA
+        <span class="nav-badge hist">HIST</span>
       </button>
     </div>
     <div class="nav-group">
       <div class="nav-label">Output</div>
       <button data-tab="reports" onclick="showTab('reports',this)">
         <span class="ico">≡</span>Reports
+        <span class="nav-badge hist">HIST</span>
       </button>
     </div>
   </div>
@@ -549,6 +580,8 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
       </div>
     </div>
 
+    <div class="phase-divider"><span class="divider-pill">LIVE STATE — Current Shift</span></div>
+
     <!-- KPI Strip -->
     <div class="kpi-row kpi-8">
       <div class="kpi"><div class="kpi-label">FCR % Official</div><div class="kpi-val green">34.2%</div><div class="kpi-sub">▲ 5.6% vs 8wk avg</div><div class="kpi-bar"><div class="kpi-bar-fill" style="width:34%;background:var(--green)"></div></div></div>
@@ -560,6 +593,27 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
       <div class="kpi"><div class="kpi-label">Delay Prevention Signals</div><div class="kpi-val orange">12 / 3.8m</div><div class="kpi-sub">Delays &gt;15m · first comment avg</div></div>
       <div class="kpi"><div class="kpi-label">Prevented Major Inc.</div><div class="kpi-val green">4</div><div class="kpi-sub">▲ 2 vs last 7 days</div></div>
     </div>
+
+    <details class="topology-accordion">
+      <summary>Topology Enrichment — Moved from Removed Tab</summary>
+      <div class="topology-body">
+        <div class="topology-note">Phase 1 keeps Topology Enrichment out of the left nav, but preserves the operational content on Command Center as a collapsible enrichment layer tied to the risk map.</div>
+        <div class="topology-table-wrap">
+          <table>
+            <thead><tr><th>Layer</th><th>Entity / Service</th><th>Enrichment Source</th><th>Signals Added</th><th>Current Use</th></tr></thead>
+            <tbody>
+              <tr><td>Business Service</td><td><b>Move Money</b></td><td>Dynatrace tags + ServiceNow CMDB</td><td>VCT, app owner, active INC, p-card cluster</td><td><span class="badge b-red">Risk Map</span></td></tr>
+              <tr><td>Middleware</td><td><b>Kafka</b></td><td>Dynatrace topology + AAG keywords</td><td>Consumer lag pattern, playbook match, support group</td><td><span class="badge b-orange">Swarm Routing</span></td></tr>
+              <tr><td>Database</td><td><b>SQL Database</b></td><td>SolarWinds DPA + ServiceNow assignment</td><td>DB health, timeout pattern, related PTASK/PRB</td><td><span class="badge b-orange">Escalation Context</span></td></tr>
+              <tr><td>Network / Edge</td><td><b>F5 / Network</b></td><td>Dynatrace entities + SNOW CI relations</td><td>Pool node status, upstream dependency, incident links</td><td><span class="badge b-yellow">Dependency Context</span></td></tr>
+              <tr><td>Platform</td><td><b>Linux / AWS PODS</b></td><td>Dynatrace host group + tags</td><td>Host group, tier, environment, automation candidate</td><td><span class="badge b-green">Automation Routing</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </details>
+
+    <div class="phase-divider"><span class="divider-pill">SHIFT SUMMARY</span></div>
 
     <!-- Row 1: Risk Map | Snapshot+Automation | Swarms -->
     <div class="g3">
@@ -893,14 +947,14 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
     </div>
 
     <div class="card">
-      <div class="card-hd"><span class="card-title">P-Card Lifecycle Timeline — PB-0044211 (Move Money)</span></div>
-      <ul class="timeline">
-        <li class="ok"><strong>P-Card Opened</strong><span class="t">09:01:22</span>Dynatrace detected app pool memory spike in Move Money service.</li>
-        <li class="ok"><strong>First NOC Comment</strong><span class="t">09:04:45</span>NOC engineer acknowledged. Initial triage started. Comment gap: 3m 23s.</li>
-        <li class="warn"><strong>Incident Created</strong><span class="t">09:14:10</span>INC0042811 opened. P-Card age at INC creation: 12m 48s.</li>
-        <li class="warn"><strong>Escalation to T2</strong><span class="t">09:26:30</span>App Dev team engaged. Escalation delay from INC creation: 12m 20s.</li>
-        <li class="active"><strong>Active Bridge — 42m</strong><span class="t">09:44:00 – Now</span>Bridge open. Kafka, SQL DB, Network, Linux, App Dev on call.</li>
-      </ul>
+      <div class="card-hd"><span class="card-title">P-Card Lifecycle Timeline</span></div>
+      <div class="lifecycle-launch">
+        <div class="lifecycle-launch-copy">
+          <strong>PB-0044211 — Move Money app pool memory spike</strong>
+          Timeline details are available as a modal so the P-Cards workspace stays focused on queue triage.
+        </div>
+        <button class="btn btn-blue" onclick="openLifecycleModal()">View Lifecycle Timeline →</button>
+      </div>
     </div>
 
     <div class="card" style="margin-top:11px">
@@ -927,7 +981,7 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
   ══════════════════════════════════ -->
   <section id="analytics" class="hidden">
     <div class="sec-hd">
-      <h2>DELAY PREVENTION</h2>
+      <h2>DELAY &amp; MTTA</h2>
       <span class="sec-tag tag-goal">Goal 3 · Delay Prevention</span>
       <span class="sec-tag" style="background:rgba(139,108,246,.1);color:var(--purple);border:1px solid rgba(139,108,246,.22)">Historical</span>
     </div>
@@ -1037,12 +1091,45 @@ body.wall-mode .wall-progress{display:block}body.wall-mode{font-size:14px}body.w
   </div>
 </div>
 
+<!-- ══════════ P-CARD LIFECYCLE MODAL ══════════ -->
+<div id="lifecycleModal" class="modal-backdrop" aria-hidden="true">
+  <div class="lifecycle-modal" role="dialog" aria-modal="true" aria-label="P-Card lifecycle timeline">
+    <div class="lifecycle-modal-hd">
+      <div>
+        <div class="lifecycle-modal-title">P-Card Lifecycle Timeline — PB-0044211</div>
+        <div class="lifecycle-modal-sub">Move Money · app pool memory spike · timeline moved out of inline tab body</div>
+      </div>
+      <button class="modal-close-btn" onclick="closeLifecycleModal()">Close ✕</button>
+    </div>
+    <div class="lifecycle-modal-body">
+      <ul class="timeline">
+        <li class="ok"><strong>P-Card Opened</strong><span class="t">09:01:22</span>Dynatrace detected app pool memory spike in Move Money service.</li>
+        <li class="ok"><strong>First NOC Comment</strong><span class="t">09:04:45</span>NOC engineer acknowledged. Initial triage started. Comment gap: 3m 23s.</li>
+        <li class="warn"><strong>Incident Created</strong><span class="t">09:14:10</span>INC0042811 opened. P-Card age at INC creation: 12m 48s.</li>
+        <li class="warn"><strong>Escalation to T2</strong><span class="t">09:26:30</span>App Dev team engaged. Escalation delay from INC creation: 12m 20s.</li>
+        <li class="active"><strong>Active Bridge — 42m</strong><span class="t">09:44:00 – Now</span>Bridge open. Kafka, SQL DB, Network, Linux, App Dev on call.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ══════════════════════════════════════
    UTILITIES
 ══════════════════════════════════════ */
 const CHARTS = [];
 function regChart(c){ CHARTS.push(c); return c; }
+
+function openLifecycleModal(){
+  const modal = document.getElementById('lifecycleModal');
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden','false');
+}
+function closeLifecycleModal(){
+  const modal = document.getElementById('lifecycleModal');
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden','true');
+}
 
 function showTab(id, btn){
   document.querySelectorAll('main section').forEach(s => s.classList.add('hidden'));
@@ -1580,6 +1667,11 @@ document.querySelectorAll('.goal-card').forEach((el,i) => {
 });
 
 // ── Resize ──
+
+document.getElementById('lifecycleModal')?.addEventListener('click', function(e){
+  if(e.target === this) closeLifecycleModal();
+});
+
 window.addEventListener('resize', () => CHARTS.forEach(c => { try{c.resize()}catch(e){} }));
 </script>
 </body>
