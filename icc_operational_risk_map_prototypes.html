@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ICC Operational Risk Map Prototypes</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<style>
+:root{
+  --bg:#03101b;--panel:#071a2b;--panel2:#04111d;--line:#16324a;--line2:#23506f;
+  --text:#d8f1ff;--muted:#6d93ad;--blue:#2eaee8;--teal:#1ac9b0;--green:#0fcc74;
+  --yellow:#f5b014;--orange:#f57c1f;--red:#e83535;--purple:#8b6cf6;
+}
+*{box-sizing:border-box;margin:0;padding:0} body{height:100vh;overflow:hidden;background:radial-gradient(circle at 30% -10%,#0d2a44 0,#03101b 38%,#020912 100%);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif;font-size:13px}.shell{height:100vh;display:grid;grid-template-rows:auto auto 1fr}.top{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line);background:rgba(3,13,22,.9)}.brand h1{font-size:17px;letter-spacing:.12em;font-weight:800}.brand p{font-size:11px;color:var(--muted);margin-top:3px}.status{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted)}.pill{border:1px solid var(--line2);background:rgba(7,26,43,.9);border-radius:999px;padding:5px 10px}.pill.hot{border-color:rgba(232,53,53,.35);color:#ff8c8c;background:rgba(232,53,53,.08)}.tabs{display:flex;gap:8px;padding:10px 18px;border-bottom:1px solid var(--line);background:rgba(4,17,29,.78)}button{font-family:inherit}.tab{border:1px solid var(--line);background:var(--panel2);color:var(--muted);border-radius:8px;padding:8px 11px;font-size:12px;font-weight:700;cursor:pointer}.tab.active{color:var(--blue);border-color:rgba(46,174,232,.45);background:rgba(46,174,232,.09)}.content{display:grid;grid-template-columns:1fr 330px;gap:12px;padding:12px 16px 16px;min-height:0}.maincard,.sidecard{border:1px solid var(--line);border-radius:12px;background:linear-gradient(160deg,rgba(7,26,43,.95),rgba(4,13,24,.96));box-shadow:0 14px 38px rgba(0,0,0,.24);min-height:0;position:relative;overflow:hidden}.maincard{display:grid;grid-template-rows:auto 1fr}.cardhd{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line)}.title{font-size:11px;letter-spacing:.14em;font-weight:800;text-transform:uppercase}.sub{font-size:11px;color:var(--muted);margin-top:2px}.controls{display:flex;gap:7px;align-items:center}.ctrl{font-size:11px;border:1px solid var(--line2);background:rgba(4,17,29,.8);color:var(--muted);border-radius:6px;padding:5px 8px;cursor:pointer}.ctrl.active{color:var(--text);border-color:var(--blue)}.chart{width:100%;height:100%;min-height:620px}.sidecard{padding:13px;overflow:auto}.section-title{font-size:10px;letter-spacing:.13em;text-transform:uppercase;font-weight:800;color:var(--muted);margin:4px 0 9px}.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}.kpi{border:1px solid var(--line);border-radius:9px;background:rgba(3,13,22,.55);padding:10px}.kpi label{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}.kpi b{display:block;margin-top:5px;font-size:19px}.risk-red{color:var(--red)}.risk-orange{color:var(--orange)}.risk-yellow{color:var(--yellow)}.risk-green{color:var(--green)}.list{display:flex;flex-direction:column;gap:7px}.row{border:1px solid var(--line);border-radius:8px;background:rgba(3,13,22,.45);padding:9px}.rowhd{display:flex;align-items:center;justify-content:space-between;font-weight:800;font-size:12px}.row p{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.35}.badge{font-size:9px;font-weight:900;border-radius:5px;padding:2px 6px;border:1px solid}.b-red{color:#ff9696;border-color:rgba(232,53,53,.35);background:rgba(232,53,53,.12)}.b-orange{color:#ffb070;border-color:rgba(245,124,31,.35);background:rgba(245,124,31,.12)}.b-green{color:#7dffb4;border-color:rgba(15,204,116,.30);background:rgba(15,204,116,.10)}.b-blue{color:#8edcff;border-color:rgba(46,174,232,.30);background:rgba(46,174,232,.10)}.note{border:1px dashed var(--line2);border-radius:9px;padding:10px;color:var(--muted);font-size:11px;line-height:1.4;background:rgba(46,174,232,.04);margin-top:12px}.legend{display:flex;gap:8px;flex-wrap:wrap}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}.hide{display:none}.domview{height:100%;min-height:620px;position:relative;padding:24px 28px;overflow:hidden}.lane-label{position:absolute;left:20px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:800}.dom-node{position:absolute;border:1px solid var(--line2);background:#071827;border-radius:9px;padding:8px 9px;text-align:center;font-weight:800;font-size:11px;box-shadow:0 4px 15px rgba(0,0,0,.25);min-width:106px;cursor:pointer}.dom-node.vct{top:52px;border-color:rgba(46,174,232,.5);box-shadow:0 0 16px rgba(46,174,232,.2)}.dom-node.high{border-color:var(--red);box-shadow:0 0 18px rgba(232,53,53,.25)}.dom-node.mod{border-color:var(--orange)}.dom-node.low{border-color:var(--green)}.dom-node small{display:block;color:var(--muted);font-weight:600;margin-top:3px;font-size:9px}.svg-lines{position:absolute;inset:0;pointer-events:none}.prototype-copy{position:absolute;bottom:14px;left:18px;right:18px;font-size:11px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px;line-height:1.35}.insight{font-size:12px;line-height:1.45;color:#b7d6e8;margin-bottom:11px}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="top">
+    <div class="brand"><h1>ICC OPERATIONAL RISK MAP · PROTOTYPE SET</h1><p>Fixed-position topology views · VCTs locked at top tier · ECharts + HTML/SVG options</p></div>
+    <div class="status"><span class="pill hot">VCT TOP TIER LOCKED</span><span class="pill">Mock data · DT + SNOW + topology snapshot</span><span class="pill" id="clock"></span></div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" data-view="tiered">1 · Fixed Tier Graph</button>
+    <button class="tab" data-view="lanes">2 · Dependency Flow Lanes</button>
+    <button class="tab" data-view="blast">3 · Blast Radius Matrix</button>
+    <button class="tab" data-view="swim">4 · VCT Swimlanes</button>
+  </div>
+  <div class="content">
+    <div class="maincard">
+      <div class="cardhd">
+        <div><div class="title" id="viewTitle">Fixed Tier Dependency Graph</div><div class="sub" id="viewSub">Best default landing-page map: VCTs top, dependencies below, risk by node, dependency strength by edge.</div></div>
+        <div class="controls"><button class="ctrl active" id="allBtn">All nodes</button><button class="ctrl" id="hotBtn">Hot path only</button><button class="ctrl" id="labelBtn">Compact labels</button></div>
+      </div>
+      <div id="chart" class="chart"></div>
+      <div id="domView" class="domview hide"></div>
+    </div>
+    <div class="sidecard">
+      <div class="section-title">Operational Summary</div>
+      <div class="kpis">
+        <div class="kpi"><label>Active VCT Risk</label><b class="risk-red">3 High</b></div>
+        <div class="kpi"><label>Shared Dependency</label><b class="risk-orange">Kafka</b></div>
+        <div class="kpi"><label>Open P-Cards</label><b class="risk-yellow">42</b></div>
+        <div class="kpi"><label>INC Conversion</label><b class="risk-orange">14.2%</b></div>
+      </div>
+      <div class="section-title">Selected Node</div>
+      <div id="selected" class="row"><div class="rowhd"><span>Move Money</span><span class="badge b-red">High</span></div><p>7 P-Cards · 2 INCs · active bridge. Top dependencies: Kafka, SQL Database, F5.</p></div>
+      <div class="section-title" style="margin-top:14px">Design Notes</div>
+      <div id="notes" class="insight"></div>
+      <div class="section-title">Suggested actions</div>
+      <div class="list" id="actions"></div>
+      <div class="note"><b>Data model fit:</b> node x/y positions can come from a saved layout table, while metrics refresh from <span class="mono">problem_topology_snapshot</span>, <span class="mono">dt_entities</span>, <span class="mono">dt_relationships</span>, and joined SNOW incident data.</div>
+    </div>
+  </div>
+</div>
+<script>
+const T={text:'#d8f1ff',muted:'#6d93ad',line:'#16324a',line2:'#23506f',blue:'#2eaee8',teal:'#1ac9b0',green:'#0fcc74',yellow:'#f5b014',orange:'#f57c1f',red:'#e83535',purple:'#8b6cf6',panel:'#071a2b'};
+const riskColor=r=>({high:T.red,mod:T.orange,watch:T.yellow,low:T.green,neutral:T.blue}[r]||T.blue);
+const riskLabel=r=>({high:'High',mod:'Moderate',watch:'Watch',low:'Low',neutral:'Info'}[r]||r);
+const layers=[{name:'VCT / Business Capability',y:72},{name:'Application / Service',y:212},{name:'Middleware / Data / Edge',y:352},{name:'Platform / Host / Network',y:492}];
+const nodes=[
+  {id:'mm',name:'Move Money',tier:'VCT',layer:0,x:115,y:72,risk:'high',pcards:7,inc:2,blast:92,owner:'Trading Apps',automation:'App pool restart'},
+  {id:'cm',name:'Client Management',tier:'VCT',layer:0,x:275,y:72,risk:'high',pcards:6,inc:1,blast:84,owner:'Client Mgmt',automation:'TIBCO retry / cache clear'},
+  {id:'ae',name:'Advisor Email',tier:'VCT',layer:0,x:435,y:72,risk:'mod',pcards:4,inc:1,blast:70,owner:'Messaging',automation:'SMTP relay flush'},
+  {id:'av',name:'Account View 2.0',tier:'VCT',layer:0,x:595,y:72,risk:'watch',pcards:2,inc:0,blast:52,owner:'Digital Apps',automation:'Synthetic validation'},
+  {id:'cw',name:'ClientWorks Login',tier:'VCT',layer:0,x:755,y:72,risk:'low',pcards:1,inc:0,blast:38,owner:'Auth / IAM',automation:'Session cache reset'},
+  {id:'nao',name:'NAO',tier:'VCT',layer:0,x:915,y:72,risk:'watch',pcards:3,inc:0,blast:60,owner:'New Account Opening',automation:'Queue drain check'},
+  {id:'tr',name:'Trading',tier:'VCT',layer:0,x:1075,y:72,risk:'mod',pcards:3,inc:1,blast:72,owner:'Trading',automation:'Market data replay check'},
+  {id:'mmapi',name:'MM API',tier:'Service',layer:1,x:130,y:212,risk:'high',pcards:5,inc:2,blast:86,owner:'Move Money'},
+  {id:'profile',name:'Profile Service',tier:'Service',layer:1,x:285,y:212,risk:'mod',pcards:4,inc:1,blast:73,owner:'Client Mgmt'},
+  {id:'emailapi',name:'Email Gateway',tier:'Service',layer:1,x:440,y:212,risk:'mod',pcards:3,inc:1,blast:64,owner:'Messaging'},
+  {id:'avapi',name:'AV Web/API',tier:'Service',layer:1,x:600,y:212,risk:'watch',pcards:2,inc:0,blast:52,owner:'Digital'},
+  {id:'auth',name:'Auth Service',tier:'Service',layer:1,x:760,y:212,risk:'low',pcards:1,inc:0,blast:34,owner:'IAM'},
+  {id:'naoapi',name:'NAO API',tier:'Service',layer:1,x:915,y:212,risk:'watch',pcards:2,inc:0,blast:58,owner:'NAO'},
+  {id:'order',name:'Order Service',tier:'Service',layer:1,x:1075,y:212,risk:'mod',pcards:3,inc:1,blast:70,owner:'Trading'},
+  {id:'kafka',name:'Kafka',tier:'Middleware',layer:2,x:165,y:352,risk:'high',pcards:10,inc:3,blast:95,owner:'Middleware',automation:'Consumer lag recovery'},
+  {id:'tibco',name:'TIBCO',tier:'Middleware',layer:2,x:335,y:352,risk:'mod',pcards:6,inc:2,blast:78,owner:'Middleware',automation:'Restart consumer adapter'},
+  {id:'f5',name:'F5',tier:'Edge',layer:2,x:505,y:352,risk:'watch',pcards:5,inc:1,blast:66,owner:'Network',automation:'Pool node re-enable'},
+  {id:'sql',name:'SQL Database',tier:'Database',layer:2,x:675,y:352,risk:'high',pcards:8,inc:2,blast:88,owner:'Cloud DB',automation:'Connection pool reset'},
+  {id:'solr',name:'SOLR Cache',tier:'Search/Cache',layer:2,x:845,y:352,risk:'mod',pcards:4,inc:0,blast:61,owner:'SOLR & COMREG',automation:'Cache health check'},
+  {id:'datapower',name:'DataPower',tier:'Gateway',layer:2,x:1015,y:352,risk:'low',pcards:2,inc:0,blast:44,owner:'DataPower',automation:'Gateway route validation'},
+  {id:'pods',name:'AWS PODS',tier:'Platform',layer:3,x:235,y:492,risk:'watch',pcards:3,inc:0,blast:54,owner:'AWS PODS',automation:'Pod recycle'},
+  {id:'linux',name:'Linux',tier:'Platform',layer:3,x:435,y:492,risk:'low',pcards:1,inc:0,blast:31,owner:'Linux',automation:'Disk cleanup'},
+  {id:'network',name:'Network',tier:'Network',layer:3,x:635,y:492,risk:'mod',pcards:6,inc:2,blast:76,owner:'Network',automation:'Path check'},
+  {id:'clouddb',name:'Cloud DB',tier:'Database Platform',layer:3,x:835,y:492,risk:'mod',pcards:4,inc:1,blast:74,owner:'Cloud DB',automation:'Replica lag check'},
+  {id:'synthetic',name:'Synthetic / AlertSite',tier:'Synthetic',layer:3,x:1035,y:492,risk:'watch',pcards:4,inc:0,blast:62,owner:'ICC',automation:'Synthetic correlation'}
+];
+const links=[
+  ['mm','mmapi',10],['cm','profile',9],['ae','emailapi',7],['av','avapi',5],['cw','auth',3],['nao','naoapi',5],['tr','order',7],
+  ['mmapi','kafka',10],['mmapi','sql',9],['mmapi','f5',6],['profile','tibco',8],['profile','sql',7],['profile','solr',5],['emailapi','f5',5],['emailapi','network',6],['avapi','datapower',4],['avapi','solr',5],['auth','network',3],['naoapi','tibco',5],['naoapi','datapower',4],['order','kafka',8],['order','sql',8],
+  ['kafka','pods',6],['tibco','pods',5],['f5','network',8],['sql','clouddb',9],['solr','linux',4],['datapower','network',3],['synthetic','mm',4],['synthetic','ae',3],['synthetic','av',2]
+].map(([source,target,weight])=>({source,target,weight}));
+const chart=echarts.init(document.getElementById('chart'),'dark');
+let view='tiered', hotOnly=false, compact=false;
+const tooltip={backgroundColor:'#071827',borderColor:'#23506f',textStyle:{color:T.text,fontSize:11},extraCssText:'border-radius:8px;box-shadow:0 8px 28px rgba(0,0,0,.45)'};
+function graphData(){
+  const hotIds=new Set(['mm','cm','tr','mmapi','profile','order','kafka','sql','tibco','f5','network','clouddb','pods']);
+  const ns=(hotOnly?nodes.filter(n=>hotIds.has(n.id)):nodes);
+  const ids=new Set(ns.map(n=>n.id));
+  const ls=links.filter(l=>ids.has(l.source)&&ids.has(l.target));
+  return {ns,ls};
+}
+function nodeStyle(n,scale=1){return {name:n.name,id:n.id,raw:n,x:n.x,y:n.y,symbol:'roundRect',symbolSize:[Math.max(86,88+n.pcards*6)*scale,Math.max(42,42+n.inc*5)*scale],itemStyle:{color:'#071827',borderColor:riskColor(n.risk),borderWidth:n.tier==='VCT'?2.4:1.8,shadowBlur:n.risk==='high'?18:7,shadowColor:riskColor(n.risk)},label:{show:true,color:T.text,fontSize:compact?9:10,lineHeight:14,formatter:()=>compact?`${n.name}`:`{a|${n.name}}\n{b|${n.pcards} P · ${n.inc} INC · ${n.blast}}`,rich:{a:{color:T.text,fontWeight:800,fontSize:10},b:{color:riskColor(n.risk),fontWeight:800,fontSize:10}}}}}
+function baseGraphOption(){const {ns,ls}=graphData();return {backgroundColor:'transparent',tooltip:{...tooltip,formatter:p=>{if(p.dataType==='edge')return `<b>${p.data.source}</b> → <b>${p.data.target}</b><br/>Dependency / correlation weight: <b>${p.data.weight}</b>`;const n=p.data.raw;return `<b>${n.name}</b><br/>Tier: ${n.tier}<br/>Risk: <span style="color:${riskColor(n.risk)}"><b>${riskLabel(n.risk)}</b></span><br/>P-Cards: <b>${n.pcards}</b> · INCs: <b>${n.inc}</b><br/>Blast radius: <b>${n.blast}/100</b><br/>Owner: ${n.owner}<br/>Playbook: ${n.automation}`}},graphic:layers.map(l=>({type:'text',left:12,top:l.y-13,style:{text:l.name,fill:T.muted,font:'700 10px Inter',opacity:.75}})),series:[{type:'graph',layout:'none',roam:true,draggable:false,edgeSymbol:['none','arrow'],edgeSymbolSize:[0,8],emphasis:{focus:'adjacency',lineStyle:{width:5,opacity:.9}},data:ns.map(n=>nodeStyle(n)),links:ls.map(l=>({source:l.source,target:l.target,weight:l.weight,lineStyle:{color:l.weight>=8?T.red:l.weight>=6?T.orange:T.blue,width:.8+l.weight/3,opacity:.48,curveness:.16}}))}]}}
+function renderTiered(){document.getElementById('chart').classList.remove('hide');document.getElementById('domView').classList.add('hide');chart.clear();chart.setOption(baseGraphOption());setText('Fixed Tier Dependency Graph','Best default landing-page map: VCTs top, dependencies below, risk by node, dependency strength by edge.', 'Strongest overall view. This gives ICC a fast “what is impacted and why” map while preserving the mental model of VCT → service → dependency → platform. Use this as the Command Center landing tile and expand to full screen for investigation.', ['Click any node to show owner, playbook, P-card count, and INC count.','Use red edges to identify likely shared root cause paths.','Keep node placement fixed so engineers build map memory over time.']);}
+function renderLanes(){document.getElementById('chart').classList.remove('hide');document.getElementById('domView').classList.add('hide');chart.clear();const opt=baseGraphOption();opt.series[0].links=opt.series[0].links.map(l=>({...l,lineStyle:{...l.lineStyle,curveness:.04,opacity:.62}}));opt.series[0].edgeLabel={show:true,formatter:p=>p.data.weight>=8?'HOT':'',color:T.red,fontSize:9,fontWeight:800};chart.setOption(opt);setText('Dependency Flow Lanes','More operational: fixed tiers behave like lanes; edge labels expose hot dependency paths and routing direction.', 'This is good for a NOC engineer triaging an active VCT impact. It is less “pretty” than a force graph, but much better for repeat use because upstream and downstream direction never moves.', ['Use HOT edge labels for dependency paths that are producing multiple P-cards.','Add filter chips by VCT, support tower, environment, and incident priority.','Works well in ECharts graph layout:none with saved x/y coordinates.']);}
+function renderBlast(){document.getElementById('chart').classList.remove('hide');document.getElementById('domView').classList.add('hide');chart.clear();const vcts=nodes.filter(n=>n.tier==='VCT');const deps=nodes.filter(n=>n.layer>=2);const matrix=[];vcts.forEach((v,i)=>deps.forEach((d,j)=>{let linked=links.some(l=>(l.source===v.id&&l.target===d.id)||(l.source===d.id&&l.target===v.id));let via=links.some(l=>l.source===v.id&&links.some(l2=>l2.source===l.target&&l2.target===d.id));let val=linked?80:via?Math.round((v.blast+d.blast)/2):0;if(val>0)matrix.push([j,i,val]);}));chart.setOption({backgroundColor:'transparent',tooltip:{...tooltip,formatter:p=>`<b>${vcts[p.value[1]].name}</b> → <b>${deps[p.value[0]].name}</b><br/>Blast / dependency score: <b>${p.value[2]}</b>`},grid:{top:70,right:25,bottom:110,left:130},xAxis:{type:'category',data:deps.map(d=>d.name),axisLabel:{color:T.muted,rotate:35,fontSize:10},axisLine:{lineStyle:{color:T.line2}},axisTick:{show:false}},yAxis:{type:'category',data:vcts.map(v=>v.name),axisLabel:{color:T.text,fontSize:10,fontWeight:800},axisLine:{lineStyle:{color:T.line2}},axisTick:{show:false}},visualMap:{min:0,max:100,calculable:true,orient:'horizontal',left:'center',bottom:18,textStyle:{color:T.muted},inRange:{color:['#071827',T.green,T.yellow,T.orange,T.red]}},series:[{type:'heatmap',data:matrix,label:{show:true,formatter:p=>p.value[2],color:'#fff',fontSize:9},itemStyle:{borderColor:'#03101b',borderWidth:2,borderRadius:3},emphasis:{itemStyle:{shadowBlur:10,shadowColor:'rgba(0,0,0,.5)'}}}]});setText('Blast Radius Matrix','Best for executive and shift-lead scanning: VCTs remain top-level rows, dependencies become columns, heat indicates likely shared impact.', 'This is the cleanest way to show blast radius without spaghetti lines. It complements the tier graph when there are too many edges or too many VCTs affected by one shared component.', ['Use high cells to prioritize bridge participants.','Great for “single dependency causing many symptoms” detection.','Can map to incident reduction by grouping related P-cards before separate INCs are created.']);}
+function renderSwim(){chart.clear();document.getElementById('chart').classList.add('hide');const dv=document.getElementById('domView');dv.classList.remove('hide');const w=dv.clientWidth||1000;const xVals=[110,265,420,575,730,885,1040];let html=`<svg class="svg-lines" viewBox="0 0 ${w} 620" preserveAspectRatio="none"><defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#2eaee8" opacity=".7"/></marker></defs>`;const pick=id=>nodes.find(n=>n.id===id);const xy={};nodes.forEach(n=>{let x=n.x;let y=n.y;if(n.tier==='VCT'){const idx=nodes.filter(v=>v.tier==='VCT').findIndex(v=>v.id===n.id);x=xVals[idx];y=72;}xy[n.id]={x,y}});links.filter(l=>!hotOnly || l.weight>=6).forEach(l=>{const a=xy[l.source],b=xy[l.target];if(!a||!b)return;const c=l.weight>=8?T.red:l.weight>=6?T.orange:T.blue;html+=`<path d="M${a.x+52},${a.y+46} C${a.x+52},${(a.y+b.y)/2} ${b.x+52},${(a.y+b.y)/2} ${b.x+52},${b.y}" stroke="${c}" stroke-width="${Math.max(1,l.weight/3)}" fill="none" opacity=".52" marker-end="url(#arrow)"/>`});html+='</svg>';layers.forEach(l=>html+=`<div class="lane-label" style="top:${l.y-22}px">${l.name}</div>`);nodes.filter(n=>!hotOnly || ['mm','cm','tr','mmapi','profile','order','kafka','sql','tibco','f5','network','clouddb','pods'].includes(n.id)).forEach(n=>{const p=xy[n.id];const cls=n.risk==='high'?'high':n.risk==='mod'?'mod':n.risk==='low'?'low':'';html+=`<div class="dom-node ${n.tier==='VCT'?'vct':''} ${cls}" style="left:${p.x}px;top:${p.y}px" data-id="${n.id}">${n.name}<small>${n.pcards} P · ${n.inc} INC · ${n.blast}</small></div>`});html+=`<div class="prototype-copy"><b>Why this version matters:</b> this is pure HTML/SVG, so it can be easier to customize with badges, hover cards, click-to-open drawers, and exact pixel placement. Use this if ECharts label/control limits get in the way.</div>`;dv.innerHTML=html;dv.querySelectorAll('.dom-node').forEach(el=>el.onclick=()=>selectNode(el.dataset.id));setText('HTML/SVG VCT Swimlanes','Most customizable prototype: fixed DOM nodes with SVG paths; better for productized UX and custom cards.', 'This is the easiest version to turn into a polished operations product. ECharts is faster for charts, but HTML/SVG gives you precise card layouts, embedded metrics, buttons, AAG links, and richer hover panels.', ['Use for a full Topology tab or expanded modal.','Add click actions: open SNOW INC, open Dynatrace problem, open AAG/playbook.','Persist node coordinates in config so VCTs always stay at top.']);}
+function setText(t,s,note,actions){document.getElementById('viewTitle').textContent=t;document.getElementById('viewSub').textContent=s;document.getElementById('notes').textContent=note;document.getElementById('actions').innerHTML=actions.map((a,i)=>`<div class="row"><div class="rowhd"><span>${i+1}. ${a}</span><span class="badge ${i===0?'b-red':i===1?'b-orange':'b-blue'}">Ops</span></div></div>`).join('');}
+function selectNode(id){const n=nodes.find(x=>x.id===id||x.name===id);if(!n)return;const cls=n.risk==='high'?'b-red':n.risk==='mod'?'b-orange':n.risk==='low'?'b-green':'b-blue';document.getElementById('selected').innerHTML=`<div class="rowhd"><span>${n.name}</span><span class="badge ${cls}">${riskLabel(n.risk)}</span></div><p>${n.tier} · Owner: ${n.owner}<br>${n.pcards} P-Cards · ${n.inc} INCs · Blast radius ${n.blast}/100<br>Suggested playbook: <b>${n.automation}</b></p>`;}
+chart.on('click',p=>{if(p.dataType==='node')selectNode(p.data.raw.id)});
+function render(){if(view==='tiered')renderTiered();if(view==='lanes')renderLanes();if(view==='blast')renderBlast();if(view==='swim')renderSwim();}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');view=b.dataset.view;render();});
+document.getElementById('allBtn').onclick=()=>{hotOnly=false;document.getElementById('allBtn').classList.add('active');document.getElementById('hotBtn').classList.remove('active');render();};
+document.getElementById('hotBtn').onclick=()=>{hotOnly=true;document.getElementById('hotBtn').classList.add('active');document.getElementById('allBtn').classList.remove('active');render();};
+document.getElementById('labelBtn').onclick=()=>{compact=!compact;document.getElementById('labelBtn').classList.toggle('active',compact);render();};
+function tick(){document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}tick();setInterval(tick,1000);window.addEventListener('resize',()=>{chart.resize(); if(view==='swim')renderSwim();});render();
+</script>
+</body>
+</html>
