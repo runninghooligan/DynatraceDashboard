@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ICC INC Tile — Today</title>
+<style>
+:root {
+  --bg-0:#060a14;--bg-1:#0b1120;--bg-2:#111827;--bg-3:#1a2236;
+  --border:rgba(255,255,255,0.07);--border-hi:rgba(255,255,255,0.13);
+  --teal:#00d4aa;--teal-d:rgba(0,212,170,0.12);
+  --purple:#7c6fcd;--purple-d:rgba(124,111,205,0.12);
+  --amber:#f59e0b;--amber-d:rgba(245,158,11,0.12);
+  --red:#ef4444;--red-d:rgba(239,68,68,0.12);
+  --green:#22c55e;--green-d:rgba(34,197,94,0.10);
+  --blue:#3b82f6;--blue-d:rgba(59,130,246,0.12);
+  --orange:#f97316;
+  --font:'Inter','Segoe UI',system-ui,sans-serif;
+  --mono:'JetBrains Mono','Fira Code','Courier New',monospace;
+  --text-hi:#f0f2f8;--text-md:#a8b3cc;--text-lo:#4d5a75;
+
+  /* Origin colors */
+  --c-pcard:   #00d4aa;
+  --c-manual:  #7c6fcd;
+  --c-alertsite:#f59e0b;
+  --c-dpa:     #3b82f6;
+  --c-other:   #4d5a75;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{font-size:13px;}
+body{
+  background:var(--bg-0);
+  color:var(--text-hi);
+  font-family:var(--font);
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:40px;
+}
+
+/* ── TILE SHELL ── */
+.tile{
+  width:380px;
+  background:var(--bg-1);
+  border:1px solid var(--border-hi);
+  border-radius:10px;
+  overflow:hidden;
+  box-shadow:0 16px 48px rgba(0,0,0,0.5);
+  position:relative;
+}
+
+/* Top accent line */
+.tile::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:2px;
+  background:linear-gradient(90deg,var(--blue),var(--teal));
+}
+
+/* ── TILE HEADER ── */
+.tile-hd{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  padding:16px 18px 12px;
+  border-bottom:1px solid var(--border);
+}
+.tile-label{
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--text-lo);
+  margin-bottom:2px;
+}
+.tile-scope{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.scope-badge{
+  font-size:9px;
+  font-family:var(--mono);
+  padding:2px 8px;
+  border-radius:12px;
+  background:var(--blue-d);
+  color:var(--blue);
+  border:1px solid rgba(59,130,246,0.25);
+  letter-spacing:.04em;
+}
+.live-dot{
+  width:6px;height:6px;
+  border-radius:50%;
+  background:var(--green);
+  animation:pip 2s ease-in-out infinite;
+}
+@keyframes pip{0%,100%{opacity:1;}50%{opacity:.2;}}
+
+.tile-hd-right{text-align:right;}
+.last-refresh{font-size:8px;color:var(--text-lo);font-family:var(--mono);}
+
+/* ── COUNTS ROW ── */
+.counts-row{
+  display:grid;
+  grid-template-columns:1fr 1px 1fr;
+  gap:0;
+  padding:18px 18px 14px;
+  border-bottom:1px solid var(--border);
+}
+.count-divider{background:var(--border);}
+.count-cell{padding:0 14px;}
+.count-cell:first-child{padding-left:0;}
+.count-cell:last-child{padding-right:0;}
+
+.count-label{
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+  color:var(--text-lo);
+  margin-bottom:4px;
+}
+.count-val{
+  font-size:42px;
+  font-weight:800;
+  line-height:1;
+  letter-spacing:-.03em;
+  font-family:var(--mono);
+}
+.count-val.active{color:var(--amber);}
+.count-val.assigned{color:var(--text-hi);}
+.count-sub{
+  font-size:9px;
+  color:var(--text-lo);
+  margin-top:4px;
+  line-height:1.4;
+}
+.count-delta{
+  display:inline-flex;
+  align-items:center;
+  gap:3px;
+  font-size:9px;
+  font-family:var(--mono);
+  margin-top:3px;
+}
+.count-delta.up{color:var(--red);}
+.count-delta.down{color:var(--green);}
+.count-delta.neutral{color:var(--text-lo);}
+
+/* ── ORIGIN BREAKDOWN ── */
+.origin-section{padding:14px 18px 0;}
+.origin-section-hd{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:10px;
+}
+.origin-section-lbl{
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--text-lo);
+}
+.origin-total{
+  font-size:9px;
+  font-family:var(--mono);
+  color:var(--text-lo);
+}
+
+/* Origin legend rows */
+.origin-rows{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  margin-bottom:12px;
+}
+.origin-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.origin-swatch{
+  width:10px;height:10px;
+  border-radius:2px;
+  flex-shrink:0;
+}
+.origin-name{font-size:10px;color:var(--text-md);flex:1;}
+.origin-bar-wrap{
+  flex:2;
+  height:6px;
+  background:var(--bg-3);
+  border-radius:3px;
+  overflow:hidden;
+}
+.origin-bar-fill{
+  height:100%;
+  border-radius:3px;
+  transition:width .4s ease;
+}
+.origin-count{
+  font-size:10px;
+  font-weight:700;
+  font-family:var(--mono);
+  min-width:24px;
+  text-align:right;
+}
+.origin-pct{
+  font-size:9px;
+  color:var(--text-lo);
+  font-family:var(--mono);
+  min-width:32px;
+  text-align:right;
+}
+
+/* ── STACKED CHART ── */
+.chart-section{padding:0 18px 16px;}
+.chart-hd{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:8px;
+}
+.chart-lbl{
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--text-lo);
+}
+.chart-range{font-size:8px;color:var(--text-lo);font-family:var(--mono);}
+
+/* SVG chart container */
+.chart-wrap{
+  position:relative;
+  height:110px;
+}
+svg.stacked-chart{
+  width:100%;
+  height:100%;
+  overflow:visible;
+}
+
+/* Y-axis gridlines */
+.grid-line{stroke:rgba(255,255,255,.05);stroke-width:1;}
+.grid-label{font-size:8px;fill:var(--text-lo);font-family:'JetBrains Mono',monospace;}
+.x-label{font-size:8px;fill:var(--text-lo);font-family:'JetBrains Mono',monospace;text-anchor:middle;}
+
+/* Data point tooltips */
+.data-dot{
+  cursor:pointer;
+  transition:r .15s;
+}
+.data-dot:hover{r:5;}
+
+/* Tooltip */
+.chart-tooltip{
+  position:absolute;
+  background:var(--bg-2);
+  border:1px solid var(--border-hi);
+  border-radius:6px;
+  padding:8px 10px;
+  font-size:9px;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .15s;
+  min-width:130px;
+  box-shadow:0 8px 24px rgba(0,0,0,.5);
+  z-index:10;
+}
+.chart-tooltip.visible{opacity:1;}
+.tt-time{font-family:var(--mono);color:var(--text-lo);margin-bottom:4px;font-size:8px;}
+.tt-row{display:flex;align-items:center;gap:5px;margin-bottom:2px;}
+.tt-swatch{width:8px;height:8px;border-radius:1px;flex-shrink:0;}
+.tt-name{flex:1;color:var(--text-md);}
+.tt-val{font-family:var(--mono);font-weight:700;color:var(--text-hi);}
+.tt-total{border-top:1px solid var(--border);margin-top:4px;padding-top:4px;display:flex;justify-content:space-between;color:var(--text-lo);}
+.tt-total span:last-child{color:var(--text-hi);font-weight:700;font-family:var(--mono);}
+
+/* ── TILE FOOTER ── */
+.tile-footer{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:8px 18px;
+  border-top:1px solid var(--border);
+  background:var(--bg-0);
+}
+.footer-note{font-size:8px;color:var(--text-lo);line-height:1.4;}
+.footer-link{font-size:9px;color:var(--teal);cursor:pointer;letter-spacing:.03em;}
+.footer-link:hover{opacity:.7;}
+</style>
+</head>
+<body>
+
+<div class="tile">
+
+  <!-- HEADER -->
+  <div class="tile-hd">
+    <div>
+      <div class="tile-label">ICC Incident Summary</div>
+      <div class="tile-scope">
+        <span class="scope-badge">TODAY</span>
+        <div class="live-dot"></div>
+        <span style="font-size:9px;color:var(--text-lo);">TECH IOPS-NOC Ops</span>
+      </div>
+    </div>
+    <div class="tile-hd-right">
+      <div class="last-refresh">Refreshed <span id="clock">—</span></div>
+      <div style="font-size:8px;color:var(--text-lo);margin-top:2px;">220-key pull · normalized</div>
+    </div>
+  </div>
+
+  <!-- COUNTS -->
+  <div class="counts-row">
+
+    <div class="count-cell">
+      <div class="count-label">Active Now</div>
+      <div class="count-val active" id="count-active">7</div>
+      <div class="count-sub">Open · assigned to ICC</div>
+      <div class="count-delta up" id="delta-active">▲ 2 vs yesterday</div>
+    </div>
+
+    <div class="count-divider"></div>
+
+    <div class="count-cell">
+      <div class="count-label">Assigned Today</div>
+      <div class="count-val assigned" id="count-assigned">47</div>
+      <div class="count-sub">Total received · all origins</div>
+      <div class="count-delta down" id="delta-assigned">▼ 3 vs avg</div>
+    </div>
+
+  </div>
+
+  <!-- ORIGIN LEGEND + BARS -->
+  <div class="origin-section">
+    <div class="origin-section-hd">
+      <span class="origin-section-lbl">Breakdown by Origin</span>
+      <span class="origin-total">47 total today</span>
+    </div>
+
+    <div class="origin-rows">
+      <!-- P-Card generated -->
+      <div class="origin-row">
+        <div class="origin-swatch" style="background:var(--c-pcard);"></div>
+        <span class="origin-name">P-Card (DT Alert)</span>
+        <div class="origin-bar-wrap">
+          <div class="origin-bar-fill" style="width:60%;background:var(--c-pcard);opacity:.8;"></div>
+        </div>
+        <span class="origin-count" style="color:var(--c-pcard);">28</span>
+        <span class="origin-pct">60%</span>
+      </div>
+      <!-- Manual ICC -->
+      <div class="origin-row">
+        <div class="origin-swatch" style="background:var(--c-manual);"></div>
+        <span class="origin-name">Manual (ICC Created)</span>
+        <div class="origin-bar-wrap">
+          <div class="origin-bar-fill" style="width:23%;background:var(--c-manual);opacity:.8;"></div>
+        </div>
+        <span class="origin-count" style="color:var(--c-manual);">11</span>
+        <span class="origin-pct">23%</span>
+      </div>
+      <!-- AlertSite -->
+      <div class="origin-row" style="opacity:.5;">
+        <div class="origin-swatch" style="background:var(--c-alertsite);"></div>
+        <span class="origin-name">AlertSite</span>
+        <div class="origin-bar-wrap">
+          <div class="origin-bar-fill" style="width:2%;background:var(--c-alertsite);opacity:.5;"></div>
+        </div>
+        <span class="origin-count" style="color:var(--text-lo);">—</span>
+        <span class="origin-pct" style="color:var(--text-lo);">stub</span>
+      </div>
+      <!-- SolarWinds DPA -->
+      <div class="origin-row" style="opacity:.5;">
+        <div class="origin-swatch" style="background:var(--c-dpa);"></div>
+        <span class="origin-name">SolarWinds DPA</span>
+        <div class="origin-bar-wrap">
+          <div class="origin-bar-fill" style="width:2%;background:var(--c-dpa);opacity:.5;"></div>
+        </div>
+        <span class="origin-count" style="color:var(--text-lo);">—</span>
+        <span class="origin-pct" style="color:var(--text-lo);">stub</span>
+      </div>
+      <!-- Other / Backfill -->
+      <div class="origin-row">
+        <div class="origin-swatch" style="background:var(--c-other);"></div>
+        <span class="origin-name">Other / Backfill</span>
+        <div class="origin-bar-wrap">
+          <div class="origin-bar-fill" style="width:17%;background:var(--c-other);opacity:.7;"></div>
+        </div>
+        <span class="origin-count" style="color:var(--text-lo);">8</span>
+        <span class="origin-pct">17%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STACKED AREA CHART -->
+  <div class="chart-section">
+    <div class="chart-hd">
+      <span class="chart-lbl">Hourly Arrivals — Today</span>
+      <span class="chart-range" id="chart-range">00:00 – <span id="now-hour">—</span></span>
+    </div>
+
+    <div class="chart-wrap">
+      <svg class="stacked-chart" id="chart" viewBox="0 0 344 100" preserveAspectRatio="none"></svg>
+      <div class="chart-tooltip" id="tooltip"></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="tile-footer">
+    <div class="footer-note">
+      FCR proxy: assigned + no reassignment = candidate &nbsp;·&nbsp;
+      <span style="color:var(--green);">12 FCR candidates today</span>
+    </div>
+    <span class="footer-link">Full INC view →</span>
+  </div>
+
+</div>
+
+<script>
+// ── CLOCK ──
+function updateClock() {
+  const n = new Date();
+  document.getElementById('clock').textContent =
+    n.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', hour12:false });
+  document.getElementById('now-hour').textContent =
+    n.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', hour12:false });
+}
+updateClock(); setInterval(updateClock, 1000);
+
+// ── CHART DATA ──
+// Hourly INC arrivals from midnight to now (simulated for today)
+// Each hour: { hour, pcard, manual, other }
+// AlertSite / DPA = 0 until collectors connected
+const NOW_HOUR = new Date().getHours();
+
+const HOURS_DATA = [
+  { h:0,  pcard:1, manual:0, other:0 },
+  { h:1,  pcard:0, manual:1, other:0 },
+  { h:2,  pcard:1, manual:0, other:1 },
+  { h:3,  pcard:0, manual:0, other:0 },
+  { h:4,  pcard:1, manual:1, other:0 },
+  { h:5,  pcard:2, manual:0, other:1 },
+  { h:6,  pcard:3, manual:1, other:0 },
+  { h:7,  pcard:2, manual:2, other:1 },
+  { h:8,  pcard:4, manual:1, other:1 },
+  { h:9,  pcard:3, manual:2, other:0 },
+  { h:10, pcard:2, manual:1, other:1 },
+  { h:11, pcard:3, manual:0, other:1 },
+  { h:12, pcard:2, manual:1, other:0 },
+  { h:13, pcard:2, manual:2, other:1 },
+  { h:14, pcard:1, manual:0, other:0 },
+  { h:15, pcard:0, manual:0, other:1 },
+  { h:16, pcard:1, manual:0, other:0 },
+  { h:17, pcard:0, manual:0, other:0 },
+  { h:18, pcard:0, manual:0, other:0 },
+  { h:19, pcard:0, manual:0, other:0 },
+  { h:20, pcard:0, manual:0, other:0 },
+  { h:21, pcard:0, manual:0, other:0 },
+  { h:22, pcard:0, manual:0, other:0 },
+  { h:23, pcard:0, manual:0, other:0 },
+];
+
+// Only show hours up to now
+const DATA = HOURS_DATA.filter(d => d.h <= NOW_HOUR);
+
+// ── CHART RENDERING ──
+const COLORS = {
+  pcard:  '#00d4aa',
+  manual: '#7c6fcd',
+  other:  '#4d5a75',
+};
+const LABELS = {
+  pcard:  'P-Card (DT)',
+  manual: 'Manual ICC',
+  other:  'Other',
+};
+const SERIES = ['pcard', 'manual', 'other'];
+
+function buildChart() {
+  const svg = document.getElementById('chart');
+  const W = 344, H = 100;
+  const PAD = { top: 8, right: 4, bottom: 22, left: 28 };
+  const CW = W - PAD.left - PAD.right;
+  const CH = H - PAD.top - PAD.bottom;
+
+  const maxTotal = Math.max(...DATA.map(d => d.pcard + d.manual + d.other), 1);
+  // Round up to next clean number
+  const yMax = Math.ceil(maxTotal / 2) * 2 + 2;
+
+  const n = DATA.length;
+  const xStep = n > 1 ? CW / (n - 1) : CW;
+
+  function xPos(i) { return PAD.left + (n > 1 ? i * xStep : CW / 2); }
+  function yPos(v) { return PAD.top + CH - (v / yMax) * CH; }
+
+  let html = '';
+
+  // ── GRIDLINES + Y LABELS ──
+  const yTicks = [0, Math.round(yMax/2), yMax];
+  yTicks.forEach(v => {
+    const y = yPos(v);
+    html += `<line class="grid-line" x1="${PAD.left}" y1="${y}" x2="${W - PAD.right}" y2="${y}"/>`;
+    html += `<text class="grid-label" x="${PAD.left - 4}" y="${y + 3}" text-anchor="end">${v}</text>`;
+  });
+
+  // ── STACKED AREA PATHS ──
+  // Build cumulative stacks bottom-up
+  const stacks = DATA.map(d => {
+    const cum = { pcard: 0, manual: 0, other: 0 };
+    cum.other  = d.other;
+    cum.manual = d.other + d.manual;
+    cum.pcard  = d.other + d.manual + d.pcard;
+    return cum;
+  });
+
+  // Draw areas from bottom series to top (so top is drawn last = in front)
+  // Bottom = other, middle = manual, top = pcard
+  const drawOrder = ['other', 'manual', 'pcard'];
+
+  drawOrder.forEach((key, si) => {
+    // Top edge of this series
+    const topVals = DATA.map((d, i) => stacks[i][key]);
+    // Bottom edge (prev series top, or 0 for first)
+    const prevKey = si > 0 ? drawOrder[si - 1] : null;
+    const botVals = prevKey
+      ? DATA.map((d, i) => stacks[i][prevKey])
+      : DATA.map(() => 0);
+
+    if (n === 0) return;
+
+    // Forward points (top edge left→right)
+    const fwd = topVals.map((v, i) => `${xPos(i).toFixed(1)},${yPos(v).toFixed(1)}`).join(' ');
+    // Backward points (bottom edge right→left)
+    const rev = botVals.map((v, i) => `${xPos(n-1-i).toFixed(1)},${yPos(v).toFixed(1)}`).join(' ');
+    const points = fwd + ' ' + rev;
+
+    const alpha = key === 'other' ? '55' : key === 'manual' ? '70' : '80';
+    html += `<polygon points="${points}" fill="${COLORS[key]}${alpha}" stroke="none"/>`;
+
+    // Top edge line
+    const linePoints = topVals.map((v, i) => `${xPos(i).toFixed(1)},${yPos(v).toFixed(1)}`).join(' ');
+    html += `<polyline points="${linePoints}" fill="none" stroke="${COLORS[key]}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+  });
+
+  // ── DATA POINT DOTS ── (top of each stack = total)
+  DATA.forEach((d, i) => {
+    const total = d.pcard + d.manual + d.other;
+    if (total === 0) return;
+    const cx = xPos(i).toFixed(1);
+    const cy = yPos(total).toFixed(1);
+    html += `<circle
+      class="data-dot"
+      cx="${cx}" cy="${cy}" r="3"
+      fill="${COLORS.pcard}"
+      stroke="var(--bg-1)" stroke-width="1.5"
+      data-idx="${i}"
+      onmouseenter="showTooltip(event,${i})"
+      onmouseleave="hideTooltip()"
+    />`;
+  });
+
+  // ── X AXIS LABELS ── (every 3 hours)
+  DATA.forEach((d, i) => {
+    if (d.h % 3 === 0 || i === DATA.length - 1) {
+      const label = String(d.h).padStart(2,'0') + ':00';
+      html += `<text class="x-label" x="${xPos(i).toFixed(1)}" y="${H - 4}">${label}</text>`;
+    }
+  });
+
+  // ── NOW LINE ──
+  if (DATA.length > 0) {
+    const nx = xPos(DATA.length - 1).toFixed(1);
+    html += `<line x1="${nx}" y1="${PAD.top}" x2="${nx}" y2="${PAD.top + CH}"
+      stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="3,3"/>`;
+    html += `<text x="${nx}" y="${PAD.top - 2}" text-anchor="middle"
+      style="font-size:7px;fill:rgba(255,255,255,0.3);font-family:var(--mono);">NOW</text>`;
+  }
+
+  svg.innerHTML = html;
+}
+
+// ── TOOLTIP ──
+function showTooltip(evt, idx) {
+  const d = DATA[idx];
+  const total = d.pcard + d.manual + d.other;
+  const tip = document.getElementById('tooltip');
+
+  const label = String(d.h).padStart(2,'0') + ':00 – ' + String(d.h+1).padStart(2,'0') + ':00';
+
+  tip.innerHTML = `
+    <div class="tt-time">${label}</div>
+    <div class="tt-row"><div class="tt-swatch" style="background:${COLORS.pcard};"></div><span class="tt-name">P-Card (DT)</span><span class="tt-val">${d.pcard}</span></div>
+    <div class="tt-row"><div class="tt-swatch" style="background:${COLORS.manual};"></div><span class="tt-name">Manual ICC</span><span class="tt-val">${d.manual}</span></div>
+    <div class="tt-row"><div class="tt-swatch" style="background:${COLORS.other};"></div><span class="tt-name">Other</span><span class="tt-val">${d.other}</span></div>
+    <div class="tt-total"><span>Total</span><span>${total}</span></div>
+  `;
+
+  // Position tooltip
+  const wrap = document.querySelector('.chart-wrap').getBoundingClientRect();
+  const svgEl = document.getElementById('chart').getBoundingClientRect();
+  const dotX = evt.clientX - svgEl.left;
+  const dotY = evt.clientY - svgEl.top;
+
+  // Keep within tile
+  const tipW = 140;
+  let left = dotX + 10;
+  if (left + tipW > svgEl.width) left = dotX - tipW - 10;
+
+  tip.style.left = left + 'px';
+  tip.style.top  = Math.max(0, dotY - 20) + 'px';
+  tip.classList.add('visible');
+}
+
+function hideTooltip() {
+  document.getElementById('tooltip').classList.remove('visible');
+}
+
+// ── LIVE COUNT UPDATE SIMULATION ──
+// In production: replace with fetch('/api/v1/analytics/inc-summary?scope=today')
+function refreshCounts() {
+  // Recompute from DATA
+  const totals = DATA.reduce((acc, d) => ({
+    pcard:  acc.pcard + d.pcard,
+    manual: acc.manual + d.manual,
+    other:  acc.other + d.other,
+  }), { pcard:0, manual:0, other:0 });
+  const total = totals.pcard + totals.manual + totals.other;
+  document.getElementById('count-assigned').textContent = total;
+}
+
+// Init
+buildChart();
+refreshCounts();
+</script>
+</body>
+</html>
