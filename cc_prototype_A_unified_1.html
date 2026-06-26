@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ICC Command Center — Prototype A: Unified Queue</title>
+<style>
+:root {
+  --bg-0:#060a14;--bg-1:#0b1120;--bg-2:#111827;--bg-3:#1a2236;
+  --border:rgba(255,255,255,0.07);--border-hi:rgba(255,255,255,0.13);
+  --teal:#00d4aa;--teal-d:rgba(0,212,170,0.10);
+  --purple:#7c6fcd;--purple-d:rgba(124,111,205,0.10);
+  --amber:#f59e0b;--amber-d:rgba(245,158,11,0.10);
+  --orange:#f97316;--orange-d:rgba(249,115,22,0.10);
+  --red:#ef4444;--red-d:rgba(239,68,68,0.10);
+  --green:#22c55e;--green-d:rgba(34,197,94,0.08);
+  --blue:#3b82f6;--blue-d:rgba(59,130,246,0.10);
+  --font:'Inter','Segoe UI',system-ui,sans-serif;
+  --mono:'JetBrains Mono','Fira Code','Courier New',monospace;
+  --text-hi:#f0f2f8;--text-md:#a8b3cc;--text-lo:#4d5a75;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;font-size:12px;}
+body{background:var(--bg-0);color:var(--text-hi);font-family:var(--font);display:flex;flex-direction:column;overflow:hidden;}
+::-webkit-scrollbar{width:3px;height:3px;}
+::-webkit-scrollbar-thumb{background:var(--border-hi);border-radius:2px;}
+
+/* CHROME */
+.chrome{background:var(--bg-1);border-bottom:1px solid var(--border);display:flex;align-items:center;height:40px;flex-shrink:0;}
+.brand{display:flex;align-items:center;gap:8px;padding:0 14px;border-right:1px solid var(--border);height:100%;min-width:180px;}
+.pip{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pip 2s ease-in-out infinite;flex-shrink:0;}
+@keyframes pip{0%,100%{opacity:1;}50%{opacity:.2;}}
+.brand-name{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--teal);}
+.brand-sub{font-size:8px;color:var(--text-lo);}
+.chrome-chips{display:flex;gap:3px;padding:0 10px;flex:1;}
+.chip{display:flex;align-items:center;gap:4px;padding:3px 7px;border-radius:20px;border:1px solid var(--border);font-size:8px;font-family:var(--mono);}
+.chip.ok{border-color:rgba(34,197,94,.25);color:var(--green);background:var(--green-d);}
+.chip.warn{border-color:rgba(245,158,11,.25);color:var(--amber);background:var(--amber-d);}
+.chip.stub{color:var(--text-lo);}
+.chip-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0;}
+.chrome-right{display:flex;align-items:center;gap:5px;padding:0 10px;border-left:1px solid var(--border);}
+.c-btn{padding:4px 9px;border-radius:4px;border:1px solid var(--border-hi);background:var(--bg-3);color:var(--text-md);font-size:9px;cursor:pointer;}
+.c-btn.primary{background:var(--teal-d);border-color:rgba(0,212,170,.3);color:var(--teal);}
+#clock{font-size:10px;font-family:var(--mono);color:var(--text-lo);}
+
+/* SOURCE STRIP */
+.src-strip{display:flex;gap:1px;background:var(--border);border-bottom:1px solid var(--border);flex-shrink:0;}
+.src-tile{flex:1;background:var(--bg-1);padding:5px 12px;display:flex;align-items:center;gap:8px;}
+.src-name{font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text-lo);flex:1;}
+.src-badge{font-size:8px;font-family:var(--mono);padding:2px 6px;border-radius:2px;font-weight:700;}
+.src-badge.fresh{background:var(--green-d);color:var(--green);border:1px solid rgba(34,197,94,.2);}
+.src-badge.aging{background:var(--amber-d);color:var(--amber);border:1px solid rgba(245,158,11,.2);}
+.src-badge.stub{background:var(--purple-d);color:var(--purple);border:1px solid rgba(124,111,205,.2);}
+.src-badge.new{background:var(--teal-d);color:var(--teal);border:1px solid rgba(0,212,170,.2);}
+.src-count{font-size:8px;font-family:var(--mono);color:var(--text-lo);}
+
+/* GOAL BANNER */
+.goals{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-bottom:1px solid var(--border);flex-shrink:0;}
+.goal{background:var(--bg-1);padding:10px 14px 9px;position:relative;}
+.goal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.g1::before{background:var(--amber);}
+.g2::before{background:var(--green);}
+.g3::before{background:var(--red);}
+.g4::before{background:var(--purple);}
+.goal-row1{display:flex;align-items:flex-start;gap:5px;margin-bottom:3px;flex-wrap:wrap;}
+.goal-lbl{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-lo);flex:1;}
+.gnum{font-size:8px;font-family:var(--mono);background:var(--bg-3);padding:1px 4px;border-radius:2px;color:var(--text-lo);}
+.dq{font-size:7px;font-weight:700;font-family:var(--mono);padding:1px 5px;border-radius:2px;}
+.dq.ok{background:var(--green-d);color:var(--green);border:1px solid rgba(34,197,94,.2);}
+.dq.partial{background:var(--amber-d);color:var(--amber);border:1px solid rgba(245,158,11,.2);}
+.dq.broken{background:var(--red-d);color:var(--red);border:1px solid rgba(239,68,68,.2);}
+.gval{font-size:24px;font-weight:700;line-height:1;letter-spacing:-.02em;}
+.g1 .gval{color:var(--amber);}
+.g2 .gval{color:var(--green);}
+.g3 .gval{color:var(--red);}
+.g4 .gval{color:var(--purple);}
+.gsub{font-size:9px;color:var(--text-lo);margin-top:2px;}
+.gdelta{font-size:9px;font-family:var(--mono);margin-top:2px;}
+.gdelta.good{color:var(--green);}
+.gdelta.warn{color:var(--amber);}
+.gdelta.bad{color:var(--red);}
+
+/* MAIN BODY */
+.body{display:grid;grid-template-columns:240px 1fr 290px;gap:1px;background:var(--border);flex:1;min-height:0;overflow:hidden;}
+.col{background:var(--bg-1);display:flex;flex-direction:column;min-height:0;overflow-y:auto;overflow-x:hidden;}
+.col-b{gap:1px;background:var(--border);}
+
+/* PANELS */
+.panel{background:var(--bg-1);padding:10px 12px;flex-shrink:0;}
+.ph{display:flex;align-items:center;gap:5px;margin-bottom:8px;}
+.pt{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-md);flex:1;}
+.pb{font-size:8px;font-family:var(--mono);padding:2px 6px;border-radius:2px;background:var(--bg-3);color:var(--text-lo);border:1px solid var(--border);}
+.pb.live{background:var(--green-d);color:var(--green);border-color:rgba(34,197,94,.2);}
+.pb.warn{background:var(--amber-d);color:var(--amber);border-color:rgba(245,158,11,.2);}
+.pb.crit{background:var(--red-d);color:var(--red);border-color:rgba(239,68,68,.2);}
+.pb.new{background:var(--teal-d);color:var(--teal);border-color:rgba(0,212,170,.2);}
+.plink{font-size:8px;color:var(--text-lo);cursor:pointer;}
+.plink:hover{color:var(--teal);}
+
+/* SNAP */
+.snap-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
+.sc{background:var(--bg-2);border:1px solid var(--border);border-radius:4px;padding:6px 8px;}
+.sc-lbl{font-size:8px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-lo);margin-bottom:2px;}
+.sc-val{font-size:17px;font-weight:700;font-family:var(--mono);}
+.sc-val.ok{color:var(--green);}
+.sc-val.warn{color:var(--amber);}
+.sc-val.crit{color:var(--red);}
+.sc-delta{font-size:8px;color:var(--text-lo);margin-top:1px;font-family:var(--mono);}
+.sc-delta.bad{color:var(--red);}
+.sc-delta.good{color:var(--green);}
+
+/* INC ORIGIN BUCKETS */
+.origin-buckets{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
+.ob{background:var(--bg-2);border:1px solid var(--border);border-radius:4px;padding:7px 8px;}
+.ob-lbl{font-size:8px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-lo);margin-bottom:3px;display:flex;align-items:center;gap:5px;}
+.ob-icon{font-size:11px;}
+.ob-val{font-size:20px;font-weight:700;font-family:var(--mono);}
+.ob-val.pcard{color:var(--teal);}
+.ob-val.manual{color:var(--purple);}
+.ob-val.alertsite{color:var(--text-lo);}
+.ob-val.dpa{color:var(--text-lo);}
+.ob-sub{font-size:8px;color:var(--text-lo);margin-top:1px;}
+.ob.stub{opacity:.5;}
+
+/* FCR from INC */
+.fcr-inc-row{display:flex;gap:4px;margin-bottom:6px;}
+.fcr-cell{flex:1;background:var(--bg-2);border:1px solid var(--border);border-radius:4px;padding:6px 8px;text-align:center;}
+.fcr-val{font-size:18px;font-weight:700;font-family:var(--mono);}
+.fcr-lbl{font-size:7px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-lo);margin-top:1px;}
+
+/* RECURRING / NOISE */
+.noise-rows{display:flex;flex-direction:column;gap:3px;}
+.noise-row{display:flex;align-items:center;gap:7px;padding:5px 8px;background:var(--bg-2);border-radius:4px;border:1px solid var(--border);}
+.noise-bar{width:3px;align-self:stretch;border-radius:2px;flex-shrink:0;}
+.noise-bar.hi{background:var(--red);}
+.noise-bar.md{background:var(--amber);}
+.noise-bar.lo{background:var(--text-lo);}
+.noise-name{font-size:9px;flex:1;font-weight:600;}
+.noise-count{font-size:9px;font-family:var(--mono);color:var(--text-lo);}
+.noise-badge{font-size:7px;padding:1px 4px;border-radius:2px;font-family:var(--mono);}
+.noise-badge.recur{background:var(--orange-d);color:var(--orange);border:1px solid rgba(249,115,22,.2);}
+.noise-badge.noisy{background:var(--amber-d);color:var(--amber);border:1px solid rgba(245,158,11,.2);}
+
+/* VCT */
+.vct-rows{display:flex;flex-direction:column;gap:3px;}
+.vct-row{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg-2);cursor:pointer;transition:all .15s;}
+.vct-row:hover{border-color:var(--border-hi);}
+.vct-row.warn{border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.05);}
+.vct-row.crit{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.05);}
+.vct-bar{width:3px;align-self:stretch;border-radius:2px;flex-shrink:0;}
+.vct-bar.ok{background:var(--green);}
+.vct-bar.warn{background:var(--amber);}
+.vct-bar.crit{background:var(--red);}
+.vct-bar.muted{background:var(--text-lo);}
+.vct-name{font-size:10px;font-weight:600;flex:1;}
+.vct-right{display:flex;align-items:center;gap:4px;}
+.vct-pc{font-size:8px;padding:1px 4px;border-radius:2px;font-family:var(--mono);}
+.vct-pc.crit{background:var(--red-d);color:var(--red);border:1px solid rgba(239,68,68,.2);}
+.vct-pc.warn{background:var(--amber-d);color:var(--amber);border:1px solid rgba(245,158,11,.2);}
+.vct-pc.ok{color:var(--text-lo);font-size:8px;}
+.vct-inc{font-size:8px;color:var(--blue);font-family:var(--mono);}
+
+/* CENTER — QUEUE */
+.qhd{display:flex;align-items:center;gap:6px;padding:9px 12px 7px;border-bottom:1px solid var(--border);background:var(--bg-1);flex-shrink:0;}
+.qtitle{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-md);flex:1;}
+.filters{display:flex;gap:3px;}
+.fpill{padding:2px 8px;border-radius:10px;border:1px solid var(--border);background:var(--bg-2);font-size:9px;color:var(--text-lo);cursor:pointer;transition:all .15s;}
+.fpill.active{background:var(--teal-d);border-color:rgba(0,212,170,.3);color:var(--teal);}
+.fpill.alert{background:var(--red-d);border-color:rgba(239,68,68,.3);color:var(--red);}
+
+/* BUCKET STRIP */
+.bstrip{display:flex;gap:1px;background:var(--border);border-bottom:1px solid var(--border);flex-shrink:0;}
+.bkt{flex:1;background:var(--bg-0);padding:6px 7px;display:flex;flex-direction:column;align-items:center;gap:1px;cursor:pointer;}
+.bkt:hover{background:var(--bg-2);}
+.bkt-lbl{font-size:7px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-lo);text-align:center;}
+.bkt-val{font-size:14px;font-weight:700;font-family:var(--mono);}
+.bkt.t0 .bkt-val{color:var(--text-md);}
+.bkt.t1 .bkt-val{color:var(--amber);}
+.bkt.t2 .bkt-val{color:var(--orange);}
+.bkt.t3 .bkt-val{color:var(--red);}
+.bkt.alert-bkt{background:rgba(239,68,68,.04);}
+.bkt.alert-bkt .bkt-val{color:var(--red);}
+.bkt-sub{font-size:7px;color:var(--text-lo);font-family:var(--mono);}
+
+/* ALERT BANNER */
+.alert-banner{background:rgba(239,68,68,.08);border-bottom:1px solid rgba(239,68,68,.2);padding:5px 12px;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.ab-icon{font-size:12px;color:var(--red);}
+.ab-text{font-size:10px;color:var(--red);font-weight:600;flex:1;}
+.ab-sub{font-size:8px;color:rgba(239,68,68,.7);}
+
+/* UNIFIED TABLE */
+.utbl{width:100%;border-collapse:collapse;table-layout:fixed;}
+.utbl thead tr{border-bottom:1px solid var(--border);}
+.utbl th{padding:5px 8px;font-size:8px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-lo);text-align:left;background:var(--bg-0);}
+.utbl tbody tr{border-bottom:1px solid rgba(255,255,255,.03);cursor:pointer;transition:background .1s;}
+.utbl tbody tr:hover{background:var(--bg-2);}
+.utbl tbody tr.selected{background:rgba(0,212,170,.05);}
+.utbl tbody tr.no-comment td:first-child{border-left:2px solid var(--red);background:rgba(239,68,68,.04);}
+.utbl tbody tr.lr-crit td:first-child{border-left:2px solid var(--red);}
+.utbl tbody tr.lr-2 td:first-child{border-left:2px solid var(--orange);}
+.utbl tbody tr.breach td:first-child{border-left:2px solid var(--amber);}
+.utbl tbody tr.inc-row{background:rgba(59,130,246,.03);}
+.utbl tbody tr.inc-row.selected{background:rgba(59,130,246,.08);}
+.utbl tbody tr.inc-row td:first-child{border-left:2px solid var(--blue);}
+.utbl tbody tr.fcr-cand td:first-child{border-left:2px solid var(--green);}
+.utbl td{padding:6px 8px;font-size:10px;color:var(--text-md);vertical-align:middle;}
+
+/* Row type indicator */
+.row-type{display:inline-flex;align-items:center;gap:3px;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:700;font-family:var(--mono);white-space:nowrap;}
+.row-type.pcard{background:var(--bg-3);color:var(--teal);border:1px solid rgba(0,212,170,.2);}
+.row-type.inc-manual{background:var(--purple-d);color:var(--purple);border:1px solid rgba(124,111,205,.2);}
+.row-type.inc-pcard{background:var(--blue-d);color:var(--blue);border:1px solid rgba(59,130,246,.2);}
+.row-type.inc-alertsite{background:var(--amber-d);color:var(--amber);border:1px solid rgba(245,158,11,.2);}
+
+.id-cell{font-family:var(--mono);font-size:9px;}
+.id-cell.pcard{color:var(--teal);}
+.id-cell.inc{color:var(--blue);}
+
+.title-wrap{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;font-weight:600;color:var(--text-hi);}
+.title-sub{font-size:8px;color:var(--text-lo);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+.age-val{font-family:var(--mono);font-size:10px;font-weight:700;}
+.age-val.t3{color:var(--red);}
+.age-val.t2{color:var(--orange);}
+.age-val.t1{color:var(--amber);}
+.age-val.t0{color:var(--text-lo);}
+.age-tier{font-size:8px;}
+.age-tier.t3{color:var(--red);}
+.age-tier.t2{color:var(--orange);}
+.age-tier.t1{color:var(--amber);}
+.age-tier.t0{color:var(--text-lo);}
+
+.sev{display:inline-flex;padding:1px 5px;border-radius:2px;font-size:8px;font-weight:700;font-family:var(--mono);}
+.sev.perf{background:var(--blue-d);color:var(--blue);border:1px solid rgba(59,130,246,.2);}
+.sev.avail{background:var(--amber-d);color:var(--amber);border:1px solid rgba(245,158,11,.2);}
+.sev.err{background:var(--red-d);color:var(--red);border:1px solid rgba(239,68,68,.2);}
+.sev.p3m{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.2);}
+.sev.p3{background:var(--amber-d);color:var(--amber);border:1px solid rgba(245,158,11,.2);}
+
+.stpill{display:inline-flex;align-items:center;gap:3px;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:600;}
+.stpill.open{background:var(--bg-3);color:var(--text-md);border:1px solid var(--border);}
+.stpill.swarm{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25);}
+.stpill.watch{background:var(--amber-d);color:var(--amber);border:1px solid rgba(245,158,11,.2);}
+.stpill.fcr{background:var(--green-d);color:var(--green);border:1px solid rgba(34,197,94,.2);}
+.stpill.active-inc{background:var(--blue-d);color:var(--blue);border:1px solid rgba(59,130,246,.2);}
+
+.sf{font-size:8px;padding:1px 4px;border-radius:2px;font-family:var(--mono);}
+.sf.recur{background:var(--orange-d);color:var(--orange);border:1px solid rgba(249,115,22,.2);}
+.sf.ans{background:var(--teal-d);color:var(--teal);border:1px solid rgba(0,212,170,.2);}
+.sf.fcrcand{background:var(--green-d);color:var(--green);border:1px solid rgba(34,197,94,.2);}
+.sf.nocomment{background:var(--red-d);color:var(--red);border:1px solid rgba(239,68,68,.2);}
+.sf.linked{background:var(--blue-d);color:var(--blue);border:1px solid rgba(59,130,246,.2);}
+.sf.noise{background:var(--amber-d);color:var(--amber);border:1px solid rgba(245,158,11,.2);}
+
+.comment-age{font-family:var(--mono);font-size:9px;}
+.comment-age.breach{color:var(--red);font-weight:700;}
+.comment-age.warn{color:var(--amber);}
+.comment-age.ok{color:var(--text-lo);}
+.comment-age.none{color:var(--red);font-weight:700;}
+.no-inc{color:var(--text-lo);font-size:9px;}
+.inc-lnk{font-family:var(--mono);font-size:9px;color:var(--blue);cursor:pointer;}
+
+/* FUNNEL */
+.funnel{display:flex;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg-0);flex-shrink:0;}
+.fs{flex:1;padding:6px 5px;display:flex;flex-direction:column;align-items:center;gap:1px;border-right:1px solid var(--border);}
+.fs:last-child{border-right:none;}
+.fs-lbl{font-size:7px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-lo);text-align:center;}
+.fs-val{font-size:13px;font-weight:700;font-family:var(--mono);}
+.fs-pct{font-size:7px;color:var(--text-lo);font-family:var(--mono);}
+.fs.bottle .fs-val{color:var(--amber);}
+.fs.good .fs-val{color:var(--green);}
+
+/* DT-SNOW */
+.dt-snow{background:rgba(59,130,246,.05);border-top:1px solid rgba(59,130,246,.1);padding:5px 14px;font-size:9px;color:rgba(147,197,253,.7);display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.dt-snow strong{color:#93c5fd;}
+
+/* RIGHT — TRIAGE */
+.triage{padding:10px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.tr-id{font-family:var(--mono);font-size:10px;color:var(--teal);font-weight:700;margin-bottom:2px;}
+.tr-title{font-size:11px;font-weight:600;line-height:1.3;margin-bottom:5px;}
+.tr-meta{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:8px;}
+.tr-timing{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-bottom:8px;}
+.tt{background:var(--bg-2);border:1px solid var(--border);border-radius:3px;padding:5px 6px;text-align:center;}
+.tt-val{font-size:13px;font-weight:700;font-family:var(--mono);}
+.tt-lbl{font-size:7px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-lo);margin-top:1px;}
+
+/* INC origin detail */
+.inc-origin-box{background:var(--bg-2);border:1px solid var(--border);border-radius:4px;padding:8px 10px;margin-bottom:8px;}
+.iob-hd{display:flex;align-items:center;gap:6px;margin-bottom:5px;}
+.iob-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-lo);flex:1;}
+.iob-rows{display:flex;flex-direction:column;gap:3px;}
+.iob-row{display:flex;align-items:center;gap:6px;font-size:9px;}
+.iob-label{color:var(--text-lo);min-width:80px;}
+.iob-val{color:var(--text-hi);font-family:var(--mono);}
+.iob-badge{font-size:8px;padding:1px 5px;border-radius:2px;font-family:var(--mono);font-weight:700;}
+.iob-badge.fcr-yes{background:var(--green-d);color:var(--green);border:1px solid rgba(34,197,94,.2);}
+.iob-badge.fcr-cand{background:var(--teal-d);color:var(--teal);border:1px solid rgba(0,212,170,.2);}
+.iob-badge.fcr-no{background:var(--red-d);color:var(--red);border:1px solid rgba(239,68,68,.2);}
+.iob-badge.noisy{background:var(--amber-d);color:var(--amber);border:1px solid rgba(245,158,11,.2);}
+
+.auto-box{background:rgba(0,212,170,.05);border:1px solid rgba(0,212,170,.18);border-radius:4px;padding:7px 9px;margin-bottom:7px;}
+.auto-hd{display:flex;align-items:center;gap:5px;margin-bottom:3px;}
+.auto-title{font-size:9px;font-weight:700;color:var(--teal);flex:1;}
+.auto-conf{font-size:8px;font-family:var(--mono);color:var(--text-lo);}
+.auto-desc{font-size:8px;color:var(--text-md);margin-bottom:4px;line-height:1.4;}
+.auto-acts{display:flex;gap:3px;}
+.aa{padding:3px 7px;border-radius:3px;font-size:8px;font-weight:700;cursor:pointer;border:1px solid;transition:all .15s;}
+.aa.run{background:var(--teal-d);border-color:rgba(0,212,170,.3);color:var(--teal);}
+.aa.rev{background:var(--bg-3);border-color:var(--border-hi);color:var(--text-md);}
+
+.triage-dec{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:5px;}
+.tdec{padding:7px;border-radius:4px;border:1px solid;font-size:9px;font-weight:700;cursor:pointer;text-align:center;}
+.tdec.resolve{background:var(--green-d);border-color:rgba(34,197,94,.3);color:var(--green);}
+.tdec.escalate{background:var(--amber-d);border-color:rgba(245,158,11,.3);color:var(--amber);}
+.fcr-warn{font-size:8px;color:var(--amber);font-family:var(--mono);margin-bottom:6px;line-height:1.4;}
+.sync-warn{background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.15);border-radius:3px;padding:5px 7px;font-size:8px;color:rgba(147,197,253,.8);line-height:1.4;margin-bottom:6px;}
+.sync-warn strong{color:#93c5fd;}
+.qacts{display:flex;gap:3px;flex-wrap:wrap;}
+.qa{padding:3px 7px;border-radius:3px;border:1px solid var(--border-hi);background:var(--bg-3);color:var(--text-md);font-size:9px;cursor:pointer;}
+.qa:hover{color:var(--teal);border-color:rgba(0,212,170,.3);}
+.qa.ansible{border-color:rgba(124,111,205,.3);color:var(--purple);background:var(--purple-d);}
+
+/* SWARMS */
+.swarm-rows{display:flex;flex-direction:column;gap:4px;}
+.swarm-card{background:var(--bg-2);border:1px solid var(--border);border-radius:5px;padding:8px 9px;border-left:3px solid;}
+.swarm-card.active{border-left-color:var(--red);}
+.swarm-card.watch{border-left-color:var(--amber);}
+.sw-top{display:flex;align-items:flex-start;gap:5px;margin-bottom:4px;}
+.sw-title{font-size:10px;font-weight:700;flex:1;}
+.sw-age{font-size:9px;font-family:var(--mono);color:var(--text-lo);}
+.sw-bridge{font-size:9px;color:var(--text-md);margin-bottom:3px;}
+.sw-bridge strong{color:var(--amber);}
+.sw-groups{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:5px;}
+.sg{font-size:8px;padding:1px 5px;border-radius:2px;background:var(--bg-3);color:var(--text-md);border:1px solid var(--border);}
+.sw-acts{display:flex;gap:3px;}
+.swa{padding:3px 7px;border-radius:3px;border:1px solid var(--border-hi);background:var(--bg-3);color:var(--text-md);font-size:8px;cursor:pointer;}
+.swa.join{border-color:rgba(239,68,68,.3);color:var(--red);background:var(--red-d);}
+
+/* ACTION Q */
+.opp-rows{display:flex;flex-direction:column;gap:3px;}
+.opp{display:flex;align-items:flex-start;gap:6px;padding:6px 7px;background:var(--bg-2);border-radius:4px;border:1px solid var(--border);cursor:pointer;}
+.opp:hover{border-color:var(--border-hi);}
+.opp-icon{width:20px;height:20px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;}
+.opp-body{flex:1;}
+.opp-title{font-size:10px;font-weight:600;}
+.opp-desc{font-size:8px;color:var(--text-lo);margin-top:1px;line-height:1.3;}
+.opp-act{font-size:9px;color:var(--teal);cursor:pointer;white-space:nowrap;flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<!-- CHROME -->
+<div class="chrome">
+  <div class="brand"><div class="pip"></div><div><div class="brand-name">ICC Command</div><div class="brand-sub">Unified P-Card + INC Queue</div></div></div>
+  <div class="chrome-chips">
+    <div class="chip ok"><div class="chip-dot"></div>DT · 1m</div>
+    <div class="chip ok"><div class="chip-dot"></div>SN · 220-key INC pull active</div>
+    <div class="chip ok"><div class="chip-dot"></div>API OK</div>
+    <div class="chip stub"><div class="chip-dot"></div>AlertSite · stub</div>
+    <div class="chip stub"><div class="chip-dot"></div>DPA · stub</div>
+  </div>
+  <div class="chrome-right"><span id="clock">—</span><button class="c-btn primary">↻ Refresh</button><button class="c-btn">Handoff →</button></div>
+</div>
+
+<!-- SOURCE STRIP -->
+<div class="src-strip">
+  <div class="src-tile"><span class="src-name">Dynatrace</span><span class="src-badge fresh">FRESH &lt;5M</span><span class="src-count">14 open P-Cards</span></div>
+  <div class="src-tile"><span class="src-name">ServiceNow INCs</span><span class="src-badge new">220-KEY PULL</span><span class="src-count">47 ICC INCs · backfilling</span></div>
+  <div class="src-tile"><span class="src-name">AlertSite</span><span class="src-badge stub">NOT INTEGRATED</span></div>
+  <div class="src-tile"><span class="src-name">SolarWinds DPA</span><span class="src-badge stub">NOT INTEGRATED</span></div>
+</div>
+
+<!-- GOAL BANNER -->
+<div class="goals">
+  <div class="goal g1">
+    <div class="goal-row1"><span class="gnum">G1</span><span class="goal-lbl">First Call Resolution</span><span class="dq partial">IMPROVING</span></div>
+    <div class="gval">75.1%</div>
+    <div class="gsub">INC-origin FCR now calculable · no sys_audit needed</div>
+    <div class="gdelta good">↑ ICC INC no-reassignment proxy active</div>
+  </div>
+  <div class="goal g2">
+    <div class="goal-row1"><span class="gnum">G2</span><span class="goal-lbl">Incident Volume YoY</span><span class="dq ok">ON TRACK</span></div>
+    <div class="gval">−18%</div>
+    <div class="gsub">47 ICC INCs this period · noise targeting active</div>
+    <div class="gdelta good">↓ 9 recurring INC patterns identified</div>
+  </div>
+  <div class="goal g3">
+    <div class="goal-row1"><span class="gnum">G3</span><span class="goal-lbl">Major Incidents Prevented</span><span class="dq broken">METRIC FIX PENDING</span></div>
+    <div class="gval">2</div>
+    <div class="gsub">P-Card → INC escalation prevention · this week</div>
+    <div class="gdelta warn">⚠ icc-towers fix still required for % metric</div>
+  </div>
+  <div class="goal g4">
+    <div class="goal-row1"><span class="gnum">G4</span><span class="goal-lbl">Automation Opportunities</span><span class="dq partial">PARTIAL</span></div>
+    <div class="gval">9</div>
+    <div class="gsub">3 Ansible scripts ready · recurring INC targets</div>
+    <div class="gdelta warn">→ aagKeywords matching 6 open P-Cards</div>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="body">
+
+<!-- LEFT -->
+<div class="col col-b">
+
+  <!-- Shift Snapshot -->
+  <div class="panel">
+    <div class="ph"><span class="pt">Shift Snapshot</span><span class="pb live">LIVE</span></div>
+    <div class="snap-grid">
+      <div class="sc"><div class="sc-lbl">Open P-Cards</div><div class="sc-val warn">14</div><div class="sc-delta bad">▲ 3 vs yesterday</div></div>
+      <div class="sc"><div class="sc-lbl">No First Comment</div><div class="sc-val crit">1</div><div class="sc-delta bad">⚠ top of queue</div></div>
+      <div class="sc"><div class="sc-lbl">ICC INCs Open</div><div class="sc-val warn">7</div><div class="sc-delta">All TECH IOPS-NOC</div></div>
+      <div class="sc"><div class="sc-lbl">FCR Candidates</div><div class="sc-val ok">12</div><div class="sc-delta good">No reassignment yet</div></div>
+      <div class="sc"><div class="sc-lbl">Active Swarms</div><div class="sc-val warn">2</div><div class="sc-delta bad">▲ 1 this hour</div></div>
+      <div class="sc"><div class="sc-lbl">Recurring Patterns</div><div class="sc-val warn">9</div><div class="sc-delta bad">INC reduction targets</div></div>
+    </div>
+  </div>
+
+  <!-- INC Origin Buckets — NEW -->
+  <div class="panel">
+    <div class="ph"><span class="pt">INC by Origin</span><span class="pb new">NEW · 220-KEY</span></div>
+    <div class="origin-buckets">
+      <div class="ob">
+        <div class="ob-lbl"><span class="ob-icon">📋</span>P-Card Generated</div>
+        <div class="ob-val pcard">28</div>
+        <div class="ob-sub">DT alert → INC created</div>
+      </div>
+      <div class="ob">
+        <div class="ob-lbl"><span class="ob-icon">🧑‍💻</span>Manual ICC</div>
+        <div class="ob-val manual">11</div>
+        <div class="ob-sub">ICC created directly</div>
+      </div>
+      <div class="ob stub">
+        <div class="ob-lbl"><span class="ob-icon">🌐</span>AlertSite</div>
+        <div class="ob-val alertsite">—</div>
+        <div class="ob-sub">Collector not connected</div>
+      </div>
+      <div class="ob stub">
+        <div class="ob-lbl"><span class="ob-icon">📊</span>SolarWinds DPA</div>
+        <div class="ob-val dpa">—</div>
+        <div class="ob-sub">Collector not connected</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FCR from INC — NEW LOGIC -->
+  <div class="panel">
+    <div class="ph"><span class="pt">FCR — INC Proxy</span><span class="pb new">NO sys_audit NEEDED</span></div>
+    <div class="fcr-inc-row">
+      <div class="fcr-cell" style="border-color:rgba(34,197,94,.2);background:var(--green-d);">
+        <div class="fcr-val" style="color:var(--green);">12</div>
+        <div class="fcr-lbl">FCR Candidates</div>
+      </div>
+      <div class="fcr-cell">
+        <div class="fcr-val" style="color:var(--amber);">8</div>
+        <div class="fcr-lbl">Under Review</div>
+      </div>
+      <div class="fcr-cell" style="border-color:rgba(239,68,68,.2);background:var(--red-d);">
+        <div class="fcr-val" style="color:var(--red);">5</div>
+        <div class="fcr-lbl">Reassigned ✗</div>
+      </div>
+    </div>
+    <div style="font-size:8px;color:var(--text-lo);line-height:1.5;padding:4px 0;">
+      <strong style="color:var(--text-md);">Logic:</strong> ICC INC assigned + no reassignment yet = FCR candidate.<br>
+      Replaces sys_audit dependency. Backfilling historical INCs now.
+    </div>
+  </div>
+
+  <!-- Recurring / Noise Targets -->
+  <div class="panel">
+    <div class="ph"><span class="pt">Recurring Patterns</span><span class="pb warn">9 TARGETS</span><span class="plink">Reduce →</span></div>
+    <div class="noise-rows">
+      <div class="noise-row"><div class="noise-bar hi"></div><span class="noise-name">App Pool Memory Spike</span><span class="noise-badge recur">↺ 6x</span><span class="noise-count">Move Money</span></div>
+      <div class="noise-row"><div class="noise-bar hi"></div><span class="noise-name">Kafka Consumer Lag</span><span class="noise-badge recur">↺ 4x</span><span class="noise-count">Middleware</span></div>
+      <div class="noise-row"><div class="noise-bar md"></div><span class="noise-name">Disk Usage 95%+</span><span class="noise-badge recur">↺ 8x</span><span class="noise-count">Platform</span></div>
+      <div class="noise-row"><div class="noise-bar md"></div><span class="noise-name">DataPower Latency</span><span class="noise-badge noisy">⚡ Ansible</span><span class="noise-count">Middleware</span></div>
+      <div class="noise-row"><div class="noise-bar lo"></div><span class="noise-name">Process Instance Low</span><span class="noise-badge recur">↺ 3x</span><span class="noise-count">App Services</span></div>
+    </div>
+  </div>
+
+  <!-- VCT Rail -->
+  <div class="panel">
+    <div class="ph"><span class="pt">VCT Signal Rail</span><span class="pb warn">1 DEGRADED</span></div>
+    <div class="vct-rows">
+      <div class="vct-row crit"><div class="vct-bar crit"></div><span class="vct-name">Move Money 3.0</span><div class="vct-right"><span class="vct-pc crit">3 P-C</span><span class="vct-inc">INC×2</span></div></div>
+      <div class="vct-row"><div class="vct-bar ok"></div><span class="vct-name">Client Management</span><div class="vct-right"><span class="vct-pc ok">1 P-C</span></div></div>
+      <div class="vct-row"><div class="vct-bar ok"></div><span class="vct-name">Account View 2.0</span><div class="vct-right"><span class="vct-pc ok">0</span></div></div>
+      <div class="vct-row"><div class="vct-bar ok"></div><span class="vct-name">Trading</span><div class="vct-right"><span class="vct-pc ok">0</span></div></div>
+      <div class="vct-row"><div class="vct-bar ok"></div><span class="vct-name">Advisor Email</span><div class="vct-right"><span class="vct-pc ok">0</span></div></div>
+      <div class="vct-row"><div class="vct-bar muted"></div><span class="vct-name">NAO</span><div class="vct-right"><span class="vct-pc ok">0</span></div></div>
+      <div class="vct-row"><div class="vct-bar ok"></div><span class="vct-name">Statements</span><div class="vct-right"><span class="vct-pc ok">0</span></div></div>
+    </div>
+    <div style="font-size:7px;color:var(--text-lo);padding:4px 0 0;font-style:italic;">VCT count shows P-Cards · INC×N = linked INCs from full INC pull</div>
+  </div>
+
+</div>
+
+<!-- CENTER -->
+<div class="col">
+
+  <!-- Queue Header -->
+  <div class="qhd">
+    <div class="qtitle">Unified Queue <span style="color:var(--amber);font-family:var(--mono);font-size:13px;margin-left:4px;">21</span> <span style="font-size:9px;color:var(--text-lo);font-weight:400;">14 P-Cards · 7 INCs</span></div>
+    <div class="filters">
+      <div class="fpill active">All</div>
+      <div class="fpill alert">No Comment (1)</div>
+      <div class="fpill">P-Cards</div>
+      <div class="fpill">INCs</div>
+      <div class="fpill">FCR Cand.</div>
+      <div class="fpill">Recurring</div>
+      <div class="fpill">⚡ Ansible</div>
+    </div>
+  </div>
+
+  <!-- Bucket strip -->
+  <div class="bstrip">
+    <div class="bkt t0"><div class="bkt-lbl">All Open</div><div class="bkt-val">21</div><div class="bkt-sub">queue</div></div>
+    <div class="bkt t1"><div class="bkt-lbl">Watch ›30m</div><div class="bkt-val">4</div><div class="bkt-sub">aging</div></div>
+    <div class="bkt t2"><div class="bkt-lbl">LR ›60m</div><div class="bkt-val">2</div><div class="bkt-sub">long-run</div></div>
+    <div class="bkt t3"><div class="bkt-lbl">Critical ›120m</div><div class="bkt-val">1</div><div class="bkt-sub">urgent</div></div>
+    <div class="bkt alert-bkt"><div class="bkt-lbl">No Comment</div><div class="bkt-val">1</div><div class="bkt-sub">unacked</div></div>
+    <div class="bkt" style="flex:1.4;"><div class="bkt-lbl">FCR Candidates</div><div class="bkt-val" style="color:var(--green);">12</div><div class="bkt-sub">no reassignment</div></div>
+    <div class="bkt"><div class="bkt-lbl">Recurring</div><div class="bkt-val" style="color:var(--orange);">9</div><div class="bkt-sub">patterns</div></div>
+  </div>
+
+  <!-- Alert banner -->
+  <div class="alert-banner">
+    <div class="ab-icon">⚠</div>
+    <div class="ab-text">1 P-Card with no first comment — immediate acknowledgement required</div>
+    <div class="ab-sub">Top of queue · SLA clock running</div>
+  </div>
+
+  <!-- Unified table -->
+  <div style="overflow-x:auto;flex:1;overflow-y:auto;">
+  <table class="utbl">
+    <colgroup>
+      <col style="width:50px"><!-- Type -->
+      <col style="width:95px"><!-- ID -->
+      <col style="width:21%"><!-- Title -->
+      <col style="width:50px"><!-- Sev -->
+      <col style="width:70px"><!-- Age -->
+      <col style="width:75px"><!-- Comment/Age -->
+      <col style="width:80px"><!-- Status -->
+      <col style="width:75px"><!-- Origin/Link -->
+      <col style="width:1fr"><!-- Signals -->
+    </colgroup>
+    <thead>
+      <tr>
+        <th>Type</th><th>ID</th><th>Title / Service</th><th>Sev</th>
+        <th>Age / Tier</th><th>Last Activity</th><th>Status</th>
+        <th>Origin / Link</th><th>Signals</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- NO COMMENT — always top -->
+      <tr class="no-comment" onclick="selectRow(this)">
+        <td><span class="row-type pcard">P-Card</span></td>
+        <td><span class="id-cell pcard">P-260614881</span></td>
+        <td><div class="title-wrap">Advisor Email SMTP Relay Latency</div><div class="title-sub">Advisor Email</div></td>
+        <td><span class="sev perf">PERF</span></td>
+        <td><div><span class="age-val t0">18m</span><br><span class="age-tier t0">—</span></div></td>
+        <td><span class="comment-age none">⚠ No comment</span></td>
+        <td><span class="stpill open">○ Open</span></td>
+        <td><span class="no-inc">No INC</span></td>
+        <td><span class="sf fcrcand">◎ FCR</span></td>
+      </tr>
+      <!-- CRITICAL LR P-Card -->
+      <tr class="lr-crit selected" onclick="selectRow(this)">
+        <td><span class="row-type pcard">P-Card</span></td>
+        <td><span class="id-cell pcard">P-260623063</span></td>
+        <td><div class="title-wrap">DatapowerProd Finra Response Degradation</div><div class="title-sub">Middleware / DataPower</div></td>
+        <td><span class="sev perf">PERF</span></td>
+        <td><div><span class="age-val t3">134m</span><br><span class="age-tier t3">CRITICAL LR</span></div></td>
+        <td><span class="comment-age warn">8m ago</span></td>
+        <td><span class="stpill swarm">● Swarm</span></td>
+        <td><span class="inc-lnk">INC1769673</span></td>
+        <td><div style="display:flex;gap:2px;flex-wrap:wrap;"><span class="sf recur">↺ Recur</span><span class="sf ans">⚡ Ansible</span></div></td>
+      </tr>
+      <!-- INC linked to P-Card above — shows the relationship -->
+      <tr class="inc-row" onclick="selectRow(this)">
+        <td><span class="row-type inc-pcard">INC · P-C</span></td>
+        <td><span class="id-cell inc">INC1769673</span></td>
+        <td><div class="title-wrap">DataPower Gateway Performance — TECH IOPS-NOC</div><div class="title-sub">Origin: P-Card alert · P-260623063</div></td>
+        <td><span class="sev p3m">P3 MAJ</span></td>
+        <td><div><span class="age-val t3">131m</span><br><span class="age-tier t3">OPEN</span></div></td>
+        <td><span class="comment-age ok">ICC active</span></td>
+        <td><span class="stpill active-inc">⬤ In Progress</span></td>
+        <td><span style="font-size:8px;color:var(--teal);">← P-260623063</span></td>
+        <td><div style="display:flex;gap:2px;"><span class="sf recur">↺ Recur</span></div></td>
+      </tr>
+      <!-- LR P-Card -->
+      <tr class="lr-2" onclick="selectRow(this)">
+        <td><span class="row-type pcard">P-Card</span></td>
+        <td><span class="id-cell pcard">P-260619441</span></td>
+        <td><div class="title-wrap">Move Money App Pool Memory Spike</div><div class="title-sub">Move Money 3.0</div></td>
+        <td><span class="sev avail">AVAIL</span></td>
+        <td><div><span class="age-val t2">82m</span><br><span class="age-tier t2">LR</span></div></td>
+        <td><span class="comment-age breach">21m ago ⚠</span></td>
+        <td><span class="stpill swarm">● Swarm</span></td>
+        <td><span class="inc-lnk">INC1769683</span></td>
+        <td><div style="display:flex;gap:2px;"><span class="sf recur">↺ Recur</span><span class="sf ans">⚡ Ansible</span></div></td>
+      </tr>
+      <!-- Manual ICC INC — no P-Card -->
+      <tr class="inc-row" onclick="selectRow(this)">
+        <td><span class="row-type inc-manual">INC · Manual</span></td>
+        <td><span class="id-cell inc">INC1769701</span></td>
+        <td><div class="title-wrap">Network Latency Event — Advisor Portal</div><div class="title-sub">Origin: Manual ICC creation · no P-Card</div></td>
+        <td><span class="sev p3">P3</span></td>
+        <td><div><span class="age-val t1">55m</span><br><span class="age-tier t1">Watch</span></div></td>
+        <td><span class="comment-age ok">ICC working</span></td>
+        <td><span class="stpill fcr">◎ FCR Cand.</span></td>
+        <td><span style="font-size:8px;color:var(--purple);">Manual · no P-Card</span></td>
+        <td><div style="display:flex;gap:2px;"><span class="sf fcrcand">◎ FCR</span></div></td>
+      </tr>
+      <!-- Watch P-Card -->
+      <tr class="breach" onclick="selectRow(this)">
+        <td><span class="row-type pcard">P-Card</span></td>
+        <td><span class="id-cell pcard">P-260617901</span></td>
+        <td><div class="title-wrap">Client Mgmt Service Degraded Response</div><div class="title-sub">Client Management</div></td>
+        <td><span class="sev avail">AVAIL</span></td>
+        <td><div><span class="age-val t1">48m</span><br><span class="age-tier t1">Watch</span></div></td>
+        <td><span class="comment-age breach">22m ago ⚠</span></td>
+        <td><span class="stpill watch">◑ Watch</span></td>
+        <td><span class="no-inc">No INC</span></td>
+        <td><div style="display:flex;gap:2px;"><span class="sf recur">↺ Recur</span></div></td>
+      </tr>
+      <!-- FCR candidate INC -->
+      <tr class="inc-row fcr-cand" onclick="selectRow(this)">
+        <td><span class="row-type inc-pcard">INC · P-C</span></td>
+        <td><span class="id-cell inc">INC1769687</span></td>
+        <td><div class="title-wrap">F5 Load Balancer Pool Member Down</div><div class="title-sub">Origin: P-Card alert · resolved by ICC</div></td>
+        <td><span class="sev p3">P3</span></td>
+        <td><div><span class="age-val t0">38m</span><br><span class="age-tier t0">—</span></div></td>
+        <td><span class="comment-age ok">Resolved</span></td>
+        <td><span class="stpill fcr">◎ FCR Cand.</span></td>
+        <td><span style="font-size:8px;color:var(--green);">No reassignment ✓</span></td>
+        <td><div style="display:flex;gap:2px;"><span class="sf fcrcand">◎ FCR</span></div></td>
+      </tr>
+      <!-- Normal P-Card -->
+      <tr onclick="selectRow(this)">
+        <td><span class="row-type pcard">P-Card</span></td>
+        <td><span class="id-cell pcard">P-260615991</span></td>
+        <td><div class="title-wrap">Linux Node03 Disk Usage 97%</div><div class="title-sub">Platform · recurring pattern</div></td>
+        <td><span class="sev perf">PERF</span></td>
+        <td><div><span class="age-val t0">12m</span><br><span class="age-tier t0">—</span></div></td>
+        <td><span class="comment-age ok">2m ago</span></td>
+        <td><span class="stpill open">⚡ Auto-Q</span></td>
+        <td><span class="no-inc">No INC</span></td>
+        <td><div style="display:flex;gap:2px;"><span class="sf ans">⚡ Ansible</span><span class="sf noise">⚡ Noisy</span></div></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <!-- Funnel -->
+  <div class="funnel">
+    <div class="fs good"><div class="fs-lbl">P-Cards Open</div><div class="fs-val">14</div><div class="fs-pct">queue</div></div>
+    <div class="fs"><div class="fs-lbl">INCs Open</div><div class="fs-val">7</div><div class="fs-pct">ICC group</div></div>
+    <div class="fs good"><div class="fs-lbl">Acked</div><div class="fs-val">13</div><div class="fs-pct">93%</div></div>
+    <div class="fs bottle"><div class="fs-lbl">Commented</div><div class="fs-val">11</div><div class="fs-pct">79% ⚠</div></div>
+    <div class="fs"><div class="fs-lbl">FCR Candidates</div><div class="fs-val" style="color:var(--green);">12</div><div class="fs-pct">no reassign</div></div>
+    <div class="fs"><div class="fs-lbl">Shift FCR</div><div class="fs-val" style="color:var(--amber);">75%</div><div class="fs-pct">INC proxy</div></div>
+  </div>
+
+  <div class="dt-snow"><strong>DT → SNow one-way.</strong> P-Card comments push to SNow · SNow INC updates do not push back to DT. Full INC pull now supplements comment-parsed INC data.</div>
+
+</div>
+
+<!-- RIGHT -->
+<div class="col col-b">
+
+  <!-- Triage -->
+  <div class="triage">
+    <div class="ph" style="margin-bottom:5px;"><span class="pt">ICC Triage</span><span class="pb live">P-260623063</span></div>
+    <div class="tr-id">P-260623063 · 134m ⚠ Critical LR</div>
+    <div class="tr-title">DatapowerProd Finra Response Degradation</div>
+    <div class="tr-meta">
+      <span class="sev perf">PERF</span>
+      <span class="stpill swarm">● Swarm</span>
+      <span class="sf recur">↺ Recurring</span>
+    </div>
+    <div class="tr-timing">
+      <div class="tt"><div class="tt-val">134m</div><div class="tt-lbl">Age</div></div>
+      <div class="tt"><div class="tt-val" style="color:var(--amber);">8m</div><div class="tt-lbl">Last Comment</div></div>
+      <div class="tt"><div class="tt-val">0.18</div><div class="tt-lbl">Aging Risk</div></div>
+    </div>
+
+    <!-- INC Detail Box — NEW -->
+    <div class="inc-origin-box">
+      <div class="iob-hd"><span class="pt" style="font-size:9px;">Linked INC</span><span class="inc-lnk">INC1769673</span></div>
+      <div class="iob-rows">
+        <div class="iob-row"><span class="iob-label">Origin</span><span class="iob-val">P-Card alert (auto-created)</span></div>
+        <div class="iob-row"><span class="iob-label">Assignment</span><span class="iob-val">TECH IOPS-NOC Ops</span></div>
+        <div class="iob-row"><span class="iob-label">Reassignments</span><span class="iob-val">0</span></div>
+        <div class="iob-row"><span class="iob-label">FCR Status</span><span class="iob-badge fcr-cand">CANDIDATE</span></div>
+        <div class="iob-row"><span class="iob-label">Recurring</span><span class="iob-badge noisy">6 prior INCs</span></div>
+      </div>
+    </div>
+
+    <!-- Ansible -->
+    <div class="auto-box">
+      <div class="auto-hd"><span style="font-size:12px;">⚡</span><span class="auto-title">Ansible Match · 6 resolutions</span><span class="auto-conf">Conf: 87%</span></div>
+      <div class="auto-desc">DataPower gateway restart resolves this pattern in 94% of historical matches. aagKeywords matched: datapower, response, degradation.</div>
+      <div class="auto-acts"><div class="aa run">▶ Run Playbook</div><div class="aa rev">History (6)</div></div>
+    </div>
+
+    <div class="triage-dec">
+      <div class="tdec resolve">✓ ICC Resolves</div>
+      <div class="tdec escalate">↗ Escalate</div>
+    </div>
+    <div class="fcr-warn">⚠ Escalating removes FCR eligibility (reassignment detected by INC pull). Correct closure code required in DT and SNow.</div>
+    <div class="sync-warn"><strong>DT → SNow one-way.</strong> Check SNow INC1769673 for updates not visible in DT.</div>
+    <div class="qacts">
+      <div class="qa">👁 Watch</div><div class="qa">⚡ Swarm</div>
+      <div class="qa ansible">▶ Ansible</div><div class="qa">✓ Close FCR</div>
+      <div class="qa">⬡ Dep Map</div>
+    </div>
+  </div>
+
+  <!-- Swarms -->
+  <div class="panel">
+    <div class="ph"><span class="pt">Active Swarms</span><span class="pb crit">2 ACTIVE</span><span class="plink">All →</span></div>
+    <div class="swarm-rows">
+      <div class="swarm-card active">
+        <div class="sw-top"><div class="sw-title">DataPower / Move Money</div><div class="sw-age"><strong style="color:var(--red);">134m</strong></div></div>
+        <div class="sw-bridge">Teams: <strong>Bridge-07</strong> · IM: J. Rivera</div>
+        <div class="sw-groups"><span class="sg">ICC</span><span class="sg">App Dev</span><span class="sg">Middleware</span></div>
+        <div class="sw-acts"><div class="swa join">Join →</div><div class="swa">INC1769673</div></div>
+      </div>
+      <div class="swarm-card watch">
+        <div class="sw-top"><div class="sw-title">Kafka Consumer Lag</div><div class="sw-age"><strong style="color:var(--amber);">71m</strong></div></div>
+        <div class="sw-bridge">Teams: <strong>Bridge-08</strong> · IM: K. Patel</div>
+        <div class="sw-groups"><span class="sg">ICC</span><span class="sg">Middleware</span></div>
+        <div class="sw-acts"><div class="swa join">Join →</div><div class="swa">INC1769683</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Queue -->
+  <div class="panel">
+    <div class="ph"><span class="pt">Action Queue</span><span class="pb warn">10 items</span><span class="plink">All →</span></div>
+    <div class="opp-rows">
+      <div class="opp"><div class="opp-icon" style="background:var(--red-d);">⚠</div><div class="opp-body"><div class="opp-title">1 P-Card — no first comment</div><div class="opp-desc">SLA clock running · acknowledge immediately</div></div><div class="opp-act">Top →</div></div>
+      <div class="opp"><div class="opp-icon" style="background:var(--green-d);">◎</div><div class="opp-body"><div class="opp-title">12 FCR Candidates</div><div class="opp-desc">ICC INCs · no reassignment yet · validate and close</div></div><div class="opp-act">Review →</div></div>
+      <div class="opp"><div class="opp-icon" style="background:var(--orange-d);">↺</div><div class="opp-body"><div class="opp-title">9 Recurring INC Patterns</div><div class="opp-desc">Disk, App Pool, Kafka — prime automation targets</div></div><div class="opp-act">Target →</div></div>
+      <div class="opp"><div class="opp-icon" style="background:var(--teal-d);">⚡</div><div class="opp-body"><div class="opp-title">3 Ansible Scripts Ready</div><div class="opp-desc">DataPower, App Pool, Disk — awaiting review</div></div><div class="opp-act">Review →</div></div>
+      <div class="opp"><div class="opp-icon" style="background:var(--amber-d);">💬</div><div class="opp-body"><div class="opp-title">2 Comment SLA Breaches</div><div class="opp-desc">P-Cards past 15m comment window this shift</div></div><div class="opp-act">Filter →</div></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+function updateClock(){const n=new Date();document.getElementById('clock').textContent=n.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});}
+updateClock();setInterval(updateClock,1000);
+function selectRow(row){document.querySelectorAll('.utbl tbody tr').forEach(r=>r.classList.remove('selected'));row.classList.add('selected');}
+document.querySelectorAll('.fpill').forEach(p=>{p.addEventListener('click',()=>{document.querySelectorAll('.fpill').forEach(x=>x.classList.remove('active'));p.classList.add('active');});});
+</script>
+</body>
+</html>

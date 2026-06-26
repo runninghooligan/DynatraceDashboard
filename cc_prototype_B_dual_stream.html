@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ICC Command Center — Prototype B: Dual Stream</title>
+<style>
+:root {
+  --bg-0:#060a14;--bg-1:#0b1120;--bg-2:#111827;--bg-3:#1a2236;
+  --border:rgba(255,255,255,0.07);--border-hi:rgba(255,255,255,0.13);
+  --teal:#00d4aa;--teal-d:rgba(0,212,170,0.10);
+  --purple:#7c6fcd;--purple-d:rgba(124,111,205,0.10);
+  --amber:#f59e0b;--amber-d:rgba(245,158,11,0.10);
+  --orange:#f97316;--orange-d:rgba(249,115,22,0.10);
+  --red:#ef4444;--red-d:rgba(239,68,68,0.10);
+  --green:#22c55e;--green-d:rgba(34,197,94,0.08);
+  --blue:#3b82f6;--blue-d:rgba(59,130,246,0.10);
+  --font:'Inter','Segoe UI',system-ui,sans-serif;
+  --mono:'JetBrains Mono','Fira Code','Courier New',monospace;
+  --text-hi:#f0f2f8;--text-md:#a8b3cc;--text-lo:#4d5a75;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;font-size:12px;}
+body{background:var(--bg-0);color:var(--text-hi);font-family:var(--font);display:flex;flex-direction:column;overflow:hidden;}
+::-webkit-scrollbar{width:3px;height:3px;}
+::-webkit-scrollbar-thumb{background:var(--border-hi);border-radius:2px;}
+
+/* CHROME */
+.chrome{background:var(--bg-1);border-bottom:1px solid var(--border);display:flex;align-items:center;height:40px;flex-shrink:0;}
+.brand{display:flex;align-items:center;gap:8px;padding:0 14px;border-right:1px solid var(--border);height:100%;min-width:180px;}
+.pip{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pip 2s ease-in-out infinite;flex-shrink:0;}
+@keyframes pip{0%,100%{opacity:1;}50%{opacity:.2;}}
+.brand-name{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--teal);}
+.brand-sub{font-size:8px;color:var(--text-lo);}
+.chrome-chips{display:flex;gap:3px;padding:0 10px;flex:1;}
+.chip{display:flex;align-items:center;gap:4px;padding:3px 7px;border-radius:20px;border:1px solid var(--border);font-size:8px;font-family:var(--mono);}
+.chip.ok{border-color:rgba(34,197,94,.25);color:var(--green);background:var(--green-d);}
+.chip.new{border-color:rgba(0,212,170,.25);color:var(--teal);background:var(--teal-d);}
+.chip.stub{color:var(--text-lo);}
+.chip-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0;}
+.chrome-right{display:flex;align-items:center;gap:5px;padding:0 10px;border-left:1px solid var(--border);}
+.c-btn{padding:4px 9px;border-radius:4px;border:1px solid var(--border-hi);background:var(--bg-3);color:var(--text-md);font-size:9px;cursor:pointer;}
+.c-btn.primary{background:var(--teal-d);border-color:rgba(0,212,170,.3);color:var(--teal);}
+#clock{font-size:10px;font-family:var(--mono);color:var(--text-lo);}
+
+/* SOURCE STRIP */
+.src-strip{display:flex;gap:1px;background:var(--border);border-bottom:1px solid var(--border);flex-shrink:0;}
+.src-tile{flex:1;background:var(--bg-1);padding:5px 12px;display:flex;align-items:center;gap:8px;}
+.src-name{font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text-lo);flex:1;}
+.src-badge{font-size:8px;font-family:var(--mono);padding:2px 6px;border-radius:2px;font-weight:700;}
+.src-badge.fresh{background:var(--green-d);color:var(--green);border:1px solid rgba(34,197,94,.2);}
+.src-badge.new{background:var(--teal-d);color:var(--teal);border:1px solid rgba(0,212,170,.2);}
+.src-badge.stub{background:var(--purple-d);color:var(--purple);border:1px solid rgba(124,111,205,.2);}
+.src-count{font-size:8px;font-family:var(--mono);color:var(--text-lo);}
+
+/* GOAL BANNER */
+.goals{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-bottom:1px solid var(--border);flex-shrink:0;}
+.goal{background:var(--bg-1);padding:9px 14px;position:relative;}
+.goal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.g1::before{background:var(--amber);}
+.g2::before{background:var(--green);}
+.g3::before{background:var(--red);}
+.g4::before{background:var(--purple);}
+.goal-row1{display:flex;align-items:flex-start;gap:5px;margin-bottom:2px;flex-wrap:wrap;}
+.goal-lbl{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-lo);flex:1;}
+.gnum{font-size:8px;font-family:var(--mono);background:var(--bg-3);padding:1px 4px;border-radius:2px;color:var(--text-lo);}
+.dq{font-size:7px;font-weight:700;font-family:var(--mono);padding:1px 5px;border-radius:2px;}
+.dq.ok{background:var(--green-d);color:var(--green);border:1px solid rgba(34,197,94,.2);}
+.dq.partial{background:var(--amber-d);color:var(--amber);border:1px solid rgba(245,158,11,.2);}
+.dq.broken{background:var(--red-d);color:var(--red);border:1px solid rgba(239,68,68,.2);}
+.gval{font-size:22px;font-weight:700;line-height:1;letter-spacing:-.02em;}
+.g1 .gval{color:var(--amber);}
+.g2 .gval{color:var(--green);}
+.g3 .gval{color:var(--red);}
+.g4 .gval{color:var(--purple);}
+.gsub{font-size:9px;color:var(--text-lo);margin-top:2px;}
+.gdelta{font-size:9px;font-family:var(--mono);margin-top:1px;}
+.gdelta.good{color:var(--green);}
+.gdelta.warn{color:var(--amber);}
+
+/* ── DUAL STREAM LAYOUT ── */
+/* 5 columns: Left context | P-Cards stream | Relationship bridge | INCs stream | Right triage */
+.body{display:grid;grid-template-columns:200px 1fr 80px 1fr 270px;gap:1px;background:var(--border);flex:1;min-height:0;overflow:hidden;}
+.col{background:var(--bg-1);display:flex;flex-direction:column;min-height:0;overflow-y:auto;overflow-x:hidden;}
+
+/* Stream headers */
+.stream-hd{display:flex;align-items:center;gap:6px;padding:9px 12px 7px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.stream-title{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;flex:1;}
+.stream-title.pcard{color:var(--teal);}
+.stream-title.inc{color:var(--blue);}
+.stream-count{font-size:13px;font-family:var(--mono);font-weight:700;}
+.stream-filters{display:flex;gap:3px;}
+.sfpill{padding:2px 7px;border-radius:10px;border:1px solid var(--border);background:var(--bg-2);font-size:8px;color:var(--text-lo);cursor:pointer;}
+.sfpill.active-pc{background:var(--teal-d);border-color:rgba(0,212,170,.3);color:var(--teal);}
+.sfpill.active-inc{background:var(--blue-d);border-color:rgba(59,130,246,.3);color:var(--blue);}
+.sfpill.alert{background:var(--red-d);border-color:rgba(239,68,68,.3);color:var(--red);}
+
+/* Bucket strip — per stream */
+.bstrip{display:flex;gap:1px;background:var(--border);border-bottom:1px solid var(--border);flex-shrink:0;}
+.bkt{flex:1;background:var(--bg-0);padding:5px 6px;display:flex;flex-direction:column;align-items:center;gap:1px;cursor:pointer;}
+.bkt-lbl{font-size:7px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-lo);text-align:center;}
+.bkt-val{font-size:13px;font-weight:700;font-family:var(--mono);}
+.bkt.t1 .bkt-val{color:var(--amber);}
+.bkt.t2 .bkt-val{color:var(--orange);}
+.bkt.t3 .bkt-val{color:var(--red);}
+.bkt.g .bkt-val{color:var(--green);}
+.bkt.b .bkt-val{color:var(--blue);}
+.bkt-sub{font-size:7px;color:var(--text-lo);}
+
+/* Alert banner */
+.alert-banner{background:rgba(239,68,68,.08);border-bottom:1px solid rgba(239,68,68,.2);padding:4px 10px;display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.ab-text{font-size:9px;color:var(--red);font-weight:600;flex:1;}
+
+/* P-CARD TABLE */
+.ptbl{width:100%;border-collapse:collapse;table-layout:fixed;}
+.ptbl thead tr{border-bottom:1px solid var(--border);}
+.ptbl th{padding:5px 8px;font-size:8px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-lo);text-align:left;background:var(--bg-0);}
+.ptbl tbody tr{border-bottom:1px solid rgba(255,255,255,.03);cursor:pointer;transition:background .1s;}
+.ptbl tbody tr:hover{background:var(--bg-2);}
+.ptbl tbody tr.selected{background:rgba(0,212,170,.06);}
+.ptbl tbody tr.no-comment td:first-child{border-left:2px solid var(--red);background:rgba(239,68,68,.04);}
+.ptbl tbody tr.lr-crit td:first-child{border-left:2px solid var(--red);}
+.ptbl tbody tr.lr-2 td:first-child{border-left:2px solid var(--orange);}
+.ptbl tbody tr.breach td:first-child{border-left:2px solid var(--amber);}
+.ptbl td{padding:6px 8px;font-size:10px;color:var(--text-md);vertical-align:middle;}
+
+/* INC TABLE */
+.itbl{width:100%;border-collapse:collapse;table-layout:fixed;}
+.itbl thead tr{border-bottom:1px solid var(--border);}
+.itbl th{padding:5px 8px;font-size:8px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-lo);text-align:left;background:var(--bg-0);}
+.itbl tbody tr{border-bottom:1px solid rgba(255,255,255,.03);cursor:pointer;transition:background .1s;}
+.itbl tbody tr:hover{background:var(--bg-2);}
+.itbl tbody tr.selected{background:rgba(59,130,246,.06);}
+.itbl tbody tr.inc-pcard td:first-child{border-left:2px solid var(--teal);}
+.itbl tbody tr.inc-manual td:first-child{border-left:2px solid var(--purple);}
+.itbl tbody tr.inc-fcr td:first-child{border-left:2px solid var(--green);}
+.itbl tbody tr.inc-recur td:first-child{border-left:2px solid var(--orange);}
+.itbl td{padding:6px 8px;font-size:10px;color:var(--text-md);vertical-align:middle;}
+
+/* Shared cell styles */
+.id-cell{font-family:var(--mono);font-size:9px;}
+.id-cell.pc{color:var(--teal);}
+.id-cell.inc{color:var(--blue);}
+.title-wrap{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;font-weight:600;color:var(--text-hi);}
+.title-sub{font-size:8px;color:var(--text-lo);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.age-val{font-family:var(--mono);font-size:10px;font-weight:700;}
+.age-val.t3{color:var(--red);}
+.age-val.t2{color:var(--orange);}
+.age-val.t1{color:var(--amber);}
+.age-val.t0{color:var(--text-lo);}
+.age-tier{font-size:8px;}
+.age-tier.t3{color:var(--red);}
+.age-tier.t2{color:var(--orange);}
+.age-tier.t1{color:var(--amber);}
+.age-tier.t0{color:var(--text-lo);}
+.sev{display:inline-flex;padding:1px 4px;border-radius:2px;font-size:8px;font-weight:700;font-family:var(--mono);}
+.sev.perf{background:var(--blue-d);color:var(--blue);border:1px solid rgba(59,130,246,.2);}
+.sev.avail{background:var(--amber-d);color:var(--amber);border:1px solid rgba(245,158,11,.2);}
+.sev.err{background:var(--red-d);color:var(--red);border:1px solid rgba(239,68,68,.2);}
+.sev.p3m{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.2);}
+.sev.p3{background:var(--amber-d);color:var(--amber);border:1px solid rgba(245,158,11,.2);}
+.stpill{display:inline-flex;align-items:center;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:600;}
+.stpill.open{background:var(--bg-3);color:var(--text-md);border:1px solid var(--border);}
+.stpill.swarm{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25);}
+.stpill.watch{background:var(--amber-d);color:var(--amber);border:1px solid rgba(245,158,11,.2);}
+.stpill.fcr{background:var(--green-d);color:var(--green);border:1px solid rgba(34,197,94,.2);}
+.stpill.prog{background:var(--blue-d);color:var(--blue);border:1px solid rgba(59,130,246,.2);}
+.sf{font-size:8px;padding:1px 4px;border-radius:2px;font-family:var(--mono);}
+.sf.recur{background:var(--orange-d);color:var(--orange);border:1px solid rgba(249,115,22,.2);}
+.sf.ans{background:var(--teal-d);color:var(--teal);border:1px solid rgba(0,212,170,.2);}
+.sf.fcrc{background:var(--green-d);color:var(--green);border:1px solid rgba(34,197,94,.2);}
+.comment-age{font-family:var(--mono);font-size:9px;}
+.comment-age.breach{color:var(--red);font-weight:700;}
+.comment-age.warn{color:var(--amber);}
+.comment-age.ok{color:var(--text-lo);}
+.comment-age.none{color:var(--red);font-weight:700;}
+.inc-lnk{font-family:var(--mono);font-size:9px;color:var(--blue);}
+.no-inc{font-size:9px;color:var(--text-lo);}
+
+/* INC origin badge */
+.orig{font-size:8px;padding:1px 5px;border-radius:2px;font-family:var(--mono);font-weight:700;white-space:nowrap;}
+.orig.pcard{background:var(--teal-d);color:var(--teal);border:1px solid rgba(0,212,170,.2);}
+.orig.manual{background:var(--purple-d);color:var(--purple);border:1px solid rgba(124,111,205,.2);}
+.orig.alertsite{background:var(--amber-d);color:var(--amber);border:1px solid rgba(245,158,11,.2);}
+.orig.dpa{background:var(--blue-d);color:var(--blue);border:1px solid rgba(59,130,246,.2);}
+
+/* FCR badge for INC */
+.fcr-badge{font-size:8px;padding:1px 5px;border-radius:2px;font-family:var(--mono);font-weight:700;}
+.fcr-badge.yes{background:var(--green-d);color:var(--green);border:1px solid rgba(34,197,94,.2);}
+.fcr-badge.cand{background:var(--teal-d);color:var(--teal);border:1px solid rgba(0,212,170,.2);}
+.fcr-badge.no{background:var(--red-d);color:var(--red);border:1px solid rgba(239,68,68,.2);}
+
+/* ── BRIDGE COLUMN ── */
+.bridge-col{background:var(--bg-0);display:flex;flex-direction:column;min-height:0;overflow:hidden;}
+.bridge-hd{padding:9px 8px 7px;border-bottom:1px solid var(--border);text-align:center;flex-shrink:0;}
+.bridge-lbl{font-size:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-lo);}
+.bridge-body{flex:1;overflow-y:auto;padding:8px 4px;display:flex;flex-direction:column;gap:8px;}
+/* Each link card in the bridge */
+.link-card{background:var(--bg-2);border:1px solid var(--border);border-radius:4px;padding:6px 5px;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.link-card.strong{border-color:rgba(0,212,170,.25);}
+.link-card.fcr{border-color:rgba(34,197,94,.2);}
+.link-card.none{border-color:var(--border);opacity:.4;}
+.link-dot-pc{width:8px;height:8px;border-radius:50%;background:var(--teal);}
+.link-dot-inc{width:8px;height:8px;border-radius:50%;background:var(--blue);}
+.link-line{width:1px;height:16px;background:rgba(255,255,255,.12);}
+.link-line.strong{background:rgba(0,212,170,.3);}
+.link-line.fcr{background:rgba(34,197,94,.3);}
+.link-badge{font-size:7px;font-family:var(--mono);padding:1px 4px;border-radius:2px;text-align:center;white-space:nowrap;}
+.link-badge.linked{background:var(--teal-d);color:var(--teal);border:1px solid rgba(0,212,170,.2);}
+.link-badge.fcr-l{background:var(--green-d);color:var(--green);border:1px solid rgba(34,197,94,.2);}
+.link-badge.nolink{color:var(--text-lo);background:var(--bg-3);border:1px solid var(--border);}
+.link-badge.manual{background:var(--purple-d);color:var(--purple);border:1px solid rgba(124,111,205,.2);}
+.bridge-spacer{height:40px;flex-shrink:0;}
+
+/* INC summary stats above INC stream */
+.inc-stats{display:flex;gap:1px;background:var(--border);border-bottom:1px solid var(--border);flex-shrink:0;}
+.inc-stat{flex:1;background:var(--bg-1);padding:5px 6px;text-align:center;}
+.inc-stat-val{font-size:14px;font-weight:700;font-family:var(--mono);}
+.inc-stat-lbl{font-size:7px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-lo);margin-top:1px;}
+
+/* LEFT COLUMN */
+.panel{background:var(--bg-1);padding:10px 12px;flex-shrink:0;}
+.ph{display:flex;align-items:center;gap:5px;margin-bottom:8px;}
+.pt{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-md);flex:1;}
+.pb{font-size:8px;font-family:var(--mono);padding:2px 6px;border-radius:2px;background:var(--bg-3);color:var(--text-lo);border:1px solid var(--border);}
+.pb.live{background:var(--green-d);color:var(--green);border-color:rgba(34,197,94,.2);}
+.pb.new{background:var(--teal-d);color:var(--teal);border-color:rgba(0,212,170,.2);}
+.pb.warn{background:var(--amber-d);color:var(--amber);border-color:rgba(245,158,11,.2);}
+.snap-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
+.sc{background:var(--bg-2);border:1px solid var(--border);border-radius:4px;padding:6px 7px;}
+.sc-lbl{font-size:8px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-lo);margin-bottom:2px;}
+.sc-val{font-size:16px;font-weight:700;font-family:var(--mono);}
+.sc-val.ok{color:var(--green);}
+.sc-val.warn{color:var(--amber);}
+.sc-val.crit{color:var(--red);}
+.sc-delta{font-size:8px;color:var(--text-lo);margin-top:1px;font-family:var(--mono);}
+.sc-delta.bad{color:var(--red);}
+.sc-delta.good{color:var(--green);}
+
+/* Origin donut-style summary */
+.origin-summary{display:flex;flex-direction:column;gap:4px;}
+.os-row{display:flex;align-items:center;gap:8px;padding:5px 8px;background:var(--bg-2);border-radius:4px;border:1px solid var(--border);}
+.os-bar{height:4px;border-radius:2px;flex:1;}
+.os-name{font-size:9px;color:var(--text-md);min-width:80px;}
+.os-val{font-size:11px;font-weight:700;font-family:var(--mono);}
+.os-pct{font-size:8px;color:var(--text-lo);font-family:var(--mono);min-width:28px;text-align:right;}
+
+/* Recurring table */
+.rec-rows{display:flex;flex-direction:column;gap:3px;}
+.rec-row{display:flex;align-items:center;gap:6px;padding:5px 7px;background:var(--bg-2);border-radius:4px;border:1px solid var(--border);}
+.rec-bar{width:3px;align-self:stretch;border-radius:2px;flex-shrink:0;}
+.rec-bar.hi{background:var(--red);}
+.rec-bar.md{background:var(--amber);}
+.rec-name{font-size:9px;font-weight:600;flex:1;}
+.rec-count{font-size:8px;font-family:var(--mono);color:var(--text-lo);}
+.rec-badge{font-size:7px;padding:1px 4px;border-radius:2px;font-family:var(--mono);}
+.rec-badge.r{background:var(--orange-d);color:var(--orange);border:1px solid rgba(249,115,22,.2);}
+.rec-badge.a{background:var(--teal-d);color:var(--teal);border:1px solid rgba(0,212,170,.2);}
+
+/* VCT */
+.vct-rows{display:flex;flex-direction:column;gap:3px;}
+.vct-row{display:flex;align-items:center;gap:6px;padding:5px 7px;border-radius:4px;border:1px solid var(--border);background:var(--bg-2);cursor:pointer;}
+.vct-row.crit{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.05);}
+.vct-b{width:3px;align-self:stretch;border-radius:2px;}
+.vct-b.ok{background:var(--green);}
+.vct-b.crit{background:var(--red);}
+.vct-b.muted{background:var(--text-lo);}
+.vct-name{font-size:9px;font-weight:600;flex:1;}
+.vct-r{display:flex;gap:4px;align-items:center;}
+.vct-pc-c{font-size:8px;font-family:var(--mono);padding:1px 4px;border-radius:2px;}
+.vct-pc-c.crit{background:var(--red-d);color:var(--red);border:1px solid rgba(239,68,68,.2);}
+.vct-pc-c.ok{color:var(--text-lo);}
+.vct-inc-c{font-size:8px;color:var(--blue);font-family:var(--mono);}
+
+/* RIGHT TRIAGE */
+.triage{padding:10px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.tr-id{font-family:var(--mono);font-size:9px;color:var(--teal);font-weight:700;margin-bottom:2px;}
+.tr-title{font-size:11px;font-weight:600;line-height:1.3;margin-bottom:5px;}
+.tr-meta{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:7px;}
+.tr-timing{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:8px;}
+.tt{background:var(--bg-2);border:1px solid var(--border);border-radius:3px;padding:5px 6px;text-align:center;}
+.tt-val{font-size:13px;font-weight:700;font-family:var(--mono);}
+.tt-lbl{font-size:7px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-lo);margin-top:1px;}
+.fcr-analysis-box{background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.18);border-radius:4px;padding:8px 9px;margin-bottom:7px;}
+.fab-hd{display:flex;align-items:center;gap:5px;margin-bottom:5px;}
+.fab-title{font-size:9px;font-weight:700;color:var(--green);flex:1;}
+.fab-rows{display:flex;flex-direction:column;gap:3px;}
+.fab-row{display:flex;align-items:center;gap:6px;font-size:9px;}
+.fab-lbl{color:var(--text-lo);min-width:90px;}
+.fab-val{color:var(--text-hi);font-family:var(--mono);}
+.fab-badge{font-size:8px;padding:1px 5px;border-radius:2px;font-family:var(--mono);font-weight:700;}
+.fab-badge.fcr-cand{background:var(--teal-d);color:var(--teal);border:1px solid rgba(0,212,170,.2);}
+.fab-badge.noisy{background:var(--amber-d);color:var(--amber);border:1px solid rgba(245,158,11,.2);}
+.auto-box{background:rgba(0,212,170,.05);border:1px solid rgba(0,212,170,.18);border-radius:4px;padding:7px 9px;margin-bottom:7px;}
+.auto-hd{display:flex;align-items:center;gap:5px;margin-bottom:3px;}
+.auto-title{font-size:9px;font-weight:700;color:var(--teal);flex:1;}
+.auto-conf{font-size:8px;font-family:var(--mono);color:var(--text-lo);}
+.auto-desc{font-size:8px;color:var(--text-md);margin-bottom:4px;line-height:1.4;}
+.auto-acts{display:flex;gap:3px;}
+.aa{padding:3px 7px;border-radius:3px;font-size:8px;font-weight:700;cursor:pointer;border:1px solid;}
+.aa.run{background:var(--teal-d);border-color:rgba(0,212,170,.3);color:var(--teal);}
+.aa.rev{background:var(--bg-3);border-color:var(--border-hi);color:var(--text-md);}
+.triage-dec{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:5px;}
+.tdec{padding:7px;border-radius:4px;border:1px solid;font-size:9px;font-weight:700;cursor:pointer;text-align:center;}
+.tdec.resolve{background:var(--green-d);border-color:rgba(34,197,94,.3);color:var(--green);}
+.tdec.escalate{background:var(--amber-d);border-color:rgba(245,158,11,.3);color:var(--amber);}
+.fcr-warn{font-size:8px;color:var(--amber);font-family:var(--mono);margin-bottom:5px;line-height:1.4;}
+.sync-warn{background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.15);border-radius:3px;padding:5px 7px;font-size:8px;color:rgba(147,197,253,.8);line-height:1.4;margin-bottom:6px;}
+.sync-warn strong{color:#93c5fd;}
+.qacts{display:flex;gap:3px;flex-wrap:wrap;}
+.qa{padding:3px 7px;border-radius:3px;border:1px solid var(--border-hi);background:var(--bg-3);color:var(--text-md);font-size:9px;cursor:pointer;}
+.qa:hover{color:var(--teal);}
+.qa.ansible{border-color:rgba(124,111,205,.3);color:var(--purple);background:var(--purple-d);}
+
+/* swarms */
+.swarm-card{background:var(--bg-2);border:1px solid var(--border);border-radius:4px;padding:7px 9px;border-left:3px solid;margin-bottom:4px;}
+.swarm-card.active{border-left-color:var(--red);}
+.sw-top{display:flex;align-items:flex-start;gap:5px;margin-bottom:3px;}
+.sw-title{font-size:10px;font-weight:700;flex:1;}
+.sw-age{font-size:9px;font-family:var(--mono);color:var(--text-lo);}
+.sw-bridge{font-size:9px;color:var(--text-md);margin-bottom:3px;}
+.sw-bridge strong{color:var(--amber);}
+.sw-groups{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:4px;}
+.sg{font-size:8px;padding:1px 5px;border-radius:2px;background:var(--bg-3);color:var(--text-md);border:1px solid var(--border);}
+.sw-acts{display:flex;gap:3px;}
+.swa{padding:3px 7px;border-radius:3px;border:1px solid var(--border-hi);background:var(--bg-3);color:var(--text-md);font-size:8px;cursor:pointer;}
+.swa.join{border-color:rgba(239,68,68,.3);color:var(--red);background:var(--red-d);}
+
+/* dt-snow */
+.dt-snow{background:rgba(59,130,246,.05);border-top:1px solid rgba(59,130,246,.1);padding:4px 12px;font-size:8px;color:rgba(147,197,253,.7);display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.dt-snow strong{color:#93c5fd;}
+</style>
+</head>
+<body>
+
+<!-- CHROME -->
+<div class="chrome">
+  <div class="brand"><div class="pip"></div><div><div class="brand-name">ICC Command</div><div class="brand-sub">Dual Stream: P-Cards + INC</div></div></div>
+  <div class="chrome-chips">
+    <div class="chip ok"><div class="chip-dot"></div>DT · 1m · 14 P-Cards</div>
+    <div class="chip new"><div class="chip-dot"></div>SN · 220-key INC pull · 47 ICC INCs</div>
+    <div class="chip stub"><div class="chip-dot"></div>AlertSite · stub</div>
+    <div class="chip stub"><div class="chip-dot"></div>DPA · stub</div>
+  </div>
+  <div class="chrome-right"><span id="clock">—</span><button class="c-btn primary">↻ Refresh</button><button class="c-btn">Handoff →</button></div>
+</div>
+
+<!-- SOURCE STRIP -->
+<div class="src-strip">
+  <div class="src-tile"><span class="src-name">Dynatrace</span><span class="src-badge fresh">FRESH &lt;5M</span><span class="src-count">14 open P-Cards</span></div>
+  <div class="src-tile"><span class="src-name">ServiceNow INCs</span><span class="src-badge new">220-KEY FULL PULL</span><span class="src-count">47 ICC INCs · 12 FCR cand.</span></div>
+  <div class="src-tile"><span class="src-name">AlertSite</span><span class="src-badge stub">NOT INTEGRATED</span></div>
+  <div class="src-tile"><span class="src-name">SolarWinds DPA</span><span class="src-badge stub">NOT INTEGRATED</span></div>
+</div>
+
+<!-- GOAL BANNER -->
+<div class="goals">
+  <div class="goal g1">
+    <div class="goal-row1"><span class="gnum">G1</span><span class="goal-lbl">First Call Resolution</span><span class="dq partial">IMPROVING</span></div>
+    <div class="gval">75.1%</div>
+    <div class="gsub">INC no-reassignment proxy · backfilling</div>
+    <div class="gdelta good">↑ sys_audit dependency removed</div>
+  </div>
+  <div class="goal g2">
+    <div class="goal-row1"><span class="gnum">G2</span><span class="goal-lbl">Incident Volume YoY</span><span class="dq ok">ON TRACK</span></div>
+    <div class="gval">−18%</div>
+    <div class="gsub">9 recurring patterns → reduction targets</div>
+    <div class="gdelta good">↓ Noise identification active</div>
+  </div>
+  <div class="goal g3">
+    <div class="goal-row1"><span class="gnum">G3</span><span class="goal-lbl">Major Incidents Prevented</span><span class="dq broken">METRIC FIX</span></div>
+    <div class="gval">2</div>
+    <div class="gsub">P-Card → INC escalation prevention · week</div>
+    <div class="gdelta warn">⚠ % metric pending icc-towers fix</div>
+  </div>
+  <div class="goal g4">
+    <div class="goal-row1"><span class="gnum">G4</span><span class="goal-lbl">Automation Opportunities</span><span class="dq partial">PARTIAL</span></div>
+    <div class="gval">9</div>
+    <div class="gsub">Recurring INC targets · 3 Ansible ready</div>
+    <div class="gdelta warn">→ aagKeywords matching 6 P-Cards</div>
+  </div>
+</div>
+
+<!-- BODY: Left | P-Cards | Bridge | INCs | Right -->
+<div class="body">
+
+<!-- LEFT CONTEXT -->
+<div class="col" style="gap:1px;background:var(--border);">
+
+  <div class="panel">
+    <div class="ph"><span class="pt">Shift Snapshot</span><span class="pb live">LIVE</span></div>
+    <div class="snap-grid">
+      <div class="sc"><div class="sc-lbl">Open P-Cards</div><div class="sc-val warn">14</div><div class="sc-delta bad">▲ 3 vs prev</div></div>
+      <div class="sc"><div class="sc-lbl">ICC INCs Open</div><div class="sc-val warn">7</div><div class="sc-delta">TECH IOPS-NOC</div></div>
+      <div class="sc"><div class="sc-lbl">FCR Candidates</div><div class="sc-val ok">12</div><div class="sc-delta good">No reassignment</div></div>
+      <div class="sc"><div class="sc-lbl">No Comment</div><div class="sc-val crit">1</div><div class="sc-delta bad">⚠ top of queue</div></div>
+    </div>
+  </div>
+
+  <!-- INC Origin Summary -->
+  <div class="panel">
+    <div class="ph"><span class="pt">INC Origin Breakdown</span><span class="pb new">220-KEY PULL</span></div>
+    <div class="origin-summary">
+      <div class="os-row">
+        <span class="os-name" style="color:var(--teal);">P-Card</span>
+        <div class="os-bar" style="background:var(--teal);opacity:.6;"></div>
+        <span class="os-val" style="color:var(--teal);">28</span>
+        <span class="os-pct">60%</span>
+      </div>
+      <div class="os-row">
+        <span class="os-name" style="color:var(--purple);">Manual ICC</span>
+        <div class="os-bar" style="background:var(--purple);opacity:.6;width:30%;flex:none;"></div>
+        <span class="os-val" style="color:var(--purple);">11</span>
+        <span class="os-pct">23%</span>
+      </div>
+      <div class="os-row" style="opacity:.4;">
+        <span class="os-name" style="color:var(--amber);">AlertSite</span>
+        <div class="os-bar" style="background:var(--text-lo);width:5%;flex:none;"></div>
+        <span class="os-val" style="color:var(--text-lo);">—</span>
+        <span class="os-pct">stub</span>
+      </div>
+      <div class="os-row" style="opacity:.4;">
+        <span class="os-name" style="color:var(--blue);">SolarWinds</span>
+        <div class="os-bar" style="background:var(--text-lo);width:5%;flex:none;"></div>
+        <span class="os-val" style="color:var(--text-lo);">—</span>
+        <span class="os-pct">stub</span>
+      </div>
+    </div>
+    <div style="font-size:8px;color:var(--text-lo);padding:6px 0 0;line-height:1.5;">
+      <strong style="color:var(--text-md);">FCR proxy:</strong> ICC INC assigned + no reassignment = candidate.<br>
+      No sys_audit required. Backfilling historical INCs.
+    </div>
+  </div>
+
+  <!-- Recurring Patterns -->
+  <div class="panel">
+    <div class="ph"><span class="pt">Recurring Patterns</span><span class="pb warn">9 TARGETS</span></div>
+    <div class="rec-rows">
+      <div class="rec-row"><div class="rec-bar hi"></div><span class="rec-name">App Pool Memory</span><span class="rec-badge r">↺ 6×</span><span class="rec-count">MM 3.0</span></div>
+      <div class="rec-row"><div class="rec-bar hi"></div><span class="rec-name">Kafka Consumer Lag</span><span class="rec-badge r">↺ 4×</span><span class="rec-count">Middleware</span></div>
+      <div class="rec-row"><div class="rec-bar md"></div><span class="rec-name">Disk Usage 95%+</span><span class="rec-badge a">⚡ Ansible</span><span class="rec-count">Platform</span></div>
+      <div class="rec-row"><div class="rec-bar md"></div><span class="rec-name">DataPower Latency</span><span class="rec-badge a">⚡ Ansible</span><span class="rec-count">Middleware</span></div>
+      <div class="rec-row"><div class="rec-bar md"></div><span class="rec-name">Process Low Count</span><span class="rec-badge r">↺ 3×</span><span class="rec-count">App Svcs</span></div>
+    </div>
+  </div>
+
+  <!-- VCT Rail -->
+  <div class="panel">
+    <div class="ph"><span class="pt">VCT Signal Rail</span></div>
+    <div class="vct-rows">
+      <div class="vct-row crit"><div class="vct-b crit"></div><span class="vct-name">Move Money 3.0</span><div class="vct-r"><span class="vct-pc-c crit">3</span><span class="vct-inc-c">INC×2</span></div></div>
+      <div class="vct-row"><div class="vct-b ok"></div><span class="vct-name">Client Management</span><div class="vct-r"><span class="vct-pc-c ok">1</span></div></div>
+      <div class="vct-row"><div class="vct-b ok"></div><span class="vct-name">Account View 2.0</span><div class="vct-r"><span class="vct-pc-c ok">0</span></div></div>
+      <div class="vct-row"><div class="vct-b ok"></div><span class="vct-name">Trading</span><div class="vct-r"><span class="vct-pc-c ok">0</span></div></div>
+      <div class="vct-row"><div class="vct-b ok"></div><span class="vct-name">Advisor Email</span><div class="vct-r"><span class="vct-pc-c ok">0</span></div></div>
+      <div class="vct-row"><div class="vct-b muted"></div><span class="vct-name">NAO</span><div class="vct-r"><span class="vct-pc-c ok">0</span></div></div>
+      <div class="vct-row"><div class="vct-b ok"></div><span class="vct-name">Statements</span><div class="vct-r"><span class="vct-pc-c ok">0</span></div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- P-CARD STREAM -->
+<div class="col">
+  <div class="stream-hd">
+    <span class="stream-title pcard">P-Cards</span>
+    <span class="stream-count" style="color:var(--teal);">14</span>
+    <div class="stream-filters">
+      <div class="sfpill active-pc">All</div>
+      <div class="sfpill alert">No Cmt (1)</div>
+      <div class="sfpill">LR</div>
+      <div class="sfpill">FCR</div>
+      <div class="sfpill">⚡</div>
+    </div>
+  </div>
+
+  <div class="bstrip">
+    <div class="bkt t3"><div class="bkt-lbl">Critical ›120m</div><div class="bkt-val">1</div><div class="bkt-sub">urgent</div></div>
+    <div class="bkt t2"><div class="bkt-lbl">LR ›60m</div><div class="bkt-val">2</div><div class="bkt-sub">long-run</div></div>
+    <div class="bkt t1"><div class="bkt-lbl">Watch ›30m</div><div class="bkt-val">4</div><div class="bkt-sub">aging</div></div>
+    <div class="bkt" style="background:rgba(239,68,68,.04);"><div class="bkt-lbl">No Comment</div><div class="bkt-val" style="color:var(--red);">1</div><div class="bkt-sub">unacked</div></div>
+  </div>
+
+  <div class="alert-banner">
+    <div class="ab-text">⚠ 1 P-Card — no first comment · SLA clock running</div>
+  </div>
+
+  <div style="overflow-x:auto;flex:1;overflow-y:auto;">
+  <table class="ptbl">
+    <colgroup>
+      <col style="width:90px"><col style="width:22%"><col style="width:46px">
+      <col style="width:65px"><col style="width:70px"><col style="width:72px">
+      <col style="width:70px"><col style="width:1fr">
+    </colgroup>
+    <thead><tr><th>P-Card ID</th><th>Title / Service</th><th>Sev</th><th>Age / Tier</th><th>Last Comment</th><th>Status</th><th>INC Link</th><th>Signals</th></tr></thead>
+    <tbody>
+      <tr class="no-comment" onclick="selectPC(this)">
+        <td><span class="id-cell pc">P-260614881</span></td>
+        <td><div class="title-wrap">Advisor Email SMTP Relay Latency</div><div class="title-sub">Advisor Email</div></td>
+        <td><span class="sev perf">PERF</span></td>
+        <td><div><span class="age-val t0">18m</span><br><span class="age-tier t0">—</span></div></td>
+        <td><span class="comment-age none">⚠ No comment</span></td>
+        <td><span class="stpill open">○ Open</span></td>
+        <td><span class="no-inc">No INC</span></td>
+        <td><span class="sf fcrc">◎ FCR</span></td>
+      </tr>
+      <tr class="lr-crit selected" onclick="selectPC(this)">
+        <td><span class="id-cell pc">P-260623063</span></td>
+        <td><div class="title-wrap">DatapowerProd Finra Response Degradation</div><div class="title-sub">Middleware / DataPower</div></td>
+        <td><span class="sev perf">PERF</span></td>
+        <td><div><span class="age-val t3">134m</span><br><span class="age-tier t3">CRITICAL LR</span></div></td>
+        <td><span class="comment-age warn">8m ago</span></td>
+        <td><span class="stpill swarm">● Swarm</span></td>
+        <td><span class="inc-lnk">INC1769673 →</span></td>
+        <td><div style="display:flex;gap:2px;"><span class="sf recur">↺</span><span class="sf ans">⚡</span></div></td>
+      </tr>
+      <tr class="lr-2" onclick="selectPC(this)">
+        <td><span class="id-cell pc">P-260619441</span></td>
+        <td><div class="title-wrap">Move Money App Pool Memory Spike</div><div class="title-sub">Move Money 3.0</div></td>
+        <td><span class="sev avail">AVAIL</span></td>
+        <td><div><span class="age-val t2">82m</span><br><span class="age-tier t2">LR</span></div></td>
+        <td><span class="comment-age breach">21m ago ⚠</span></td>
+        <td><span class="stpill swarm">● Swarm</span></td>
+        <td><span class="inc-lnk">INC1769683 →</span></td>
+        <td><div style="display:flex;gap:2px;"><span class="sf recur">↺</span><span class="sf ans">⚡</span></div></td>
+      </tr>
+      <tr class="breach" onclick="selectPC(this)">
+        <td><span class="id-cell pc">P-260617901</span></td>
+        <td><div class="title-wrap">Client Mgmt Service Degraded</div><div class="title-sub">Client Management</div></td>
+        <td><span class="sev avail">AVAIL</span></td>
+        <td><div><span class="age-val t1">48m</span><br><span class="age-tier t1">Watch</span></div></td>
+        <td><span class="comment-age breach">22m ago ⚠</span></td>
+        <td><span class="stpill watch">◑ Watch</span></td>
+        <td><span class="no-inc">No INC</span></td>
+        <td><span class="sf recur">↺ Recur</span></td>
+      </tr>
+      <tr onclick="selectPC(this)">
+        <td><span class="id-cell pc">P-260615991</span></td>
+        <td><div class="title-wrap">Linux Node03 Disk Usage 97%</div><div class="title-sub">Platform</div></td>
+        <td><span class="sev perf">PERF</span></td>
+        <td><div><span class="age-val t0">12m</span><br><span class="age-tier t0">—</span></div></td>
+        <td><span class="comment-age ok">2m ago</span></td>
+        <td><span class="stpill open">⚡ Auto-Q</span></td>
+        <td><span class="no-inc">No INC</span></td>
+        <td><span class="sf ans">⚡ Ansible</span></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="dt-snow"><strong>DT → SNow one-way.</strong> P-Card comments push to INC · INC updates do not push back to DT. Full INC pull supplements comment-parsed data.</div>
+</div>
+
+<!-- BRIDGE COLUMN -->
+<div class="bridge-col">
+  <div class="bridge-hd"><div class="bridge-lbl">Relationship</div></div>
+  <div class="bridge-body">
+    <!-- No-comment PC — no INC yet -->
+    <div class="link-card none">
+      <div class="link-dot-pc"></div>
+      <div class="link-badge nolink">No INC</div>
+    </div>
+    <!-- PC ←→ INC (linked) -->
+    <div class="link-card strong">
+      <div class="link-dot-pc"></div>
+      <div class="link-line strong"></div>
+      <div class="link-badge linked">← INC →</div>
+      <div class="link-line strong"></div>
+      <div class="link-dot-inc"></div>
+    </div>
+    <!-- Spacer to align with LR row -->
+    <div style="height:36px;"></div>
+    <!-- PC ←→ INC (FCR candidate) -->
+    <div class="link-card fcr">
+      <div class="link-dot-pc"></div>
+      <div class="link-line fcr"></div>
+      <div class="link-badge fcr-l">FCR ✓</div>
+      <div class="link-line fcr"></div>
+      <div class="link-dot-inc"></div>
+    </div>
+    <div style="height:36px;"></div>
+    <!-- PC with no INC — Ansible only -->
+    <div class="link-card none">
+      <div class="link-dot-pc"></div>
+      <div class="link-badge nolink">No INC</div>
+    </div>
+    <!-- Manual INC (no PC) -->
+    <div class="link-card" style="border-color:rgba(124,111,205,.2);">
+      <div class="link-badge manual">Manual</div>
+      <div class="link-line"></div>
+      <div class="link-dot-inc"></div>
+    </div>
+    <!-- Recurring INC -->
+    <div class="link-card strong">
+      <div class="link-dot-pc"></div>
+      <div class="link-line strong"></div>
+      <div class="link-badge linked">↺ Recur</div>
+      <div class="link-line strong"></div>
+      <div class="link-dot-inc"></div>
+    </div>
+    <!-- FCR resolved -->
+    <div class="link-card fcr">
+      <div class="link-dot-pc"></div>
+      <div class="link-line fcr"></div>
+      <div class="link-badge fcr-l">FCR ✓</div>
+      <div class="link-line fcr"></div>
+      <div class="link-dot-inc"></div>
+    </div>
+  </div>
+</div>
+
+<!-- INC STREAM -->
+<div class="col">
+  <!-- INC stats bar -->
+  <div class="inc-stats">
+    <div class="inc-stat"><div class="inc-stat-val" style="color:var(--green);">12</div><div class="inc-stat-lbl">FCR Cand.</div></div>
+    <div class="inc-stat"><div class="inc-stat-val" style="color:var(--red);">5</div><div class="inc-stat-lbl">Reassigned</div></div>
+    <div class="inc-stat"><div class="inc-stat-val" style="color:var(--teal);">28</div><div class="inc-stat-lbl">P-Card Origin</div></div>
+    <div class="inc-stat"><div class="inc-stat-val" style="color:var(--purple);">11</div><div class="inc-stat-lbl">Manual</div></div>
+    <div class="inc-stat"><div class="inc-stat-val" style="color:var(--orange);">9</div><div class="inc-stat-lbl">Recurring</div></div>
+  </div>
+
+  <div class="stream-hd">
+    <span class="stream-title inc">ICC INCs</span>
+    <span class="stream-count" style="color:var(--blue);">47</span>
+    <div class="stream-filters">
+      <div class="sfpill active-inc">All</div>
+      <div class="sfpill">FCR Cand.</div>
+      <div class="sfpill">P-Card</div>
+      <div class="sfpill">Manual</div>
+      <div class="sfpill">Recurring</div>
+    </div>
+  </div>
+
+  <div style="overflow-x:auto;flex:1;overflow-y:auto;">
+  <table class="itbl">
+    <colgroup>
+      <col style="width:90px"><col style="width:22%"><col style="width:46px">
+      <col style="width:65px"><col style="width:70px"><col style="width:80px">
+      <col style="width:70px"><col style="width:1fr">
+    </colgroup>
+    <thead><tr><th>INC ID</th><th>Title</th><th>Sev</th><th>Age</th><th>Status</th><th>Origin</th><th>FCR</th><th>Signals</th></tr></thead>
+    <tbody>
+      <!-- P-Card generated, active, FCR candidate -->
+      <tr class="inc-pcard selected" onclick="selectINC(this)">
+        <td><span class="id-cell inc">INC1769673</span></td>
+        <td><div class="title-wrap">DataPower Gateway Performance</div><div class="title-sub">TECH IOPS-NOC · P-Card linked</div></td>
+        <td><span class="sev p3m">P3 MAJ</span></td>
+        <td><span class="age-val t3">131m</span></td>
+        <td><span class="stpill prog">⬤ In Progress</span></td>
+        <td><span class="orig pcard">P-Card</span></td>
+        <td><span class="fcr-badge cand">CANDIDATE</span></td>
+        <td><span class="sf recur">↺ 6×</span></td>
+      </tr>
+      <!-- P-Card generated, FCR candidate resolved -->
+      <tr class="inc-fcr" onclick="selectINC(this)">
+        <td><span class="id-cell inc">INC1769687</span></td>
+        <td><div class="title-wrap">F5 Load Balancer Pool Member Down</div><div class="title-sub">TECH IOPS-NOC · ICC resolved</div></td>
+        <td><span class="sev p3">P3</span></td>
+        <td><span class="age-val t0">38m</span></td>
+        <td><span class="stpill fcr">◎ FCR ✓</span></td>
+        <td><span class="orig pcard">P-Card</span></td>
+        <td><span class="fcr-badge yes">FCR ✓</span></td>
+        <td></td>
+      </tr>
+      <!-- Manual ICC creation -->
+      <tr class="inc-manual" onclick="selectINC(this)">
+        <td><span class="id-cell inc">INC1769701</span></td>
+        <td><div class="title-wrap">Network Latency — Advisor Portal</div><div class="title-sub">TECH IOPS-NOC · no P-Card</div></td>
+        <td><span class="sev p3">P3</span></td>
+        <td><span class="age-val t1">55m</span></td>
+        <td><span class="stpill prog">⬤ In Progress</span></td>
+        <td><span class="orig manual">Manual ICC</span></td>
+        <td><span class="fcr-badge cand">CANDIDATE</span></td>
+        <td></td>
+      </tr>
+      <!-- Recurring — noise target -->
+      <tr class="inc-recur" onclick="selectINC(this)">
+        <td><span class="id-cell inc">INC1769683</span></td>
+        <td><div class="title-wrap">Move Money App Pool Memory Spike</div><div class="title-sub">TECH IOPS-NOC · recurring pattern</div></td>
+        <td><span class="sev p3m">P3 MAJ</span></td>
+        <td><span class="age-val t2">79m</span></td>
+        <td><span class="stpill swarm">● Swarm</span></td>
+        <td><span class="orig pcard">P-Card</span></td>
+        <td><span class="fcr-badge no">REASSIGNED ✗</span></td>
+        <td><span class="sf recur">↺ 4×</span></td>
+      </tr>
+      <!-- P-Card generated, open -->
+      <tr class="inc-pcard" onclick="selectINC(this)">
+        <td><span class="id-cell inc">INC1769710</span></td>
+        <td><div class="title-wrap">Kafka Consumer Group Lag Spike</div><div class="title-sub">TECH IOPS-NOC · in progress</div></td>
+        <td><span class="sev p3">P3</span></td>
+        <td><span class="age-val t2">71m</span></td>
+        <td><span class="stpill prog">⬤ In Progress</span></td>
+        <td><span class="orig pcard">P-Card</span></td>
+        <td><span class="fcr-badge cand">CANDIDATE</span></td>
+        <td><span class="sf recur">↺ 3×</span></td>
+      </tr>
+      <!-- Manual ICC, resolved, FCR -->
+      <tr class="inc-manual inc-fcr" onclick="selectINC(this)">
+        <td><span class="id-cell inc">INC1769695</span></td>
+        <td><div class="title-wrap">Planned Maintenance Window Alert</div><div class="title-sub">TECH IOPS-NOC · Manual · resolved</div></td>
+        <td><span class="sev p3">P3</span></td>
+        <td><span class="age-val t0">22m</span></td>
+        <td><span class="stpill fcr">◎ FCR ✓</span></td>
+        <td><span class="orig manual">Manual ICC</span></td>
+        <td><span class="fcr-badge yes">FCR ✓</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- RIGHT TRIAGE -->
+<div class="col" style="background:var(--bg-1);">
+
+  <div class="triage">
+    <div class="ph" style="margin-bottom:5px;"><span class="pt">ICC Triage</span><span class="pb live">P-260623063</span></div>
+    <div class="tr-id">P-260623063 · 134m ⚠ Critical LR</div>
+    <div class="tr-title">DatapowerProd Finra Response Degradation</div>
+    <div class="tr-meta">
+      <span class="sev perf">PERF</span>
+      <span class="stpill swarm">● Swarm</span>
+      <span class="sf recur">↺ 6×</span>
+    </div>
+    <div class="tr-timing">
+      <div class="tt"><div class="tt-val">134m</div><div class="tt-lbl">P-Card Age</div></div>
+      <div class="tt"><div class="tt-val" style="color:var(--amber);">8m</div><div class="tt-lbl">Last Comment</div></div>
+      <div class="tt"><div class="tt-val">131m</div><div class="tt-lbl">INC Age</div></div>
+      <div class="tt"><div class="tt-val" style="color:var(--green);">0</div><div class="tt-lbl">Reassignments</div></div>
+    </div>
+
+    <!-- FCR Analysis box — new with full INC pull -->
+    <div class="fcr-analysis-box">
+      <div class="fab-hd"><span class="pt" style="font-size:9px;">FCR Analysis · INC1769673</span><span class="fcr-badge fab-badge fcr-cand">CANDIDATE</span></div>
+      <div class="fab-rows">
+        <div class="fab-row"><span class="fab-lbl">Assignment</span><span class="fab-val">TECH IOPS-NOC</span></div>
+        <div class="fab-row"><span class="fab-lbl">Origin</span><span class="fab-val">P-Card (auto-created)</span></div>
+        <div class="fab-row"><span class="fab-lbl">Reassignments</span><span class="fab-val">0 — FCR eligible ✓</span></div>
+        <div class="fab-row"><span class="fab-lbl">Recurring</span><span class="fab-badge noisy">6 prior INCs</span></div>
+        <div class="fab-row"><span class="fab-lbl">sys_audit</span><span class="fab-val">Not needed ✓</span></div>
+      </div>
+    </div>
+
+    <div class="auto-box">
+      <div class="auto-hd"><span style="font-size:12px;">⚡</span><span class="auto-title">Ansible · 6 resolutions</span><span class="auto-conf">87% conf</span></div>
+      <div class="auto-desc">DataPower gateway restart resolves this pattern. aagKeywords matched: datapower, response, degradation.</div>
+      <div class="auto-acts"><div class="aa run">▶ Run Playbook</div><div class="aa rev">History (6)</div></div>
+    </div>
+
+    <div class="triage-dec">
+      <div class="tdec resolve">✓ ICC Resolves</div>
+      <div class="tdec escalate">↗ Escalate</div>
+    </div>
+    <div class="fcr-warn">⚠ Escalating creates a reassignment event — removes FCR eligibility (detected by full INC pull).</div>
+    <div class="sync-warn"><strong>DT → SNow one-way.</strong> Check SNow INC1769673 for updates not in DT.</div>
+    <div class="qacts">
+      <div class="qa">👁 Watch</div><div class="qa">⚡ Swarm</div>
+      <div class="qa ansible">▶ Ansible</div><div class="qa">✓ Close FCR</div>
+      <div class="qa">⬡ Dep Map</div>
+    </div>
+  </div>
+
+  <!-- Swarms -->
+  <div class="panel">
+    <div class="ph"><span class="pt">Active Swarms</span><span class="pb" style="background:var(--red-d);color:var(--red);border-color:rgba(239,68,68,.2);">2 ACTIVE</span></div>
+    <div class="swarm-card active">
+      <div class="sw-top"><div class="sw-title">DataPower / Move Money</div><div class="sw-age"><strong style="color:var(--red);">134m</strong></div></div>
+      <div class="sw-bridge">Teams: <strong>Bridge-07</strong> · IM: J. Rivera</div>
+      <div class="sw-groups"><span class="sg">ICC</span><span class="sg">App Dev</span><span class="sg">Middleware</span></div>
+      <div class="sw-acts"><div class="swa join">Join →</div><div class="swa">INC1769673</div></div>
+    </div>
+    <div class="swarm-card" style="border-left-color:var(--amber);margin-top:4px;">
+      <div class="sw-top"><div class="sw-title">Kafka Consumer Lag</div><div class="sw-age"><strong style="color:var(--amber);">71m</strong></div></div>
+      <div class="sw-bridge">Teams: <strong>Bridge-08</strong> · IM: K. Patel</div>
+      <div class="sw-groups"><span class="sg">ICC</span><span class="sg">Middleware</span></div>
+      <div class="sw-acts"><div class="swa join">Join →</div><div class="swa">INC1769710</div></div>
+    </div>
+  </div>
+
+  <!-- Action queue -->
+  <div class="panel">
+    <div class="ph"><span class="pt">Action Queue</span><span class="pb warn">10 items</span></div>
+    <div style="display:flex;flex-direction:column;gap:3px;">
+      <div style="display:flex;align-items:center;gap:7px;padding:6px 7px;background:var(--bg-2);border-radius:4px;border:1px solid rgba(239,68,68,.2);cursor:pointer;">
+        <span style="font-size:10px;">⚠</span>
+        <div style="flex:1;"><div style="font-size:10px;font-weight:600;">1 P-Card — no comment</div><div style="font-size:8px;color:var(--text-lo);">SLA clock running</div></div>
+        <span style="font-size:9px;color:var(--teal);">Top →</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:7px;padding:6px 7px;background:var(--bg-2);border-radius:4px;border:1px solid var(--border);cursor:pointer;">
+        <span style="font-size:10px;">◎</span>
+        <div style="flex:1;"><div style="font-size:10px;font-weight:600;">12 FCR Candidates</div><div style="font-size:8px;color:var(--text-lo);">ICC INCs · no reassignment · validate</div></div>
+        <span style="font-size:9px;color:var(--teal);">Review →</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:7px;padding:6px 7px;background:var(--bg-2);border-radius:4px;border:1px solid var(--border);cursor:pointer;">
+        <span style="font-size:10px;">↺</span>
+        <div style="flex:1;"><div style="font-size:10px;font-weight:600;">9 Recurring Patterns</div><div style="font-size:8px;color:var(--text-lo);">INC reduction · Ansible candidates</div></div>
+        <span style="font-size:9px;color:var(--teal);">Target →</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:7px;padding:6px 7px;background:var(--bg-2);border-radius:4px;border:1px solid var(--border);cursor:pointer;">
+        <span style="font-size:10px;">⚡</span>
+        <div style="flex:1;"><div style="font-size:10px;font-weight:600;">3 Ansible Scripts Ready</div><div style="font-size:8px;color:var(--text-lo);">DataPower, App Pool, Disk</div></div>
+        <span style="font-size:9px;color:var(--teal);">Review →</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+function updateClock(){const n=new Date();document.getElementById('clock').textContent=n.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});}
+updateClock();setInterval(updateClock,1000);
+function selectPC(row){document.querySelectorAll('.ptbl tbody tr').forEach(r=>r.classList.remove('selected'));row.classList.add('selected');}
+function selectINC(row){document.querySelectorAll('.itbl tbody tr').forEach(r=>r.classList.remove('selected'));row.classList.add('selected');}
+document.querySelectorAll('.sfpill').forEach(p=>{
+  p.addEventListener('click',()=>{
+    const parent=p.closest('.stream-filters');
+    parent.querySelectorAll('.sfpill').forEach(x=>{x.classList.remove('active-pc','active-inc');});
+    if(p.closest('.stream-hd').querySelector('.pcard')) p.classList.add('active-pc');
+    else p.classList.add('active-inc');
+  });
+});
+</script>
+</body>
+</html>
