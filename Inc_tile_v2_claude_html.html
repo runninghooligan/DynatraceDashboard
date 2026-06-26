@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ICC INC + FCR Intelligence Tile</title>
+<style>
+:root {
+  --bg-0:#060a14;--bg-1:#0b1120;--bg-2:#111827;--bg-3:#1a2236;
+  --border:rgba(255,255,255,0.07);--border-hi:rgba(255,255,255,0.13);
+  --teal:#00d4aa;--teal-d:rgba(0,212,170,0.12);
+  --purple:#7c6fcd;--purple-d:rgba(124,111,205,0.12);
+  --amber:#f59e0b;--amber-d:rgba(245,158,11,0.12);
+  --red:#ef4444;--red-d:rgba(239,68,68,0.12);
+  --green:#22c55e;--green-d:rgba(34,197,94,0.10);
+  --blue:#3b82f6;--blue-d:rgba(59,130,246,0.12);
+  --orange:#f97316;--orange-d:rgba(249,115,22,0.12);
+  --font:'Inter','Segoe UI',system-ui,sans-serif;
+  --mono:'JetBrains Mono','Fira Code','Courier New',monospace;
+  --text-hi:#f0f2f8;--text-md:#a8b3cc;--text-lo:#4d5a75;
+  --c-pcard:#00d4aa;--c-manual:#7c6fcd;--c-recur:#f97316;--c-other:#4d5a75;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{font-size:13px;}
+body{
+  background:var(--bg-0);color:var(--text-hi);font-family:var(--font);
+  min-height:100vh;display:flex;align-items:flex-start;justify-content:center;
+  padding:40px 24px;
+}
+
+/* ── TILE SHELL — same as v1, wider ── */
+.tile{
+  width:820px;
+  background:var(--bg-1);border:1px solid var(--border-hi);
+  border-radius:10px;overflow:hidden;
+  box-shadow:0 16px 48px rgba(0,0,0,0.5);position:relative;
+}
+.tile::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--blue),var(--teal),var(--green));
+}
+
+/* ── TILE HEADER — v1 exact ── */
+.tile-hd{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  padding:16px 18px 12px;border-bottom:1px solid var(--border);
+}
+.tile-label{
+  font-size:9px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--text-lo);margin-bottom:3px;
+}
+.tile-scope{display:flex;align-items:center;gap:6px;}
+.scope-badge{
+  font-size:9px;font-family:var(--mono);padding:2px 8px;border-radius:12px;
+  background:var(--blue-d);color:var(--blue);
+  border:1px solid rgba(59,130,246,0.25);letter-spacing:.04em;
+}
+.live-dot{
+  width:6px;height:6px;border-radius:50%;background:var(--green);
+  animation:pip 2s ease-in-out infinite;
+}
+@keyframes pip{0%,100%{opacity:1;}50%{opacity:.2;}}
+.tile-hd-right{text-align:right;}
+.last-refresh{font-size:8px;color:var(--text-lo);font-family:var(--mono);}
+.data-note{font-size:8px;color:var(--text-lo);margin-top:2px;}
+
+/* ── SCOPE TOGGLE ── */
+.scope-row{
+  display:flex;align-items:center;gap:3px;
+  padding:9px 18px;border-bottom:1px solid var(--border);
+}
+.scope-pill{
+  padding:4px 13px;border-radius:6px;border:1px solid var(--border);
+  background:transparent;color:var(--text-lo);font-size:9px;
+  font-family:var(--font);font-weight:600;cursor:pointer;
+  letter-spacing:.03em;transition:all .15s;
+}
+.scope-pill:hover{border-color:var(--border-hi);color:var(--text-md);}
+.scope-pill.active{background:var(--blue-d);border-color:rgba(59,130,246,.35);color:var(--blue);}
+.scope-sep{flex:1;}
+.scope-note{font-size:8px;color:var(--text-lo);font-family:var(--mono);}
+
+/* ── TWO-COLUMN BODY ── */
+.tile-body{
+  display:grid;grid-template-columns:1fr 1px 1fr;
+}
+.col-divider{background:var(--border);}
+.tile-col{display:flex;flex-direction:column;}
+
+/* ── SECTION LABEL (reused) ── */
+.sec-hd{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 18px 7px;
+}
+.sec-lbl{
+  font-size:9px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--text-lo);
+}
+.sec-meta{font-size:8px;color:var(--text-lo);font-family:var(--mono);}
+
+/* ── COUNTS ROW — v1 exact ── */
+.counts-row{
+  display:grid;gap:0;padding:16px 18px 13px;
+  border-bottom:1px solid var(--border);
+}
+.counts-row.two{grid-template-columns:1fr 1px 1fr;}
+.counts-row.three{grid-template-columns:1fr 1px 1fr 1px 1fr;}
+.count-divider{background:var(--border);}
+.count-cell{padding:0 14px;}
+.count-cell:first-child{padding-left:0;}
+.count-cell:last-child{padding-right:0;}
+.count-label{
+  font-size:8px;font-weight:700;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--text-lo);margin-bottom:4px;
+}
+.count-val{
+  font-size:42px;font-weight:800;line-height:1;
+  letter-spacing:-.03em;font-family:var(--mono);
+}
+.count-val.amber{color:var(--amber);}
+.count-val.white{color:var(--text-hi);}
+.count-val.green{color:var(--green);}
+.count-val.red{color:var(--red);}
+.count-val.teal{color:var(--teal);}
+.count-sub{font-size:9px;color:var(--text-lo);margin-top:4px;line-height:1.4;}
+.count-delta{
+  display:inline-flex;align-items:center;gap:3px;
+  font-size:9px;font-family:var(--mono);margin-top:3px;
+}
+.count-delta.up{color:var(--red);}
+.count-delta.down{color:var(--green);}
+.count-delta.neutral{color:var(--text-lo);}
+
+/* ── SEVERITY BAND ── */
+.sev-wrap{padding:10px 18px 4px;}
+.sev-band-lbl{font-size:8px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-lo);margin-bottom:5px;}
+.sev-band{display:flex;height:5px;border-radius:3px;overflow:hidden;gap:1px;}
+.sev-seg{height:100%;}
+.sev-legend{display:flex;gap:10px;margin-top:5px;padding-bottom:4px;}
+.sl-item{display:flex;align-items:center;gap:4px;font-size:8px;color:var(--text-lo);}
+.sl-dot{width:7px;height:7px;border-radius:1px;flex-shrink:0;}
+
+/* ── ORIGIN ROWS — v1 exact ── */
+.origin-rows{
+  display:flex;flex-direction:column;gap:5px;
+  padding:0 18px 12px;
+}
+.origin-row{display:flex;align-items:center;gap:8px;}
+.origin-swatch{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+.origin-name{font-size:10px;color:var(--text-md);flex:1;}
+.origin-bar-wrap{
+  flex:2;height:6px;background:var(--bg-3);
+  border-radius:3px;overflow:hidden;
+}
+.origin-bar-fill{height:100%;border-radius:3px;transition:width .45s ease;}
+.origin-count{
+  font-size:10px;font-weight:700;font-family:var(--mono);
+  min-width:24px;text-align:right;
+}
+.origin-pct{
+  font-size:9px;color:var(--text-lo);font-family:var(--mono);
+  min-width:32px;text-align:right;
+}
+
+/* ── CLOSURE ROWS ── */
+.closure-rows{display:flex;flex-direction:column;gap:4px;padding:0 18px 12px;}
+.closure-row{
+  display:flex;align-items:center;gap:8px;
+  padding:5px 8px;background:var(--bg-2);
+  border-radius:4px;border:1px solid var(--border);
+}
+.closure-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.closure-name{font-size:9px;color:var(--text-md);flex:1;}
+.closure-bar-wrap{flex:1.5;height:4px;background:var(--bg-3);border-radius:2px;overflow:hidden;}
+.closure-bar-fill{height:100%;border-radius:2px;transition:width .45s ease;}
+.closure-count{font-size:10px;font-weight:700;font-family:var(--mono);min-width:20px;text-align:right;}
+.closure-pct{font-size:8px;color:var(--text-lo);font-family:var(--mono);min-width:28px;text-align:right;}
+
+/* ── FCR BY ORIGIN BARS ── */
+.fcr-bars{display:flex;flex-direction:column;gap:5px;padding:0 18px 12px;}
+.fcr-bar-row{display:flex;align-items:center;gap:8px;}
+.fcr-bar-lbl{font-size:9px;color:var(--text-md);min-width:96px;}
+.fcr-bar-track{flex:1;height:8px;background:var(--bg-3);border-radius:4px;overflow:hidden;}
+.fcr-bar-fill{height:100%;border-radius:4px;transition:width .45s ease;}
+.fcr-bar-pct{font-size:9px;font-weight:700;font-family:var(--mono);min-width:32px;text-align:right;}
+.fcr-bar-n{font-size:8px;color:var(--text-lo);font-family:var(--mono);min-width:34px;text-align:right;}
+
+/* ── CHART — v1 style exactly ── */
+.chart-section{padding:0 18px 14px;}
+.chart-hd{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;
+}
+.chart-lbl{
+  font-size:9px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--text-lo);
+}
+.chart-range{font-size:8px;color:var(--text-lo);font-family:var(--mono);}
+.chart-legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px;}
+.cl-item{display:flex;align-items:center;gap:4px;font-size:8px;color:var(--text-lo);}
+.cl-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+.chart-wrap{position:relative;height:110px;}
+svg.stacked-chart{width:100%;height:100%;overflow:visible;}
+.grid-line{stroke:rgba(255,255,255,.05);stroke-width:1;}
+.grid-label{font-size:8px;fill:var(--text-lo);font-family:'JetBrains Mono',monospace;}
+.x-label{font-size:8px;fill:var(--text-lo);font-family:'JetBrains Mono',monospace;text-anchor:middle;}
+
+/* Tooltip — v1 exact */
+.chart-tooltip{
+  position:absolute;background:var(--bg-2);border:1px solid var(--border-hi);
+  border-radius:6px;padding:8px 10px;font-size:9px;pointer-events:none;
+  opacity:0;transition:opacity .15s;min-width:138px;
+  box-shadow:0 8px 24px rgba(0,0,0,.5);z-index:10;
+}
+.chart-tooltip.visible{opacity:1;}
+.tt-time{font-family:var(--mono);color:var(--text-lo);margin-bottom:4px;font-size:8px;}
+.tt-row{display:flex;align-items:center;gap:5px;margin-bottom:2px;}
+.tt-swatch{width:8px;height:8px;border-radius:1px;flex-shrink:0;}
+.tt-name{flex:1;color:var(--text-md);}
+.tt-val{font-family:var(--mono);font-weight:700;color:var(--text-hi);}
+.tt-total{
+  border-top:1px solid var(--border);margin-top:4px;padding-top:4px;
+  display:flex;justify-content:space-between;font-size:8px;color:var(--text-lo);
+}
+.tt-total span:last-child{color:var(--text-hi);font-weight:700;font-family:var(--mono);}
+
+/* ── TILE FOOTER — v1 exact ── */
+.tile-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 18px;border-top:1px solid var(--border);background:var(--bg-0);
+}
+.footer-note{font-size:8px;color:var(--text-lo);line-height:1.4;}
+.footer-link{font-size:9px;color:var(--teal);cursor:pointer;letter-spacing:.03em;}
+.footer-link:hover{opacity:.7;}
+
+.col-border-top{border-top:1px solid var(--border);}
+</style>
+</head>
+<body>
+<div class="tile">
+
+  <!-- ── HEADER ── -->
+  <div class="tile-hd">
+    <div>
+      <div class="tile-label">ICC Incident + FCR Intelligence</div>
+      <div class="tile-scope">
+        <div class="live-dot"></div>
+        <span class="scope-badge" id="scope-badge">TODAY</span>
+        <span style="font-size:9px;color:var(--text-lo);">TECH IOPS-NOC Ops · 220-key pull</span>
+      </div>
+    </div>
+    <div class="tile-hd-right">
+      <div class="last-refresh">Updated <span id="clock">—</span></div>
+      <div class="data-note">Normalized · backfill active</div>
+    </div>
+  </div>
+
+  <!-- ── SCOPE TOGGLE ── -->
+  <div class="scope-row">
+    <button class="scope-pill active" data-scope="today"  onclick="setScope('today',this)">Today</button>
+    <button class="scope-pill"        data-scope="week"   onclick="setScope('week',this)">7 Days</button>
+    <button class="scope-pill"        data-scope="month"  onclick="setScope('month',this)">30 Days</button>
+    <div class="scope-sep"></div>
+    <span class="scope-note" id="scope-range-note">—</span>
+  </div>
+
+  <!-- ── BODY: INC (left) | FCR (right) ── -->
+  <div class="tile-body">
+
+    <!-- ════════════ INC COLUMN ════════════ -->
+    <div class="tile-col">
+
+      <!-- INC Counts -->
+      <div class="counts-row two">
+        <div class="count-cell">
+          <div class="count-label">Active Now</div>
+          <div class="count-val amber" id="inc-active">7</div>
+          <div class="count-sub">Open · assigned ICC</div>
+          <div class="count-delta up" id="inc-active-d">▲ 2 vs yesterday</div>
+        </div>
+        <div class="count-divider"></div>
+        <div class="count-cell">
+          <div class="count-label">Assigned <span id="inc-scope-lbl">Today</span></div>
+          <div class="count-val white" id="inc-total">47</div>
+          <div class="count-sub">All origins · this period</div>
+          <div class="count-delta down" id="inc-total-d">▼ 3 vs avg</div>
+        </div>
+      </div>
+
+      <!-- Severity Band -->
+      <div class="sev-wrap">
+        <div class="sev-band-lbl">Severity Mix</div>
+        <div class="sev-band" id="sev-band"></div>
+        <div class="sev-legend">
+          <div class="sl-item"><div class="sl-dot" style="background:var(--red);opacity:.8;"></div>P3 Major</div>
+          <div class="sl-item"><div class="sl-dot" style="background:var(--amber);opacity:.8;"></div>P3 Non-Major</div>
+          <div class="sl-item"><div class="sl-dot" style="background:var(--text-lo);opacity:.7;"></div>Other</div>
+        </div>
+      </div>
+
+      <div style="height:1px;background:var(--border);margin:0 18px;"></div>
+
+      <!-- By Origin -->
+      <div class="sec-hd">
+        <span class="sec-lbl">By Origin</span>
+        <span class="sec-meta" id="inc-origin-total">47 total</span>
+      </div>
+      <div class="origin-rows" id="inc-origin-rows"></div>
+
+      <div style="height:1px;background:var(--border);margin:0 18px;"></div>
+
+      <!-- Closure Intelligence -->
+      <div class="sec-hd">
+        <span class="sec-lbl">Closure Intelligence</span>
+        <span class="sec-meta">from closure notes</span>
+      </div>
+      <div class="closure-rows" id="inc-closure-rows"></div>
+
+      <div style="height:1px;background:var(--border);margin:0 18px;"></div>
+
+      <!-- INC Stacked Area Chart -->
+      <div class="chart-section" style="padding-top:12px;">
+        <div class="chart-hd">
+          <span class="chart-lbl" id="inc-chart-lbl">Hourly Arrivals — Today</span>
+          <span class="chart-range" id="inc-chart-range">00:00 – <span id="now-hour">—</span></span>
+        </div>
+        <div class="chart-legend" id="inc-legend"></div>
+        <div class="chart-wrap">
+          <svg class="stacked-chart" id="inc-chart" viewBox="0 0 344 100" preserveAspectRatio="none"></svg>
+          <div class="chart-tooltip" id="inc-tip"></div>
+        </div>
+      </div>
+
+    </div><!-- /inc col -->
+
+    <div class="col-divider"></div>
+
+    <!-- ════════════ FCR COLUMN ════════════ -->
+    <div class="tile-col">
+
+      <!-- FCR Counts — 3 cells -->
+      <div class="counts-row three">
+        <div class="count-cell">
+          <div class="count-label">FCR Rate</div>
+          <div class="count-val green" id="fcr-rate">75%</div>
+          <div class="count-sub">No reassignment</div>
+          <div class="count-delta down" id="fcr-rate-d">▲ 2pt vs prior</div>
+        </div>
+        <div class="count-divider"></div>
+        <div class="count-cell">
+          <div class="count-label">Candidates</div>
+          <div class="count-val teal" id="fcr-cand">12</div>
+          <div class="count-sub">Open · eligible</div>
+          <div class="count-delta neutral" id="fcr-cand-d">— same as avg</div>
+        </div>
+        <div class="count-divider"></div>
+        <div class="count-cell">
+          <div class="count-label">Reassigned ✗</div>
+          <div class="count-val red" id="fcr-reass">5</div>
+          <div class="count-sub">Escalated out</div>
+          <div class="count-delta down" id="fcr-reass-d">▼ 1 vs yesterday</div>
+        </div>
+      </div>
+
+      <!-- FCR by Origin -->
+      <div class="sec-hd" style="padding-top:13px;">
+        <span class="sec-lbl">FCR Rate by Origin</span>
+        <span class="sec-meta">assigned ÷ no reassign</span>
+      </div>
+      <div class="fcr-bars" id="fcr-origin-bars"></div>
+
+      <div style="height:1px;background:var(--border);margin:0 18px;"></div>
+
+      <!-- FCR Closure Breakdown -->
+      <div class="sec-hd">
+        <span class="sec-lbl">Closure Breakdown</span>
+        <span class="sec-meta">from closure notes · 220-key</span>
+      </div>
+      <div class="closure-rows" id="fcr-closure-rows"></div>
+
+      <div style="height:1px;background:var(--border);margin:0 18px;"></div>
+
+      <!-- FCR Rate Line Chart -->
+      <div class="chart-section" style="padding-top:12px;">
+        <div class="chart-hd">
+          <span class="chart-lbl" id="fcr-chart-lbl">FCR Rate — Today by Hour</span>
+          <span class="chart-range" id="fcr-chart-range">—</span>
+        </div>
+        <div class="chart-legend" id="fcr-legend"></div>
+        <div class="chart-wrap">
+          <svg class="stacked-chart" id="fcr-chart" viewBox="0 0 344 100" preserveAspectRatio="none"></svg>
+          <div class="chart-tooltip" id="fcr-tip"></div>
+        </div>
+      </div>
+
+    </div><!-- /fcr col -->
+  </div><!-- /tile-body -->
+
+  <!-- ── FOOTER ── -->
+  <div class="tile-footer">
+    <div class="footer-note">
+      FCR proxy: ICC assigned + 0 reassignments = candidate &nbsp;·&nbsp;
+      <span style="color:var(--green);" id="footer-fcr-note">12 FCR candidates today</span>
+      &nbsp;·&nbsp;
+      <span style="color:var(--orange);">9 recurring patterns → INC reduction targets</span>
+    </div>
+    <span class="footer-link">Full INC view →</span>
+  </div>
+
+</div><!-- /tile -->
+
+<script>
+// ══════════════════════════════
+// DATA — keyed by scope
+// Production: fetch('/api/v1/analytics/inc-summary?scope={scope}&group_by=hour,origin')
+// ══════════════════════════════
+const NOW_H = new Date().getHours();
+
+const SD = {
+  today: {
+    label:'Today', rangNote:'Midnight – now',
+    incActive:7, incActiveD:'▲ 2 vs yesterday', incActiveUp:true,
+    incTotal:47, incTotalD:'▼ 3 vs avg', incTotalUp:false,
+    sev:{major:3,nonmajor:36,other:8},
+    origin:[
+      {name:'P-Card (DT Alert)', c:'#00d4aa', n:28, pct:60},
+      {name:'Manual (ICC)',      c:'#7c6fcd', n:11, pct:23},
+      {name:'Other / Backfill', c:'#4d5a75', n:8,  pct:17},
+      {name:'AlertSite',        c:'#f59e0b', n:0,  pct:0, stub:true},
+      {name:'SolarWinds DPA',   c:'#3b82f6', n:0,  pct:0, stub:true},
+    ],
+    closure:[
+      {name:'Resolved by ICC',  c:'#22c55e', n:22, pct:62},
+      {name:'Auto-resolved',    c:'#00d4aa', n:4,  pct:11},
+      {name:'Reassigned out',   c:'#ef4444', n:5,  pct:14},
+      {name:'Pending closure',  c:'#f59e0b', n:7,  pct:20},
+    ],
+    hourly:[
+      {h:0,pcard:1,manual:0,recur:0,other:0},{h:1,pcard:0,manual:1,recur:0,other:0},
+      {h:2,pcard:1,manual:0,recur:1,other:1},{h:3,pcard:0,manual:0,recur:0,other:0},
+      {h:4,pcard:1,manual:1,recur:1,other:0},{h:5,pcard:2,manual:0,recur:1,other:1},
+      {h:6,pcard:3,manual:1,recur:2,other:0},{h:7,pcard:2,manual:2,recur:1,other:1},
+      {h:8,pcard:4,manual:1,recur:2,other:1},{h:9,pcard:3,manual:2,recur:1,other:0},
+      {h:10,pcard:2,manual:1,recur:1,other:1},{h:11,pcard:3,manual:0,recur:2,other:1},
+      {h:12,pcard:2,manual:1,recur:1,other:0},{h:13,pcard:2,manual:2,recur:0,other:1},
+      {h:14,pcard:1,manual:0,recur:1,other:0},{h:15,pcard:0,manual:0,recur:1,other:1},
+      {h:16,pcard:1,manual:0,recur:0,other:0},{h:17,pcard:0,manual:0,recur:0,other:0},
+      {h:18,pcard:0,manual:0,recur:0,other:0},{h:19,pcard:0,manual:0,recur:0,other:0},
+      {h:20,pcard:0,manual:0,recur:0,other:0},{h:21,pcard:0,manual:0,recur:0,other:0},
+      {h:22,pcard:0,manual:0,recur:0,other:0},{h:23,pcard:0,manual:0,recur:0,other:0},
+    ].filter(d=>d.h<=NOW_H),
+    fcrRate:75, fcrRateD:'▲ 2pt vs prior', fcrRateUp:false,
+    fcrCand:12, fcrCandD:'— same as avg',
+    fcrReass:5, fcrReassD:'▼ 1 vs yesterday', fcrReassUp:false,
+    fcrByOrigin:[
+      {name:'P-Card (DT)', c:'#00d4aa', rate:78, n:28},
+      {name:'Manual ICC',  c:'#7c6fcd', rate:64, n:11},
+      {name:'Other',       c:'#4d5a75', rate:62, n:8 },
+    ],
+    fcrClosure:[
+      {name:'Self-resolved by ICC',   c:'#22c55e', n:18, pct:72},
+      {name:'Assisted · no escalate', c:'#00d4aa', n:4,  pct:16},
+      {name:'Escalated (not FCR)',    c:'#ef4444', n:5,  pct:20},
+    ],
+    fcrHourly: Array.from({length:24},(_,h)=>{
+      if(h>NOW_H)return{h,rate:null};
+      return{h, rate:Math.min(95,Math.max(48,65+Math.round(Math.sin(h/3.2)*14)))};
+    }).filter(d=>d.rate!==null),
+    xLabel: h=>String(h).padStart(2,'0')+':00',
+    fcrXLabel: (h)=>String(h).padStart(2,'0')+':00',
+    incChartLbl:'Hourly Arrivals — Today',
+    fcrChartLbl:'FCR Rate — Today by Hour',
+  },
+  week:{
+    label:'7 Days', rangNote:'Last 7 days',
+    incActive:7, incActiveD:'▲ 2 vs prior week', incActiveUp:true,
+    incTotal:312, incTotalD:'▼ 18 vs prior 7d', incTotalUp:false,
+    sev:{major:22,nonmajor:238,other:52},
+    origin:[
+      {name:'P-Card (DT Alert)',c:'#00d4aa',n:188,pct:60},
+      {name:'Manual (ICC)',     c:'#7c6fcd',n:72, pct:23},
+      {name:'Other / Backfill',c:'#4d5a75', n:52, pct:17},
+      {name:'AlertSite',       c:'#f59e0b', n:0,  pct:0, stub:true},
+      {name:'SolarWinds DPA',  c:'#3b82f6', n:0,  pct:0, stub:true},
+    ],
+    closure:[
+      {name:'Resolved by ICC', c:'#22c55e',n:148,pct:64},
+      {name:'Auto-resolved',   c:'#00d4aa',n:31, pct:13},
+      {name:'Reassigned out',  c:'#ef4444',n:38, pct:16},
+      {name:'Pending closure', c:'#f59e0b',n:17, pct:7 },
+    ],
+    hourly:[
+      {h:0,pcard:28,manual:10,recur:12,other:8},{h:1,pcard:32,manual:14,recur:9,other:6},
+      {h:2,pcard:44,manual:11,recur:14,other:9},{h:3,pcard:38,manual:9,recur:11,other:7},
+      {h:4,pcard:22,manual:12,recur:8,other:5}, {h:5,pcard:18,manual:8,recur:7,other:4},
+      {h:6,pcard:26,manual:8,recur:6,other:7},
+    ],
+    fcrRate:72, fcrRateD:'▼ 1pt vs prior 7d', fcrRateUp:true,
+    fcrCand:58, fcrCandD:'▲ 4 vs prior',
+    fcrReass:38, fcrReassD:'▼ 6 vs prior', fcrReassUp:false,
+    fcrByOrigin:[
+      {name:'P-Card (DT)',c:'#00d4aa',rate:76,n:188},
+      {name:'Manual ICC', c:'#7c6fcd',rate:62,n:72},
+      {name:'Other',      c:'#4d5a75',rate:58,n:52},
+    ],
+    fcrClosure:[
+      {name:'Self-resolved by ICC',   c:'#22c55e',n:112,pct:65},
+      {name:'Assisted · no escalate', c:'#00d4aa',n:36, pct:21},
+      {name:'Escalated (not FCR)',    c:'#ef4444',n:38, pct:22},
+    ],
+    fcrHourly:[
+      {h:0,rate:71},{h:1,rate:74},{h:2,rate:69},{h:3,rate:76},
+      {h:4,rate:72},{h:5,rate:68},{h:6,rate:73},
+    ],
+    xLabel:(_,i)=>{const d=new Date();d.setDate(d.getDate()-6+i);return['Su','Mo','Tu','We','Th','Fr','Sa'][d.getDay()];},
+    fcrXLabel:(_,i)=>{const d=new Date();d.setDate(d.getDate()-6+i);return['Su','Mo','Tu','We','Th','Fr','Sa'][d.getDay()];},
+    incChartLbl:'Daily Arrivals — Last 7 Days',
+    fcrChartLbl:'FCR Rate — Last 7 Days',
+  },
+  month:{
+    label:'30 Days', rangNote:'Last 30 days',
+    incActive:7, incActiveD:'▲ 2 active now', incActiveUp:true,
+    incTotal:1247, incTotalD:'▼ 84 vs prior 30d', incTotalUp:false,
+    sev:{major:89,nonmajor:942,other:216},
+    origin:[
+      {name:'P-Card (DT Alert)',c:'#00d4aa',n:748,pct:60},
+      {name:'Manual (ICC)',     c:'#7c6fcd',n:287,pct:23},
+      {name:'Other / Backfill',c:'#4d5a75', n:212,pct:17},
+      {name:'AlertSite',       c:'#f59e0b', n:0,  pct:0, stub:true},
+      {name:'SolarWinds DPA',  c:'#3b82f6', n:0,  pct:0, stub:true},
+    ],
+    closure:[
+      {name:'Resolved by ICC', c:'#22c55e',n:591,pct:63},
+      {name:'Auto-resolved',   c:'#00d4aa',n:124,pct:13},
+      {name:'Reassigned out',  c:'#ef4444',n:149,pct:16},
+      {name:'Pending closure', c:'#f59e0b',n:75, pct:8 },
+    ],
+    hourly:[
+      {h:0,pcard:112,manual:44,recur:48,other:31},{h:1,pcard:128,manual:56,recur:38,other:27},
+      {h:2,pcard:176,manual:44,recur:56,other:36},{h:3,pcard:152,manual:36,recur:44,other:28},
+    ],
+    fcrRate:70, fcrRateD:'▼ 3pt vs prior 30d', fcrRateUp:true,
+    fcrCand:198, fcrCandD:'▲ 22 vs prior',
+    fcrReass:149, fcrReassD:'▲ 11 vs prior', fcrReassUp:true,
+    fcrByOrigin:[
+      {name:'P-Card (DT)',c:'#00d4aa',rate:74,n:748},
+      {name:'Manual ICC', c:'#7c6fcd',rate:60,n:287},
+      {name:'Other',      c:'#4d5a75',rate:56,n:212},
+    ],
+    fcrClosure:[
+      {name:'Self-resolved by ICC',   c:'#22c55e',n:448,pct:64},
+      {name:'Assisted · no escalate', c:'#00d4aa',n:143,pct:20},
+      {name:'Escalated (not FCR)',    c:'#ef4444',n:149,pct:21},
+    ],
+    fcrHourly:[{h:0,rate:68},{h:1,rate:72},{h:2,rate:67},{h:3,rate:71}],
+    xLabel:(_,i)=>`Wk ${i+1}`,
+    fcrXLabel:(_,i)=>`Wk ${i+1}`,
+    incChartLbl:'Weekly Arrivals — Last 30 Days',
+    fcrChartLbl:'FCR Rate — Last 30 Days',
+  },
+};
+
+const INC_COLORS = {pcard:'#00d4aa',manual:'#7c6fcd',recur:'#f97316',other:'#4d5a75'};
+const INC_NAMES  = {pcard:'P-Card (DT)',manual:'Manual ICC',recur:'Recurring',other:'Other'};
+const INC_ORDER  = ['other','recur','manual','pcard']; // bottom → top
+
+let scope = 'today';
+
+// ── CLOCK ──
+function tick(){
+  const t=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false});
+  document.getElementById('clock').textContent=t;
+  document.getElementById('now-hour').textContent=t;
+}
+tick(); setInterval(tick,1000);
+
+// ── SCOPE ──
+function setScope(s,btn){
+  scope=s;
+  document.querySelectorAll('.scope-pill').forEach(p=>{
+    p.classList.toggle('active',p.dataset.scope===s);
+  });
+  render();
+}
+
+// ── RENDER ALL ──
+function render(){
+  const d=SD[scope];
+  document.getElementById('scope-badge').textContent=d.label.toUpperCase();
+  document.getElementById('scope-range-note').textContent=d.rangNote;
+  document.getElementById('inc-scope-lbl').textContent=d.label;
+
+  // INC counts
+  set('inc-active',    d.incActive);
+  setDelta('inc-active-d', d.incActiveD, d.incActiveUp);
+  set('inc-total',     d.incTotal.toLocaleString());
+  setDelta('inc-total-d',  d.incTotalD,  d.incTotalUp);
+  set('inc-origin-total', d.incTotal.toLocaleString()+' total');
+
+  // FCR counts
+  set('fcr-rate',   d.fcrRate+'%');
+  setDelta('fcr-rate-d',  d.fcrRateD,  d.fcrRateUp);
+  set('fcr-cand',   d.fcrCand.toLocaleString());
+  setEl('fcr-cand-d', d.fcrCandD, 'count-delta neutral');
+  set('fcr-reass',  d.fcrReass.toLocaleString());
+  setDelta('fcr-reass-d', d.fcrReassD, d.fcrReassUp);
+
+  // FCR footer note
+  set('footer-fcr-note', d.fcrCand+' FCR candidates '+d.label.toLowerCase());
+
+  // Sev band
+  renderSevBand(d.sev, d.incTotal);
+
+  // Origin rows
+  renderOriginRows('inc-origin-rows', d.origin);
+
+  // Closure
+  renderClosureRows('inc-closure-rows', d.closure);
+
+  // FCR by origin
+  renderFcrBars('fcr-origin-bars', d.fcrByOrigin);
+
+  // FCR closure
+  renderClosureRows('fcr-closure-rows', d.fcrClosure);
+
+  // Charts
+  set('inc-chart-lbl', d.incChartLbl);
+  set('fcr-chart-lbl', d.fcrChartLbl);
+  buildIncChart(d);
+  buildFcrChart(d);
+}
+
+function set(id,v){ const e=document.getElementById(id); if(e)e.textContent=v; }
+function setEl(id,html,cls){
+  const e=document.getElementById(id);
+  if(!e)return; e.textContent=html;
+  if(cls)e.className='count-delta '+cls;
+}
+function setDelta(id,txt,isUp){
+  const e=document.getElementById(id); if(!e)return;
+  e.textContent=txt;
+  e.className='count-delta '+(isUp?'up':'down');
+}
+
+// ── SEV BAND ──
+function renderSevBand(sev,tot){
+  const el=document.getElementById('sev-band');
+  const pM=sev.major/tot, pN=sev.nonmajor/tot, pO=sev.other/tot;
+  el.innerHTML=`
+    <div class="sev-seg" style="flex:${pM};background:var(--red);opacity:.8;border-radius:3px 0 0 3px;"
+      title="P3 Major: ${sev.major}"></div>
+    <div class="sev-seg" style="flex:${pN};background:var(--amber);opacity:.75;"
+      title="P3 Non-Major: ${sev.nonmajor}"></div>
+    <div class="sev-seg" style="flex:${pO};background:var(--text-lo);opacity:.6;border-radius:0 3px 3px 0;"
+      title="Other: ${sev.other}"></div>`;
+}
+
+// ── ORIGIN ROWS — v1 pattern ──
+function renderOriginRows(id,rows){
+  document.getElementById(id).innerHTML=rows.map(o=>{
+    const stub=!!o.stub;
+    const w=stub?2:o.pct;
+    return `<div class="origin-row" style="${stub?'opacity:.4;':''}">
+      <div class="origin-swatch" style="background:${o.c};${stub?'opacity:.5;':''}"></div>
+      <span class="origin-name">${o.name}</span>
+      <div class="origin-bar-wrap">
+        <div class="origin-bar-fill" style="width:${w}%;background:${o.c};opacity:${stub?.4:.78};"></div>
+      </div>
+      <span class="origin-count" style="color:${stub?'var(--text-lo)':o.c};">${stub?'—':o.n.toLocaleString()}</span>
+      <span class="origin-pct">${stub?'stub':o.pct+'%'}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── CLOSURE ROWS ──
+function renderClosureRows(id,rows){
+  const mx=Math.max(...rows.map(r=>r.pct));
+  document.getElementById(id).innerHTML=rows.map(r=>`
+    <div class="closure-row">
+      <div class="closure-dot" style="background:${r.c};"></div>
+      <span class="closure-name">${r.name}</span>
+      <div class="closure-bar-wrap">
+        <div class="closure-bar-fill" style="width:${(r.pct/mx*100).toFixed(0)}%;background:${r.c};opacity:.72;"></div>
+      </div>
+      <span class="closure-count" style="color:${r.c};">${r.n.toLocaleString()}</span>
+      <span class="closure-pct">${r.pct}%</span>
+    </div>`).join('');
+}
+
+// ── FCR ORIGIN BARS ──
+function renderFcrBars(id,rows){
+  document.getElementById(id).innerHTML=rows.map(r=>`
+    <div class="fcr-bar-row">
+      <span class="fcr-bar-lbl">${r.name}</span>
+      <div class="fcr-bar-track">
+        <div class="fcr-bar-fill" style="width:${r.rate}%;background:${r.c};opacity:.8;"></div>
+      </div>
+      <span class="fcr-bar-pct" style="color:${r.c};">${r.rate}%</span>
+      <span class="fcr-bar-n">n=${r.n.toLocaleString()}</span>
+    </div>`).join('');
+}
+
+// ══════════════════════════════
+// INC STACKED AREA CHART — v1 architecture preserved
+// ══════════════════════════════
+function buildIncChart(d){
+  const data=d.hourly;
+  const svg=document.getElementById('inc-chart');
+  const tip=document.getElementById('inc-tip');
+  const W=344,H=100,PAD={top:8,right:4,bottom:22,left:28};
+  const CW=W-PAD.left-PAD.right, CH=H-PAD.top-PAD.bottom;
+  const n=data.length; if(!n){svg.innerHTML='';return;}
+
+  const maxT=Math.max(...data.map(r=>(r.pcard||0)+(r.manual||0)+(r.recur||0)+(r.other||0)),1);
+  const yMax=Math.ceil(maxT/2)*2+2;
+  const xS=n>1?CW/(n-1):CW;
+  const xP=i=>PAD.left+(n>1?i*xS:CW/2);
+  const yP=v=>PAD.top+CH-(v/yMax)*CH;
+
+  // Cumulative stacks bottom → top
+  const stk=data.map(r=>{
+    const o=r.other||0,rc=r.recur||0,m=r.manual||0,p=r.pcard||0;
+    return{other:o,recur:o+rc,manual:o+rc+m,pcard:o+rc+m+p};
+  });
+
+  let h='';
+
+  // Gridlines — v1 exact
+  [0,Math.round(yMax/2),yMax].forEach(v=>{
+    const y=yP(v).toFixed(1);
+    h+=`<line class="grid-line" x1="${PAD.left}" y1="${y}" x2="${W-PAD.right}" y2="${y}"/>`;
+    h+=`<text class="grid-label" x="${PAD.left-4}" y="${+y+3}" text-anchor="end">${v}</text>`;
+  });
+
+  // Stacked areas
+  INC_ORDER.forEach((key,si)=>{
+    const top=stk.map(s=>s[key]);
+    const prev=si>0?stk.map(s=>s[INC_ORDER[si-1]]):data.map(()=>0);
+    const fwd=top.map((v,i)=>`${xP(i).toFixed(1)},${yP(v).toFixed(1)}`).join(' ');
+    const rev=prev.map((v,i)=>`${xP(n-1-i).toFixed(1)},${yP(v).toFixed(1)}`).join(' ');
+    const alpha=key==='other'?'50':key==='recur'?'65':key==='manual'?'72':'82';
+    h+=`<polygon points="${fwd} ${rev}" fill="${INC_COLORS[key]}${alpha}" stroke="none"/>`;
+    const line=top.map((v,i)=>`${xP(i).toFixed(1)},${yP(v).toFixed(1)}`).join(' ');
+    h+=`<polyline points="${line}" fill="none" stroke="${INC_COLORS[key]}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+  });
+
+  // Data dots — v1 pattern: total dot at top of stack
+  data.forEach((r,i)=>{
+    const tot=(r.pcard||0)+(r.manual||0)+(r.recur||0)+(r.other||0);
+    if(!tot)return;
+    h+=`<circle class="data-dot" cx="${xP(i).toFixed(1)}" cy="${yP(tot).toFixed(1)}" r="3"
+      fill="${INC_COLORS.pcard}" stroke="var(--bg-1)" stroke-width="1.5"
+      onmouseenter="showIncTip(event,${i})" onmouseleave="hideTip('inc-tip')"/>`;
+  });
+
+  // X labels — v1 every 3h pattern
+  data.forEach((r,i)=>{
+    const skip=n>8?Math.ceil(n/6):1;
+    if(i%skip===0||i===n-1)
+      h+=`<text class="x-label" x="${xP(i).toFixed(1)}" y="${H-4}">${d.xLabel(r.h,i)}</text>`;
+  });
+
+  // NOW line — v1 exact
+  if(scope==='today'){
+    const nx=xP(n-1).toFixed(1);
+    h+=`<line x1="${nx}" y1="${PAD.top}" x2="${nx}" y2="${PAD.top+CH}"
+      stroke="rgba(255,255,255,.15)" stroke-width="1" stroke-dasharray="3,3"/>`;
+    h+=`<text x="${nx}" y="${PAD.top-2}" text-anchor="middle"
+      style="font-size:7px;fill:rgba(255,255,255,.3);font-family:var(--mono);">NOW</text>`;
+  }
+
+  svg.innerHTML=h;
+  svg._data=data;
+
+  // Legend
+  document.getElementById('inc-legend').innerHTML=
+    Object.entries(INC_COLORS).reverse().map(([k,c])=>
+      `<div class="cl-item"><div class="cl-dot" style="background:${c};opacity:.85;"></div>${INC_NAMES[k]}</div>`
+    ).join('');
+}
+
+// ══════════════════════════════
+// FCR LINE CHART — same SVG architecture as INC
+// ══════════════════════════════
+function buildFcrChart(d){
+  const data=d.fcrHourly.filter(r=>r.rate!==null);
+  const svg=document.getElementById('fcr-chart');
+  const W=344,H=100,PAD={top:8,right:18,bottom:22,left:32};
+  const CW=W-PAD.left-PAD.right, CH=H-PAD.top-PAD.bottom;
+  const n=data.length; if(!n){svg.innerHTML='';return;}
+
+  const yMin=50,yMax=100;
+  const xS=n>1?CW/(n-1):CW;
+  const xP=i=>PAD.left+(n>1?i*xS:CW/2);
+  const yP=v=>PAD.top+CH-((v-yMin)/(yMax-yMin))*CH;
+
+  let h='';
+
+  // Gridlines
+  [50,75,100].forEach(v=>{
+    const y=yP(v).toFixed(1);
+    h+=`<line class="grid-line" x1="${PAD.left}" y1="${y}" x2="${W-PAD.right}" y2="${y}"/>`;
+    h+=`<text class="grid-label" x="${PAD.left-4}" y="${+y+3}" text-anchor="end">${v}%</text>`;
+  });
+
+  // Target dashed line at 80%
+  const ty=yP(80).toFixed(1);
+  h+=`<line x1="${PAD.left}" y1="${ty}" x2="${W-PAD.right}" y2="${ty}"
+    stroke="rgba(34,197,94,.22)" stroke-width="1" stroke-dasharray="4,3"/>`;
+  h+=`<text x="${W-PAD.right+2}" y="${+ty+3}"
+    style="font-size:7px;fill:rgba(34,197,94,.45);font-family:var(--mono);">80%</text>`;
+
+  // Area fill
+  const pts=data.map((r,i)=>`${xP(i).toFixed(1)},${yP(r.rate).toFixed(1)}`).join(' ');
+  const close=`${xP(n-1).toFixed(1)},${yP(yMin).toFixed(1)} ${xP(0).toFixed(1)},${yP(yMin).toFixed(1)}`;
+  h+=`<polygon points="${pts} ${close}" fill="rgba(34,197,94,.08)" stroke="none"/>`;
+
+  // Line
+  h+=`<polyline points="${pts}" fill="none" stroke="var(--green)" stroke-width="2"
+    stroke-linejoin="round" stroke-linecap="round"/>`;
+
+  // Data dots — colored by threshold (green ≥80, amber ≥70, red <70)
+  data.forEach((r,i)=>{
+    const col=r.rate>=80?'var(--green)':r.rate>=70?'var(--amber)':'var(--red)';
+    h+=`<circle class="data-dot" cx="${xP(i).toFixed(1)}" cy="${yP(r.rate).toFixed(1)}" r="3"
+      fill="${col}" stroke="var(--bg-1)" stroke-width="1.5"
+      onmouseenter="showFcrTip(event,${i})" onmouseleave="hideTip('fcr-tip')"/>`;
+  });
+
+  // X labels
+  data.forEach((r,i)=>{
+    const skip=n>8?Math.ceil(n/6):1;
+    if(i%skip===0||i===n-1)
+      h+=`<text class="x-label" x="${xP(i).toFixed(1)}" y="${H-4}">${d.fcrXLabel(r.h,i)}</text>`;
+  });
+
+  // NOW line
+  if(scope==='today'){
+    const nx=xP(n-1).toFixed(1);
+    h+=`<line x1="${nx}" y1="${PAD.top}" x2="${nx}" y2="${PAD.top+CH}"
+      stroke="rgba(255,255,255,.15)" stroke-width="1" stroke-dasharray="3,3"/>`;
+    h+=`<text x="${nx}" y="${PAD.top-2}" text-anchor="middle"
+      style="font-size:7px;fill:rgba(255,255,255,.3);font-family:var(--mono);">NOW</text>`;
+  }
+
+  svg.innerHTML=h;
+  svg._data=data;
+
+  document.getElementById('fcr-legend').innerHTML=`
+    <div class="cl-item"><div class="cl-dot" style="background:var(--green);"></div>FCR Rate</div>
+    <div class="cl-item"><div class="cl-dot" style="background:rgba(34,197,94,.3);border:1px dashed rgba(34,197,94,.4);"></div>80% target</div>`;
+}
+
+// ── TOOLTIPS ──
+function showIncTip(evt,idx){
+  const data=document.getElementById('inc-chart')._data;
+  if(!data)return;
+  const r=data[idx];
+  const tot=(r.pcard||0)+(r.manual||0)+(r.recur||0)+(r.other||0);
+  const d=SD[scope];
+  const lbl=scope==='today'
+    ?String(r.h).padStart(2,'0')+':00–'+String(r.h+1).padStart(2,'0')+':00'
+    :d.xLabel(r.h,idx);
+  const tip=document.getElementById('inc-tip');
+  tip.innerHTML=`
+    <div class="tt-time">${lbl}</div>
+    ${Object.entries(INC_COLORS).reverse().map(([k,c])=>`
+      <div class="tt-row">
+        <div class="tt-swatch" style="background:${c};"></div>
+        <span class="tt-name">${INC_NAMES[k]}</span>
+        <span class="tt-val">${r[k]||0}</span>
+      </div>`).join('')}
+    <div class="tt-total"><span>Total</span><span>${tot}</span></div>`;
+  posTip(tip,evt,'inc-chart');
+  tip.classList.add('visible');
+}
+
+function showFcrTip(evt,idx){
+  const data=document.getElementById('fcr-chart')._data;
+  if(!data)return;
+  const r=data[idx];
+  const d=SD[scope];
+  const lbl=scope==='today'
+    ?String(r.h).padStart(2,'0')+':00':'Period '+(idx+1);
+  const status=r.rate>=80?'✓ On target':r.rate>=70?'▼ Below target':'⚠ At risk';
+  const sc=r.rate>=80?'var(--green)':r.rate>=70?'var(--amber)':'var(--red)';
+  const tip=document.getElementById('fcr-tip');
+  tip.innerHTML=`
+    <div class="tt-time">${lbl}</div>
+    <div class="tt-row">
+      <div class="tt-swatch" style="background:var(--green);"></div>
+      <span class="tt-name">FCR Rate</span>
+      <span class="tt-val">${r.rate}%</span>
+    </div>
+    <div style="font-size:8px;color:${sc};margin-top:4px;">${status}</div>`;
+  posTip(tip,evt,'fcr-chart');
+  tip.classList.add('visible');
+}
+
+function hideTip(id){ document.getElementById(id).classList.remove('visible'); }
+
+function posTip(tip,evt,svgId){
+  const r=document.getElementById(svgId).getBoundingClientRect();
+  const dx=evt.clientX-r.left, dy=evt.clientY-r.top;
+  const tw=148;
+  let left=dx+12; if(left+tw>r.width)left=dx-tw-12;
+  tip.style.left=Math.max(0,left)+'px';
+  tip.style.top=Math.max(0,dy-22)+'px';
+}
+
+// ── INIT ──
+render();
+</script>
+</body>
+</html>
