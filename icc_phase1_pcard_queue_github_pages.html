@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ICC Phase 1 — Active P-Card Intelligence Queue</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+<style>
+:root{
+  --bg:#06101b;--bg2:#091625;--bg3:#0d1d30;--panel:#0b1929;--line:#1b3148;
+  --text:#edf4fb;--muted:#8194aa;--teal:#20d6b5;--blue:#4da3ff;--green:#39d27f;
+  --amber:#f4b740;--orange:#ff8a3d;--red:#ef5b5b;--purple:#9d82ff;--cyan:#55d8ff;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
+button,input{font:inherit}
+.app{height:100%;display:flex;flex-direction:column}
+.topbar{height:48px;background:#071321;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:0 14px;flex-shrink:0}
+.brand{font-size:12px;font-weight:800;letter-spacing:.06em}
+.sub{font-size:9px;color:var(--muted)}
+.spacer{flex:1}
+.pill,.btn{border:1px solid var(--line);background:var(--bg2);border-radius:6px;padding:5px 9px;font-size:8px;color:var(--muted)}
+.pill.live{color:var(--green)}
+.btn{color:var(--text);cursor:pointer}
+.btn.primary{color:var(--teal);border-color:#1c7465;background:#0b2926}
+.nav{height:38px;display:flex;gap:4px;align-items:center;padding:0 12px;background:#081522;border-bottom:1px solid var(--line);flex-shrink:0}
+.nav button{background:transparent;border:1px solid transparent;color:var(--muted);padding:6px 9px;border-radius:5px;font-size:9px;cursor:pointer}
+.nav button.active{color:var(--blue);background:#0e2338;border-color:#1c4d72}
+.trust{height:34px;display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(--line);flex-shrink:0}
+.trust-item{display:flex;align-items:center;gap:7px;padding:0 10px;background:#091624;border-right:1px solid var(--line);font-size:9px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
+.dot.partial{background:var(--amber)}.dot.stub{background:var(--purple)}
+.trust-meta{font-size:8px;color:var(--muted)}
+.content{flex:1;min-height:0;overflow:hidden}
+.workspace{height:100%;display:grid;grid-template-columns:215px minmax(900px,1fr) 335px;min-height:0}
+.col{min-height:0;overflow-y:auto;overflow-x:hidden;background:var(--bg2);border-right:1px solid var(--line)}
+.col:last-child{border-right:none}
+.panel{padding:10px;border-bottom:1px solid var(--line)}
+.hd{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.title{font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#b8c8d7}
+.badge{font-size:7px;padding:2px 5px;border-radius:4px;border:1px solid var(--line);color:var(--muted)}
+.badge.live{color:var(--green)}.badge.partial{color:var(--amber)}.badge.ref{color:var(--purple)}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.card{background:var(--bg3);border:1px solid var(--line);border-radius:7px;padding:8px}
+.card .k{font-size:7px;color:var(--muted);text-transform:uppercase}.card .v{font-size:19px;font-weight:800}.card .s{font-size:7px;color:var(--muted)}
+.teal{color:var(--teal)}.blue{color:var(--blue)}.green{color:var(--green)}.amber{color:var(--amber)}.orange{color:var(--orange)}.red{color:var(--red)}.purple{color:var(--purple)}
+.row{display:flex;align-items:center;gap:7px;background:var(--bg3);border:1px solid var(--line);border-radius:6px;padding:6px 7px;margin-bottom:4px}
+.row .name{flex:1;font-size:9px}
+.queue{display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.queue-hd{padding:9px 10px;background:#091523;border-bottom:1px solid var(--line)}
+.queue-top{display:flex;align-items:center;gap:8px}
+.queue-top h2{font-size:11px;margin:0;text-transform:uppercase;letter-spacing:.05em}
+.search{flex:1;background:#071321;border:1px solid var(--line);color:var(--text);padding:6px 8px;border-radius:6px;font-size:8px}
+.filters{display:flex;gap:4px;flex-wrap:wrap;margin-top:7px}
+.filter{font-size:7px;border:1px solid var(--line);background:var(--bg3);color:var(--muted);padding:3px 6px;border-radius:999px;cursor:pointer}
+.filter.active{color:var(--teal);border-color:#1b7364}
+.bucketbar{display:grid;grid-template-columns:repeat(8,1fr);border-bottom:1px solid var(--line)}
+.bucket{background:#081321;border-right:1px solid var(--line);padding:6px;text-align:center}
+.bucket .n{font-size:14px;font-weight:800}.bucket .l{font-size:6.5px;color:var(--muted);text-transform:uppercase}
+.alert{padding:6px 9px;font-size:8px;color:var(--red);background:#2a121a;border-bottom:1px solid #5b2631}
+.tablewrap{flex:1;min-height:0;overflow:auto}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+th{position:sticky;top:0;z-index:3;background:#081321;color:var(--muted);font-size:7px;text-transform:uppercase;padding:6px;text-align:left;border-bottom:1px solid var(--line)}
+td{padding:7px 6px;border-bottom:1px solid #102033;font-size:8px;color:#bdcad8;vertical-align:middle}
+tr{cursor:pointer}tr:hover{background:#0e1d30}tr.selected{background:#0a2828}
+tr.no-comment td:first-child{border-left:2px solid var(--red)}
+tr.critical td:first-child{border-left:2px solid var(--orange)}
+.id{font-family:Consolas,monospace;font-size:7.5px}.id.pc{color:var(--teal)}.id.inc{color:var(--blue)}
+.main{font-size:9px;color:var(--text);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.small{font-size:7px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tag{display:inline-block;padding:2px 4px;border-radius:4px;font-size:6.5px;border:1px solid var(--line);white-space:nowrap}
+.tag.pcard{color:var(--teal);background:#0c2d2a}.tag.inc{color:var(--blue);background:#102a43}.tag.swarm{color:var(--red);background:#321721}
+.tag.fcr{color:var(--green);background:#102b20}.tag.warn{color:var(--amber);background:#302511}.tag.ref{color:var(--purple);background:#251d3d}
+.age,.comment,.score{font-family:Consolas,monospace;font-weight:800}.age.crit,.comment.none,.score.high{color:var(--red)}
+.age.lr{color:var(--orange)}.age.watch,.comment.breach,.score.med{color:var(--amber)}.comment.ok,.score.low{color:var(--green)}
+.signal-stack{display:flex;gap:2px;flex-wrap:wrap}
+.sync{padding:6px 9px;font-size:7.5px;color:#9ec9ff;background:#0b1d31;border-top:1px solid #183d5b}
+.inspect{padding:10px}.hero,.box{background:var(--bg3);border:1px solid var(--line);border-radius:8px;padding:9px;margin-bottom:7px}
+.hero h3{font-size:13px;margin:4px 0}.eyebrow{font-size:7px;color:var(--teal);font-family:Consolas,monospace}
+.metricgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:7px}
+.metric{background:#091523;border:1px solid var(--line);border-radius:5px;padding:6px;text-align:center}
+.metric .n{font-size:14px;font-weight:800}.metric .l{font-size:6.5px;color:var(--muted);text-transform:uppercase}
+.box h4{margin:0 0 6px;font-size:8px;text-transform:uppercase}
+.kv{display:flex;justify-content:space-between;gap:8px;font-size:7.5px;margin:4px 0}.kv span:first-child{color:var(--muted)}
+.chart{height:140px}
+.timeline{padding-left:12px;border-left:1px solid var(--line)}
+.event{position:relative;padding:0 0 10px 12px}.event:before{content:'';position:absolute;left:-17px;top:3px;width:8px;height:8px;border-radius:50%;background:var(--blue);border:2px solid var(--bg2)}
+.event.dt:before{background:var(--teal)}.event.sw:before{background:var(--purple)}.event.auto:before{background:var(--green)}
+.event-time{font-size:7px;color:var(--muted)}.event-title{font-size:8.5px;font-weight:700}.event-sub{font-size:7px;color:var(--muted)}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.action{padding:6px;border-radius:6px;border:1px solid var(--line);background:var(--bg3);font-size:8px;cursor:pointer}
+.action.good{color:var(--green)}.action.warn{color:var(--amber)}.action.blue{color:var(--blue)}.action.purple{color:var(--purple)}
+.modal{position:fixed;inset:0;background:#02070ed9;display:none;align-items:center;justify-content:center;padding:18px;z-index:20}
+.modal.open{display:flex}.modal-card{width:min(1180px,96vw);height:min(740px,92vh);background:#081321;border:1px solid var(--line);border-radius:10px;display:flex;flex-direction:column;overflow:hidden}
+.modal-hd{padding:10px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center}
+.graphchart{flex:1;min-height:0}
+@media(max-width:1180px){
+ body{overflow:auto}.app{height:auto}.content{overflow:visible}.workspace{height:auto;grid-template-columns:1fr}
+ .col,.queue{overflow:visible;border-right:none;border-bottom:1px solid var(--line)}.trust{grid-template-columns:1fr 1fr;height:auto}
+ .tablewrap{max-height:620px}.bucketbar{grid-template-columns:repeat(4,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div><div class="brand">ICC PHASE 1 — P-CARD INTELLIGENCE</div><div class="sub">L1 real-time queue with Dynatrace, comments, ServiceNow, situation, swarm, FCR, and automation context</div></div>
+    <div class="spacer"></div>
+    <div class="pill live">● LIVE</div><div class="pill">Last 24h</div><div class="pill">Shift: Day</div>
+    <button class="btn" id="graphBtn">⬡ Dependency Map</button><button class="btn primary" id="refreshBtn">↻ Refresh</button>
+  </div>
+
+  <div class="nav">
+    <button class="active">Active P-Card Queue</button><button>Situation View</button><button>Dual Stream</button><button>Swarm Coordination</button><button>FCR Intelligence</button><button>Automation</button>
+  </div>
+
+  <div class="trust">
+    <div class="trust-item"><span class="dot"></span><div><strong>Dynatrace</strong><div class="trust-meta">LIVE · P-Cards + comments</div></div></div>
+    <div class="trust-item"><span class="dot partial"></span><div><strong>ServiceNow</strong><div class="trust-meta">PARTIAL · 220-key INC pull</div></div></div>
+    <div class="trust-item"><span class="dot"></span><div><strong>Comment Intelligence</strong><div class="trust-meta">LIVE · first/last/gaps</div></div></div>
+    <div class="trust-item"><span class="dot stub"></span><div><strong>Topology</strong><div class="trust-meta">REFERENCE + live overlays</div></div></div>
+    <div class="trust-item"><span class="dot partial"></span><div><strong>Correlation</strong><div class="trust-meta">RULE-BASED · operator review</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="workspace">
+      <aside class="col">
+        <div class="panel">
+          <div class="hd"><span class="title">Shift Snapshot</span><span class="badge live">LIVE</span></div>
+          <div class="cards">
+            <div class="card"><div class="k">Open P-Cards</div><div class="v amber">14</div><div class="s">3 new this hour</div></div>
+            <div class="card"><div class="k">No Comment</div><div class="v red">1</div><div class="s">Immediate action</div></div>
+            <div class="card"><div class="k">Critical LR</div><div class="v orange">2</div><div class="s">&gt;120m</div></div>
+            <div class="card"><div class="k">Swarm Candidates</div><div class="v purple">2</div><div class="s">1 active</div></div>
+            <div class="card"><div class="k">FCR Opportunities</div><div class="v green">10</div><div class="s">No INC / ICC-owned</div></div>
+            <div class="card"><div class="k">Automation Ready</div><div class="v teal">3</div><div class="s">AAG matched</div></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="hd"><span class="title">VCT Signal Rail</span></div>
+          <div class="row"><span class="name red">Move Money 3.0</span><span class="tag warn">3 P</span><span class="tag inc">2 INC</span></div>
+          <div class="row"><span class="name amber">Client Management</span><span class="tag warn">2 P</span></div>
+          <div class="row"><span class="name amber">Advisor Email</span><span class="tag warn">1 P</span></div>
+          <div class="row"><span class="name green">Account View 2.0</span><span class="tag fcr">0</span></div>
+          <div class="row"><span class="name green">Trading</span><span class="tag fcr">0</span></div>
+          <div class="row"><span class="name green">NAO</span><span class="tag fcr">0</span></div>
+          <div class="row"><span class="name green">Statements</span><span class="tag fcr">0</span></div>
+        </div>
+
+        <div class="panel">
+          <div class="hd"><span class="title">Comment Intelligence</span><span class="badge live">LIVE</span></div>
+          <div class="row"><span class="name">No first comment</span><span class="tag no">1</span></div>
+          <div class="row"><span class="name">Comment breach &gt;15m</span><span class="tag warn">2</span></div>
+          <div class="row"><span class="name">Stale updates &gt;30m</span><span class="tag warn">3</span></div>
+          <div class="row"><span class="name">Healthy cadence</span><span class="tag fcr">8</span></div>
+        </div>
+
+        <div class="panel">
+          <div class="hd"><span class="title">Queue Pressure</span><span class="badge partial">SIM</span></div>
+          <div id="queuePressureChart" class="chart"></div>
+        </div>
+      </aside>
+
+      <main class="col queue">
+        <div class="queue-hd">
+          <div class="queue-top">
+            <h2 class="teal">Active P-Card Intelligence Queue</h2><strong class="teal">14</strong>
+            <div class="spacer"></div>
+            <input id="searchBox" class="search" placeholder="Search P-Card, service, VCT, INC, group...">
+          </div>
+          <div class="filters">
+            <button class="filter active" data-filter="">All</button>
+            <button class="filter" data-filter="nocomment">No Comment</button>
+            <button class="filter" data-filter="critical">Critical LR</button>
+            <button class="filter" data-filter="breach">Comment Breach</button>
+            <button class="filter" data-filter="swarm">Swarm</button>
+            <button class="filter" data-filter="fcr">FCR</button>
+            <button class="filter" data-filter="automation">Automation</button>
+            <button class="filter" data-filter="unlinked">No INC</button>
+          </div>
+        </div>
+
+        <div class="bucketbar">
+          <div class="bucket"><div class="n teal">14</div><div class="l">All Open</div></div>
+          <div class="bucket"><div class="n amber">4</div><div class="l">Watch &gt;30m</div></div>
+          <div class="bucket"><div class="n orange">2</div><div class="l">LR &gt;60m</div></div>
+          <div class="bucket"><div class="n red">2</div><div class="l">Critical &gt;120m</div></div>
+          <div class="bucket"><div class="n red">1</div><div class="l">No Comment</div></div>
+          <div class="bucket"><div class="n amber">2</div><div class="l">Comment Breach</div></div>
+          <div class="bucket"><div class="n purple">2</div><div class="l">Active Swarms</div></div>
+          <div class="bucket"><div class="n green">10</div><div class="l">FCR Opportunities</div></div>
+        </div>
+
+        <div class="alert">⚠ 1 P-Card has no first comment. Immediate L1 acknowledgment required.</div>
+
+        <div class="tablewrap">
+          <table id="queueTable">
+            <colgroup>
+              <col style="width:88px"><col style="width:20%"><col style="width:70px"><col style="width:82px">
+              <col style="width:78px"><col style="width:58px"><col style="width:86px"><col style="width:84px">
+              <col style="width:82px"><col style="width:72px"><col style="width:88px"><col>
+            </colgroup>
+            <thead>
+              <tr>
+                <th>P-Card ID</th><th>Title / Service</th><th>Age / Tier</th><th>Last Comment</th>
+                <th>Status</th><th>Blast</th><th>Group</th><th>INC</th>
+                <th>Situation</th><th>FCR</th><th>Source Intel</th><th>Signals / Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="no-comment" data-kind="nocomment fcr unlinked" data-id="P-260614881">
+                <td><span class="id pc">P-260614881</span></td>
+                <td><div class="main">Advisor Email SMTP Relay Latency</div><div class="small">Advisor Email · SMTP Relay</div></td>
+                <td><span class="age">18m</span><div class="small">Open</div></td>
+                <td><span class="comment none">No comment</span><div class="small">First-comment SLA</div></td>
+                <td><span class="tag warn">Unacked</span></td>
+                <td><span class="score med">51</span></td>
+                <td><div class="main">ICC</div><div class="small">Owner pending</div></td>
+                <td><span class="small">No INC</span></td>
+                <td><span class="tag ref">Single signal</span></td>
+                <td><span class="tag fcr">Opportunity</span></td>
+                <td><span class="tag ref">DT only</span></td>
+                <td><div class="signal-stack"><span class="tag no">Comment now</span><span class="tag fcr">◎ FCR</span></div></td>
+              </tr>
+
+              <tr class="critical selected" data-kind="critical swarm automation" data-id="P-260623063">
+                <td><span class="id pc">P-260623063</span></td>
+                <td><div class="main">DataPower FINRA Response Degradation</div><div class="small">Move Money 3.0 · DataPower</div></td>
+                <td><span class="age crit">134m</span><div class="small red">Critical LR</div></td>
+                <td><span class="comment ok">8m ago</span><div class="small">3 comments</div></td>
+                <td><span class="tag swarm">Swarm</span></td>
+                <td><span class="score high">88</span></td>
+                <td><div class="main">Middleware</div><div class="small">TECH IOPS-NOC</div></td>
+                <td><span class="id inc">INC1769673</span></td>
+                <td><span class="tag warn">SIT-00421</span></td>
+                <td><span class="tag fcr">Eligible</span></td>
+                <td><span class="tag inc">SN linked</span></td>
+                <td><div class="signal-stack"><span class="tag warn">↺ 6×</span><span class="tag pcard">⚡ AAG</span><span class="tag swarm">Bridge</span></div></td>
+              </tr>
+
+              <tr class="critical" data-kind="critical breach swarm automation" data-id="P-260619441">
+                <td><span class="id pc">P-260619441</span></td>
+                <td><div class="main">Move Money App Pool Memory Spike</div><div class="small">Move Money 3.0 · App Pool</div></td>
+                <td><span class="age lr">82m</span><div class="small orange">Long Running</div></td>
+                <td><span class="comment breach">21m ago</span><div class="small">Cadence breach</div></td>
+                <td><span class="tag swarm">Swarm</span></td>
+                <td><span class="score high">79</span></td>
+                <td><div class="main">App Dev</div><div class="small">TECH IOPS-NOC</div></td>
+                <td><span class="id inc">INC1769683</span></td>
+                <td><span class="tag warn">SIT-00422</span></td>
+                <td><span class="tag no">Reassigned</span></td>
+                <td><span class="tag inc">SN linked</span></td>
+                <td><div class="signal-stack"><span class="tag warn">↺ 4×</span><span class="tag pcard">⚡ AAG</span></div></td>
+              </tr>
+
+              <tr data-kind="breach unlinked" data-id="P-260617901">
+                <td><span class="id pc">P-260617901</span></td>
+                <td><div class="main">Client Management Service Degraded</div><div class="small">Client Management · TIBCO path</div></td>
+                <td><span class="age watch">48m</span><div class="small amber">Watch</div></td>
+                <td><span class="comment breach">22m ago</span><div class="small">Update overdue</div></td>
+                <td><span class="tag warn">Watch</span></td>
+                <td><span class="score med">43</span></td>
+                <td><div class="main">App Support</div><div class="small">Owner inferred</div></td>
+                <td><span class="small">No INC</span></td>
+                <td><span class="tag ref">SIT-00424</span></td>
+                <td><span class="tag fcr">Opportunity</span></td>
+                <td><span class="tag ref">Topology ref</span></td>
+                <td><div class="signal-stack"><span class="tag warn">↺ Recurring</span><span class="tag ref">Compare prior</span></div></td>
+              </tr>
+
+              <tr data-kind="automation fcr unlinked" data-id="P-260615991">
+                <td><span class="id pc">P-260615991</span></td>
+                <td><div class="main">Linux Node03 Disk Usage 97%</div><div class="small">Platform · Linux Node03</div></td>
+                <td><span class="age">12m</span><div class="small">Open</div></td>
+                <td><span class="comment ok">2m ago</span><div class="small">Healthy cadence</div></td>
+                <td><span class="tag pcard">Auto-Queue</span></td>
+                <td><span class="score low">24</span></td>
+                <td><div class="main">Platform</div><div class="small">Owner confirmed</div></td>
+                <td><span class="small">No INC</span></td>
+                <td><span class="tag ref">Single signal</span></td>
+                <td><span class="tag fcr">Opportunity</span></td>
+                <td><span class="tag pcard">AAG match</span></td>
+                <td><div class="signal-stack"><span class="tag pcard">⚡ Cleanup</span><span class="tag fcr">◎ FCR</span></div></td>
+              </tr>
+
+              <tr data-kind="automation" data-id="P-260615443">
+                <td><span class="id pc">P-260615443</span></td>
+                <td><div class="main">Kafka Consumer Group Lag Spike</div><div class="small">Shared Middleware · Kafka</div></td>
+                <td><span class="age lr">71m</span><div class="small orange">Long Running</div></td>
+                <td><span class="comment ok">6m ago</span><div class="small">4 comments</div></td>
+                <td><span class="tag warn">Investigating</span></td>
+                <td><span class="score med">67</span></td>
+                <td><div class="main">Middleware</div><div class="small">Owner confirmed</div></td>
+                <td><span class="id inc">INC1769710</span></td>
+                <td><span class="tag warn">SIT-00423</span></td>
+                <td><span class="tag fcr">Eligible</span></td>
+                <td><span class="tag inc">SN linked</span></td>
+                <td><div class="signal-stack"><span class="tag warn">↺ 3×</span><span class="tag pcard">⚡ Recovery</span></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="sync"><strong>DT → ServiceNow is one-way.</strong> P-Card comments may push to the INC. ServiceNow updates do not write back to Dynatrace.</div>
+      </main>
+
+      <aside class="col">
+        <div class="inspect">
+          <div class="hd"><span class="title">Selected P-Card Workspace</span><span class="badge live" id="selectedBadge">P-260623063</span></div>
+          <div class="hero">
+            <div class="eyebrow" id="heroEyebrow">Move Money 3.0 · Critical LR · SIT-00421</div>
+            <h3 id="heroTitle">DataPower FINRA Response Degradation</h3>
+            <div><span class="tag warn">PERF</span> <span class="tag swarm">Swarm</span> <span class="tag inc">INC1769673</span></div>
+            <div class="metricgrid">
+              <div class="metric"><div class="n red">134m</div><div class="l">Age</div></div>
+              <div class="metric"><div class="n amber">8m</div><div class="l">Last Comment</div></div>
+              <div class="metric"><div class="n red">88</div><div class="l">Blast / Risk</div></div>
+            </div>
+          </div>
+
+          <div class="box"><h4>Selected Queue Intelligence</h4><div id="riskBreakdownChart" class="chart"></div></div>
+
+          <div class="box">
+            <h4>Comment Intelligence</h4>
+            <div class="kv"><span>First comment</span><strong class="green">3m 23s</strong></div>
+            <div class="kv"><span>Last comment</span><strong>8m ago</strong></div>
+            <div class="kv"><span>Comment count</span><strong>3</strong></div>
+            <div class="kv"><span>Cadence state</span><strong class="green">Healthy</strong></div>
+          </div>
+
+          <div class="box">
+            <h4>ServiceNow / FCR</h4>
+            <div class="kv"><span>Incident</span><strong class="blue">INC1769673</strong></div>
+            <div class="kv"><span>Origin</span><strong>P-Card</strong></div>
+            <div class="kv"><span>Assignment</span><strong>TECH IOPS-NOC</strong></div>
+            <div class="kv"><span>Reassignments</span><strong class="green">0</strong></div>
+            <div class="kv"><span>FCR eligibility</span><strong class="green">Candidate · proxy</strong></div>
+          </div>
+
+          <div class="box">
+            <h4>Situation / Swarm</h4>
+            <div class="kv"><span>Situation</span><strong>SIT-00421</strong></div>
+            <div class="kv"><span>Related P-Cards</span><strong>3</strong></div>
+            <div class="kv"><span>Root candidate</span><strong>DataPower · 86%</strong></div>
+            <div class="kv"><span>Bridge</span><strong>Bridge-07 · 42m</strong></div>
+          </div>
+
+          <div class="box">
+            <h4>Automation Intelligence</h4>
+            <div class="kv"><span>Matched AAG</span><strong>DataPower Restart</strong></div>
+            <div class="kv"><span>Historical uses</span><strong>6</strong></div>
+            <div class="kv"><span>Success history</span><strong class="green">5 / 6</strong></div>
+            <div class="kv"><span>Confidence</span><strong>87%</strong></div>
+          </div>
+
+          <div class="box">
+            <h4>Unified Timeline</h4>
+            <div class="timeline">
+              <div class="event dt"><div class="event-time">09:01 · Dynatrace</div><div class="event-title">P-Card opened</div><div class="event-sub">DataPower degradation detected.</div></div>
+              <div class="event dt"><div class="event-time">09:04 · Dynatrace</div><div class="event-title">First ICC comment</div><div class="event-sub">Triage started.</div></div>
+              <div class="event"><div class="event-time">09:12 · ServiceNow</div><div class="event-title">INC1769673 linked</div><div class="event-sub">Assigned to TECH IOPS-NOC.</div></div>
+              <div class="event sw"><div class="event-time">09:19 · Swarm</div><div class="event-title">Bridge-07 opened</div><div class="event-sub">App Dev and Middleware engaged.</div></div>
+              <div class="event auto"><div class="event-time">09:31 · Automation</div><div class="event-title">Playbook recommended</div><div class="event-sub">Human approval required.</div></div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="action good">✓ ICC Resolves</button><button class="action warn">↗ Escalate</button>
+            <button class="action blue" id="inspectGraphBtn">⬡ Dep Map</button><button class="action purple">● Join Swarm</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="graphModal">
+  <div class="modal-card">
+    <div class="modal-hd">
+      <div><div class="title">Selected P-Card Dependency Context</div><div class="small">ECharts reference topology with active incident and inferred correlation overlays</div></div>
+      <div class="spacer"></div><button class="btn" id="closeGraph">Close</button>
+    </div>
+    <div id="graphChart" class="graphchart"></div>
+  </div>
+</div>
+
+<script>
+const rows=[...document.querySelectorAll('#queueTable tbody tr')];
+document.querySelectorAll('.filter').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  const f=b.dataset.filter||'';
+  rows.forEach(r=>r.style.display=!f||r.dataset.kind.includes(f)?'':'none');
+});
+document.getElementById('searchBox').oninput=e=>{
+  const q=e.target.value.toLowerCase();
+  rows.forEach(r=>r.style.display=r.textContent.toLowerCase().includes(q)?'':'none');
+};
+rows.forEach(r=>r.onclick=()=>{
+  rows.forEach(x=>x.classList.remove('selected'));
+  r.classList.add('selected');
+  selectedBadge.textContent=r.dataset.id;
+  heroTitle.textContent=r.querySelector('.main').textContent;
+  heroEyebrow.textContent=r.querySelector('.small').textContent;
+});
+
+const queueChart=echarts.init(document.getElementById('queuePressureChart'));
+queueChart.setOption({
+  backgroundColor:'transparent',
+  grid:{left:24,right:8,top:10,bottom:18},
+  xAxis:{type:'category',data:['08','09','10','11','12','13','14','15'],axisLine:{lineStyle:{color:'#29425c'}},axisLabel:{color:'#73889e',fontSize:8}},
+  yAxis:{type:'value',axisLine:{show:false},splitLine:{lineStyle:{color:'#13283c'}},axisLabel:{color:'#73889e',fontSize:8}},
+  tooltip:{trigger:'axis'},
+  series:[
+    {name:'Open',type:'line',smooth:true,data:[8,9,11,10,12,13,14,14],lineStyle:{color:'#20d6b5'},itemStyle:{color:'#20d6b5'},areaStyle:{color:'rgba(32,214,181,.12)'}},
+    {name:'Action Required',type:'line',smooth:true,data:[2,3,3,2,4,4,5,5],lineStyle:{color:'#ef5b5b'},itemStyle:{color:'#ef5b5b'}}
+  ]
+});
+
+const riskChart=echarts.init(document.getElementById('riskBreakdownChart'));
+riskChart.setOption({
+  backgroundColor:'transparent',
+  radar:{
+    indicator:[
+      {name:'VCT Impact',max:100},{name:'Age',max:100},{name:'INC',max:100},
+      {name:'Recurrence',max:100},{name:'Comments',max:100},{name:'Ownership',max:100}
+    ],
+    splitLine:{lineStyle:{color:'#1c3249'}},
+    splitArea:{areaStyle:{color:['rgba(14,29,48,.15)','rgba(14,29,48,.05)']}},
+    axisLine:{lineStyle:{color:'#29425c'}},
+    name:{color:'#8da2b7',fontSize:8}
+  },
+  series:[{type:'radar',data:[{value:[90,95,85,70,80,65],areaStyle:{color:'rgba(239,91,91,.18)'},lineStyle:{color:'#ef5b5b'},itemStyle:{color:'#ef5b5b'}}]}]
+});
+
+const modal=document.getElementById('graphModal');
+let graphChart;
+function renderGraph(){
+  if(!graphChart) graphChart=echarts.init(document.getElementById('graphChart'));
+  graphChart.setOption({
+    backgroundColor:'#07101c',
+    tooltip:{formatter:p=>p.data.tooltip||p.name},
+    series:[{
+      type:'graph',layout:'none',roam:true,symbolSize:58,
+      label:{show:true,color:'#edf4fb',fontSize:10},
+      edgeSymbol:['none','arrow'],edgeSymbolSize:8,
+      lineStyle:{color:'#48637f',width:1.4,curveness:.08},
+      data:[
+        {name:'Move Money 3.0',x:520,y:70,itemStyle:{color:'#321721',borderColor:'#ef5b5b',borderWidth:2},tooltip:'VCT · 3 P-Cards · 2 INCs'},
+        {name:'Advisor Email',x:820,y:70,itemStyle:{color:'#302511',borderColor:'#f4b740',borderWidth:2}},
+        {name:'Payment Service',x:520,y:220,itemStyle:{color:'#321721',borderColor:'#ef5b5b',borderWidth:2}},
+        {name:'Email Service',x:820,y:220,itemStyle:{color:'#302511',borderColor:'#f4b740',borderWidth:2}},
+        {name:'DataPower',x:520,y:370,itemStyle:{color:'#321721',borderColor:'#ef5b5b',borderWidth:2}},
+        {name:'Messaging',x:820,y:370,itemStyle:{color:'#302511',borderColor:'#f4b740',borderWidth:2}},
+        {name:'Database',x:520,y:520,itemStyle:{color:'#321721',borderColor:'#ef5b5b',borderWidth:2}},
+        {name:'Network',x:820,y:520,itemStyle:{color:'#102b20',borderColor:'#39d27f',borderWidth:2}}
+      ],
+      links:[
+        {source:'Move Money 3.0',target:'Payment Service',lineStyle:{color:'#ef5b5b',width:3}},
+        {source:'Payment Service',target:'DataPower',lineStyle:{color:'#ef5b5b',width:3}},
+        {source:'DataPower',target:'Database',lineStyle:{color:'#ef5b5b',width:3,type:'dashed'}},
+        {source:'Advisor Email',target:'Email Service',lineStyle:{color:'#9d82ff',type:'dashed'}},
+        {source:'Email Service',target:'DataPower',lineStyle:{color:'#9d82ff',type:'dashed'}}
+      ]
+    }]
+  });
+}
+function openGraph(){modal.classList.add('open');setTimeout(()=>{renderGraph();graphChart.resize()},50)}
+graphBtn.onclick=openGraph;inspectGraphBtn.onclick=openGraph;
+closeGraph.onclick=()=>modal.classList.remove('open');
+modal.onclick=e=>{if(e.target===modal)modal.classList.remove('open')};
+refreshBtn.onclick=()=>{refreshBtn.textContent='✓ Refreshed';setTimeout(()=>refreshBtn.textContent='↻ Refresh',1200)};
+window.addEventListener('resize',()=>{queueChart.resize();riskChart.resize();if(graphChart)graphChart.resize()});
+</script>
+</body>
+</html>
