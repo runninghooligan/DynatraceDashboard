@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tailwind Operations Dashboard Prototype</title>
+
+  <!-- Prototype only: Tailwind Play CDN. Compile Tailwind locally for production. -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+  <style type="text/tailwindcss">
+    @theme {
+      --color-brand-400: #38bdf8;
+      --color-brand-500: #0ea5e9;
+      --color-brand-600: #0284c7;
+    }
+
+    @layer utilities {
+      .scrollbar-thin {
+        scrollbar-width: thin;
+        scrollbar-color: rgb(71 85 105) transparent;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-full bg-slate-950 text-slate-100 antialiased">
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside id="sidebar"
+      class="fixed inset-y-0 left-0 z-40 w-72 -translate-x-full border-r border-slate-800 bg-slate-950/95 p-5 backdrop-blur transition-transform duration-200 lg:static lg:translate-x-0">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-sky-400">Operations</p>
+          <h1 class="mt-1 text-xl font-bold">Command Center</h1>
+        </div>
+        <button id="closeSidebar" class="rounded-lg p-2 text-slate-400 hover:bg-slate-800 lg:hidden" aria-label="Close navigation">
+          ✕
+        </button>
+      </div>
+
+      <nav class="mt-8 space-y-1">
+        <button class="nav-item flex w-full items-center gap-3 rounded-xl bg-sky-500/15 px-4 py-3 text-left text-sm font-semibold text-sky-300 ring-1 ring-inset ring-sky-400/20">
+          <span>◫</span><span>Overview</span>
+        </button>
+        <button class="nav-item flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm text-slate-400 hover:bg-slate-900 hover:text-white">
+          <span>⌁</span><span>Live Signals</span><span class="ml-auto rounded-full bg-rose-500/15 px-2 py-0.5 text-xs text-rose-300">18</span>
+        </button>
+        <button class="nav-item flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm text-slate-400 hover:bg-slate-900 hover:text-white">
+          <span>◎</span><span>Incidents</span>
+        </button>
+        <button class="nav-item flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm text-slate-400 hover:bg-slate-900 hover:text-white">
+          <span>⌘</span><span>Automation</span>
+        </button>
+        <button class="nav-item flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm text-slate-400 hover:bg-slate-900 hover:text-white">
+          <span>▥</span><span>Reports</span>
+        </button>
+      </nav>
+
+      <div class="mt-8 rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-semibold">Collector health</span>
+          <span class="flex items-center gap-2 text-xs text-emerald-300">
+            <span class="h-2 w-2 rounded-full bg-emerald-400"></span>Healthy
+          </span>
+        </div>
+        <div class="mt-4 space-y-3 text-xs">
+          <div>
+            <div class="mb-1 flex justify-between text-slate-400"><span>Dynatrace</span><span>28s</span></div>
+            <div class="h-1.5 rounded-full bg-slate-800"><div class="h-1.5 w-[92%] rounded-full bg-emerald-400"></div></div>
+          </div>
+          <div>
+            <div class="mb-1 flex justify-between text-slate-400"><span>ServiceNow</span><span>1m 42s</span></div>
+            <div class="h-1.5 rounded-full bg-slate-800"><div class="h-1.5 w-[76%] rounded-full bg-sky-400"></div></div>
+          </div>
+          <div>
+            <div class="mb-1 flex justify-between text-slate-400"><span>AlertSite</span><span>16s</span></div>
+            <div class="h-1.5 rounded-full bg-slate-800"><div class="h-1.5 w-[96%] rounded-full bg-emerald-400"></div></div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Mobile overlay -->
+    <div id="overlay" class="fixed inset-0 z-30 hidden bg-black/60 lg:hidden"></div>
+
+    <!-- Main -->
+    <main class="min-w-0 flex-1">
+      <header class="sticky top-0 z-20 border-b border-slate-800 bg-slate-950/85 px-4 py-4 backdrop-blur-xl sm:px-6 xl:px-8">
+        <div class="flex items-center gap-3">
+          <button id="openSidebar" class="rounded-xl border border-slate-800 bg-slate-900 p-2.5 text-slate-300 lg:hidden" aria-label="Open navigation">☰</button>
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <h2 class="truncate text-lg font-bold sm:text-xl">Operational Overview</h2>
+              <span class="rounded-full bg-emerald-500/15 px-2 py-1 text-[10px] font-bold tracking-wide text-emerald-300 ring-1 ring-inset ring-emerald-400/20">LIVE</span>
+            </div>
+            <p class="mt-0.5 hidden text-sm text-slate-400 sm:block">Current shift health, response risk, and active workload</p>
+          </div>
+
+          <div class="ml-auto flex items-center gap-2">
+            <button id="refreshButton" class="hidden rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-sm font-semibold text-slate-200 hover:border-sky-500 hover:text-white sm:inline-flex">
+              Refresh data
+            </button>
+            <button class="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br from-sky-400 to-indigo-500 text-sm font-black text-white shadow-lg shadow-sky-500/20">TH</button>
+          </div>
+        </div>
+      </header>
+
+      <div class="space-y-6 p-4 sm:p-6 xl:p-8">
+        <!-- Alert strip -->
+        <section class="flex flex-col gap-3 rounded-2xl border border-amber-400/20 bg-amber-400/10 p-4 sm:flex-row sm:items-center">
+          <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-amber-400/15 text-amber-300">!</div>
+          <div class="min-w-0">
+            <p class="font-semibold text-amber-100">Three signals are approaching escalation thresholds</p>
+            <p class="mt-0.5 text-sm text-amber-200/70">Oldest unacknowledged item has been open for 18 minutes.</p>
+          </div>
+          <button class="rounded-xl bg-amber-300 px-4 py-2 text-sm font-bold text-slate-950 hover:bg-amber-200 sm:ml-auto">Review signals</button>
+        </section>
+
+        <!-- KPI cards -->
+        <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <article class="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-xl shadow-black/10">
+            <div class="flex items-start justify-between">
+              <div>
+                <p class="text-sm font-medium text-slate-400">Active incidents</p>
+                <p class="mt-2 text-3xl font-black tracking-tight">14</p>
+              </div>
+              <span class="rounded-xl bg-rose-500/10 px-2.5 py-1 text-xs font-bold text-rose-300">+3</span>
+            </div>
+            <div class="mt-5 flex items-center gap-2 text-xs text-slate-400">
+              <span class="h-2 w-2 rounded-full bg-rose-400"></span>
+              2 require immediate ownership
+            </div>
+          </article>
+
+          <article class="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-xl shadow-black/10">
+            <div class="flex items-start justify-between">
+              <div>
+                <p class="text-sm font-medium text-slate-400">First contact resolution</p>
+                <p class="mt-2 text-3xl font-black tracking-tight">71.4%</p>
+              </div>
+              <span class="rounded-xl bg-emerald-500/10 px-2.5 py-1 text-xs font-bold text-emerald-300">+4.8%</span>
+            </div>
+            <div class="mt-5 h-2 rounded-full bg-slate-800"><div class="h-2 w-[71.4%] rounded-full bg-emerald-400"></div></div>
+          </article>
+
+          <article class="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-xl shadow-black/10">
+            <div class="flex items-start justify-between">
+              <div>
+                <p class="text-sm font-medium text-slate-400">Unacknowledged signals</p>
+                <p class="mt-2 text-3xl font-black tracking-tight">18</p>
+              </div>
+              <span class="rounded-xl bg-amber-500/10 px-2.5 py-1 text-xs font-bold text-amber-300">18m oldest</span>
+            </div>
+            <div class="mt-5 flex gap-1">
+              <span class="h-2 flex-[7] rounded-full bg-rose-400"></span>
+              <span class="h-2 flex-[6] rounded-full bg-amber-400"></span>
+              <span class="h-2 flex-[5] rounded-full bg-sky-400"></span>
+            </div>
+          </article>
+
+          <article class="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-xl shadow-black/10">
+            <div class="flex items-start justify-between">
+              <div>
+                <p class="text-sm font-medium text-slate-400">Automation queue</p>
+                <p class="mt-2 text-3xl font-black tracking-tight">36</p>
+              </div>
+              <span class="rounded-xl bg-violet-500/10 px-2.5 py-1 text-xs font-bold text-violet-300">5 urgent</span>
+            </div>
+            <button class="mt-5 text-xs font-bold text-sky-300 hover:text-sky-200">Open approval queue →</button>
+          </article>
+        </section>
+
+        <!-- Main content grid -->
+        <section class="grid gap-6 xl:grid-cols-[1.45fr_0.9fr]">
+          <!-- Incident workload -->
+          <article class="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/70">
+            <div class="flex flex-col gap-3 border-b border-slate-800 p-5 sm:flex-row sm:items-center">
+              <div>
+                <h3 class="font-bold">Incident workload</h3>
+                <p class="mt-1 text-sm text-slate-400">Current volume by source and operational state</p>
+              </div>
+              <select id="rangeSelect" class="rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-300 outline-none hover:border-slate-600 sm:ml-auto">
+                <option>Current shift</option>
+                <option>Last 24 hours</option>
+                <option>Last 7 days</option>
+              </select>
+            </div>
+
+            <div class="p-5">
+              <div class="grid h-52 grid-cols-7 items-end gap-3 rounded-2xl border border-slate-800 bg-slate-950/55 p-4 sm:gap-5">
+                <div class="flex h-full flex-col justify-end gap-2"><div class="rounded-t-lg bg-sky-400/90" style="height:48%"></div><span class="text-center text-[10px] text-slate-500">07</span></div>
+                <div class="flex h-full flex-col justify-end gap-2"><div class="rounded-t-lg bg-sky-400/90" style="height:67%"></div><span class="text-center text-[10px] text-slate-500">09</span></div>
+                <div class="flex h-full flex-col justify-end gap-2"><div class="rounded-t-lg bg-indigo-400/90" style="height:84%"></div><span class="text-center text-[10px] text-slate-500">11</span></div>
+                <div class="flex h-full flex-col justify-end gap-2"><div class="rounded-t-lg bg-rose-400/90" style="height:72%"></div><span class="text-center text-[10px] text-slate-500">13</span></div>
+                <div class="flex h-full flex-col justify-end gap-2"><div class="rounded-t-lg bg-amber-400/90" style="height:57%"></div><span class="text-center text-[10px] text-slate-500">15</span></div>
+                <div class="flex h-full flex-col justify-end gap-2"><div class="rounded-t-lg bg-sky-400/90" style="height:62%"></div><span class="text-center text-[10px] text-slate-500">17</span></div>
+                <div class="flex h-full flex-col justify-end gap-2"><div class="rounded-t-lg bg-emerald-400/90" style="height:38%"></div><span class="text-center text-[10px] text-slate-500">19</span></div>
+              </div>
+
+              <div class="mt-5 grid gap-3 sm:grid-cols-3">
+                <div class="rounded-xl border border-slate-800 bg-slate-950/40 p-4">
+                  <p class="text-xs uppercase tracking-wide text-slate-500">Dynatrace</p>
+                  <p class="mt-1 text-xl font-bold">92</p>
+                </div>
+                <div class="rounded-xl border border-slate-800 bg-slate-950/40 p-4">
+                  <p class="text-xs uppercase tracking-wide text-slate-500">Manual</p>
+                  <p class="mt-1 text-xl font-bold">51</p>
+                </div>
+                <div class="rounded-xl border border-slate-800 bg-slate-950/40 p-4">
+                  <p class="text-xs uppercase tracking-wide text-slate-500">AlertSite</p>
+                  <p class="mt-1 text-xl font-bold">35</p>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Risk panel -->
+          <article class="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="font-bold">Major incident risk</h3>
+                <p class="mt-1 text-sm text-slate-400">Composite operational risk score</p>
+              </div>
+              <span class="rounded-full bg-amber-500/15 px-3 py-1 text-xs font-bold text-amber-300">Elevated</span>
+            </div>
+
+            <div class="mx-auto mt-7 grid h-44 w-44 place-items-center rounded-full bg-[conic-gradient(rgb(251_191_36)_0_68%,rgb(30_41_59)_68%_100%)] p-4">
+              <div class="grid h-full w-full place-items-center rounded-full bg-slate-900 text-center">
+                <div>
+                  <p class="text-4xl font-black">68</p>
+                  <p class="text-xs uppercase tracking-[0.22em] text-slate-500">Risk score</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-7 space-y-3">
+              <div class="flex items-center justify-between rounded-xl bg-slate-950/50 px-4 py-3">
+                <span class="text-sm text-slate-400">Pending escalation</span><strong>5</strong>
+              </div>
+              <div class="flex items-center justify-between rounded-xl bg-slate-950/50 px-4 py-3">
+                <span class="text-sm text-slate-400">No owner</span><strong>2</strong>
+              </div>
+              <div class="flex items-center justify-between rounded-xl bg-slate-950/50 px-4 py-3">
+                <span class="text-sm text-slate-400">Oldest pending</span><strong>18m</strong>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <!-- Table -->
+        <section class="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/70">
+          <div class="flex flex-col gap-3 border-b border-slate-800 p-5 sm:flex-row sm:items-center">
+            <div>
+              <h3 class="font-bold">Priority work queue</h3>
+              <p class="mt-1 text-sm text-slate-400">Items ranked by impact, age, and ownership risk</p>
+            </div>
+            <input id="queueSearch" type="search" placeholder="Search queue..."
+              class="rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-sm outline-none placeholder:text-slate-600 focus:border-sky-500 sm:ml-auto" />
+          </div>
+          <div class="overflow-x-auto scrollbar-thin">
+            <table class="w-full min-w-[760px] text-left text-sm">
+              <thead class="bg-slate-950/60 text-xs uppercase tracking-wider text-slate-500">
+                <tr>
+                  <th class="px-5 py-3">Priority</th>
+                  <th class="px-5 py-3">Signal / incident</th>
+                  <th class="px-5 py-3">Source</th>
+                  <th class="px-5 py-3">Owner</th>
+                  <th class="px-5 py-3">Age</th>
+                  <th class="px-5 py-3 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="queueBody" class="divide-y divide-slate-800">
+                <tr data-search="p2 clientworks authentication dynatrace identity platform">
+                  <td class="px-5 py-4"><span class="rounded-lg bg-rose-500/15 px-2 py-1 text-xs font-bold text-rose-300">P2</span></td>
+                  <td class="px-5 py-4"><p class="font-semibold">ClientWorks authentication degradation</p><p class="mt-1 text-xs text-slate-500">Login failures exceed baseline by 34%</p></td>
+                  <td class="px-5 py-4 text-slate-400">Dynatrace</td>
+                  <td class="px-5 py-4">Identity Platform</td>
+                  <td class="px-5 py-4 text-amber-300">18m</td>
+                  <td class="px-5 py-4 text-right"><button class="rounded-lg border border-slate-700 px-3 py-1.5 text-xs font-bold hover:border-sky-500 hover:text-sky-300">Open</button></td>
+                </tr>
+                <tr data-search="p3 trading latency alertsite trading operations">
+                  <td class="px-5 py-4"><span class="rounded-lg bg-amber-500/15 px-2 py-1 text-xs font-bold text-amber-300">P3</span></td>
+                  <td class="px-5 py-4"><p class="font-semibold">Trading latency above warning threshold</p><p class="mt-1 text-xs text-slate-500">Synthetic journey slowed in two regions</p></td>
+                  <td class="px-5 py-4 text-slate-400">AlertSite</td>
+                  <td class="px-5 py-4">Trading Operations</td>
+                  <td class="px-5 py-4">11m</td>
+                  <td class="px-5 py-4 text-right"><button class="rounded-lg border border-slate-700 px-3 py-1.5 text-xs font-bold hover:border-sky-500 hover:text-sky-300">Open</button></td>
+                </tr>
+                <tr data-search="medium tibco recurring error dynatrace unassigned">
+                  <td class="px-5 py-4"><span class="rounded-lg bg-sky-500/15 px-2 py-1 text-xs font-bold text-sky-300">MED</span></td>
+                  <td class="px-5 py-4"><p class="font-semibold">Recurring TIBCO error-rate cluster</p><p class="mt-1 text-xs text-slate-500">Seven related problem cards detected</p></td>
+                  <td class="px-5 py-4 text-slate-400">Dynatrace</td>
+                  <td class="px-5 py-4 text-rose-300">Unassigned</td>
+                  <td class="px-5 py-4">7m</td>
+                  <td class="px-5 py-4 text-right"><button class="rounded-lg border border-slate-700 px-3 py-1.5 text-xs font-bold hover:border-sky-500 hover:text-sky-300">Open</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div id="toast" class="fixed bottom-5 right-5 translate-y-20 rounded-xl border border-emerald-400/20 bg-slate-900 px-4 py-3 text-sm font-semibold text-emerald-300 opacity-0 shadow-2xl transition-all duration-300">
+    Dashboard data refreshed
+  </div>
+
+  <script>
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+
+    function setSidebar(open) {
+      sidebar.classList.toggle('-translate-x-full', !open);
+      overlay.classList.toggle('hidden', !open);
+    }
+
+    document.getElementById('openSidebar').addEventListener('click', () => setSidebar(true));
+    document.getElementById('closeSidebar').addEventListener('click', () => setSidebar(false));
+    overlay.addEventListener('click', () => setSidebar(false));
+
+    document.getElementById('refreshButton').addEventListener('click', () => {
+      const toast = document.getElementById('toast');
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 1800);
+    });
+
+    document.getElementById('queueSearch').addEventListener('input', (event) => {
+      const value = event.target.value.toLowerCase().trim();
+      document.querySelectorAll('#queueBody tr').forEach((row) => {
+        row.classList.toggle('hidden', !row.dataset.search.includes(value));
+      });
+    });
+
+    document.querySelectorAll('.nav-item').forEach((button) => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('.nav-item').forEach((item) => {
+          item.classList.remove('bg-sky-500/15', 'text-sky-300', 'ring-1', 'ring-inset', 'ring-sky-400/20', 'font-semibold');
+          item.classList.add('text-slate-400');
+        });
+        button.classList.remove('text-slate-400');
+        button.classList.add('bg-sky-500/15', 'text-sky-300', 'ring-1', 'ring-inset', 'ring-sky-400/20', 'font-semibold');
+        if (window.innerWidth < 1024) setSidebar(false);
+      });
+    });
+  </script>
+</body>
+</html>
