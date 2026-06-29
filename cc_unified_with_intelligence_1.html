@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ICC Command Center — Unified Queue + Management Intelligence</title>
+<style>
+:root {
+  --bg-0:#060a14;--bg-1:#0b1120;--bg-2:#111827;--bg-3:#1a2236;
+  --border:rgba(255,255,255,0.07);--border-hi:rgba(255,255,255,0.13);
+  --teal:#00d4aa;--teal-d:rgba(0,212,170,0.12);
+  --purple:#7c6fcd;--purple-d:rgba(124,111,205,0.12);
+  --amber:#f59e0b;--amber-d:rgba(245,158,11,0.12);
+  --red:#ef4444;--red-d:rgba(239,68,68,0.12);
+  --green:#22c55e;--green-d:rgba(34,197,94,0.10);
+  --orange:#f97316;--orange-d:rgba(249,115,22,0.12);
+  --blue:#3b82f6;--blue-d:rgba(59,130,246,0.12);
+  --font:'Inter','Segoe UI',system-ui,sans-serif;
+  --mono:'JetBrains Mono','Fira Code','Courier New',monospace;
+  --text-hi:#f0f2f8;--text-md:#a8b3cc;--text-lo:#4d5a75;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body,#root{height:100%;font-size:13px;}
+body{
+  background:var(--bg-0);
+  color:var(--text-hi);
+  font-family:var(--font);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+/* ── HEADER ── */
+.cc-header{
+  height:52px;
+  border-bottom:1px solid var(--border);
+  background:var(--bg-1);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 20px;
+  flex-shrink:0;
+  gap:16px;
+}
+.cc-header-left{display:flex;align-items:center;gap:12px;}
+.cc-logo{
+  width:32px;height:32px;border-radius:6px;background:var(--blue);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:14px;color:white;
+}
+.cc-title{display:flex;flex-direction:column;gap:2px;}
+.cc-title-main{font-size:13px;font-weight:700;letter-spacing:.03em;}
+.cc-title-sub{font-size:10px;color:var(--text-lo);letter-spacing:.03em;text-transform:uppercase;}
+.cc-header-right{display:flex;align-items:center;gap:12px;margin-left:auto;}
+.cc-status-bar{
+  display:flex;align-items:center;gap:6px;
+  padding:4px 12px;border-radius:6px;background:var(--bg-3);border:1px solid var(--border);
+  font-size:9px;
+}
+.cc-live-dot{
+  width:6px;height:6px;border-radius:50%;background:var(--green);
+  animation:pip 1.5s ease-in-out infinite;
+}
+@keyframes pip{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+/* ── MAIN LAYOUT: 3-COLUMN + SIDEBAR ── */
+.cc-container{
+  flex:1;display:grid;
+  grid-template-columns:280px 1fr 300px 320px;
+  gap:12px;overflow:hidden;min-height:0;
+  padding:12px;
+}
+
+/* ── TILES ── */
+.tile{
+  background:var(--bg-1);border:1px solid var(--border);
+  border-radius:8px;overflow:hidden;display:flex;
+  flex-direction:column;min-height:0;
+}
+.tile-header{
+  padding:12px 14px;border-bottom:1px solid var(--border);
+  background:var(--bg-2);flex-shrink:0;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.tile-title{
+  font-size:10px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--text-lo);
+}
+.tile-count{
+  font-size:9px;font-weight:700;font-family:var(--mono);
+  color:var(--text-hi);padding:2px 6px;
+  border-radius:3px;background:var(--bg-3);
+}
+.tile-content{
+  flex:1;overflow-y:auto;overflow-x:hidden;min-height:0;
+}
+.tile-content::-webkit-scrollbar{width:5px;}
+.tile-content::-webkit-scrollbar-track{background:transparent;}
+.tile-content::-webkit-scrollbar-thumb{
+  background:rgba(255,255,255,0.1);border-radius:2px;}
+
+/* ── LEFT COLUMN: SIGNALS & HEALTH ── */
+.cc-left{display:flex;flex-direction:column;gap:12px;min-height:0;}
+
+/* LR Buckets */
+.lr-buckets{padding:12px;}
+.bucket{
+  display:flex;justify-content:space-between;
+  padding:6px 8px;font-size:9px;
+  border-radius:4px;background:var(--bg-3);
+  margin-bottom:4px;
+}
+.bucket-label{color:var(--text-md);}
+.bucket-count{font-family:var(--mono);font-weight:700;color:var(--text-hi);}
+
+/* VCT Rail */
+.vct-rail{
+  padding:12px;display:flex;flex-direction:column;gap:8px;
+}
+.vct-badge{
+  padding:6px 8px;background:var(--bg-3);border-radius:4px;
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:9px;cursor:pointer;transition:all .15s;
+}
+.vct-badge:hover{background:rgba(59,130,246,0.2);border:1px solid var(--blue);}
+.vct-name{color:var(--text-md);flex:1;}
+.vct-count{
+  font-family:var(--mono);font-weight:700;
+  padding:2px 6px;border-radius:2px;background:var(--bg-2);
+  color:var(--text-hi);font-size:8px;
+}
+.vct-badge.warn .vct-count{background:rgba(245,158,11,0.2);color:var(--amber);}
+.vct-badge.crit .vct-count{background:rgba(239,68,68,0.2);color:var(--red);}
+
+/* No-Comment Alert */
+.no-comment-alert{
+  padding:10px;background:var(--red-d);border:1px solid var(--red);
+  border-radius:4px;font-size:9px;color:var(--text-md);
+  display:flex;gap:6px;align-items:flex-start;
+}
+.no-comment-icon{
+  width:12px;height:12px;background:var(--red);
+  border-radius:2px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  color:white;font-weight:700;font-size:7px;
+}
+
+/* ── CENTER COLUMN: UNIFIED QUEUE ── */
+.cc-center{display:flex;flex-direction:column;gap:12px;min-height:0;}
+
+/* Queue Header */
+.queue-header{
+  padding:12px 14px;background:var(--bg-2);border-radius:6px;
+  border:1px solid var(--border);font-size:9px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.queue-info{display:flex;gap:12px;}
+.queue-stat{font-weight:700;color:var(--text-hi);}
+.queue-stat-label{color:var(--text-lo);}
+
+/* Incident Row */
+.incident-row{
+  padding:10px 12px;border-bottom:1px solid var(--border);
+  cursor:pointer;transition:all .15s;border-left:3px solid transparent;
+}
+.incident-row:hover{background:var(--bg-3);border-left-color:var(--blue);}
+.incident-row.selected{
+  background:rgba(59,130,246,0.15);border-left-color:var(--blue);
+}
+
+.incident-id-line{
+  display:flex;align-items:baseline;justify-content:space-between;
+  margin-bottom:6px;gap:8px;
+}
+.incident-id{font-family:var(--mono);font-weight:700;font-size:9px;color:var(--text-hi);}
+.incident-age{font-size:8px;color:var(--text-lo);font-family:var(--mono);}
+.incident-age-val{color:var(--text-hi);font-weight:600;}
+
+.incident-service{
+  font-size:9px;color:var(--text-md);font-weight:500;
+  margin-bottom:4px;
+}
+
+.incident-signals{
+  display:flex;gap:3px;flex-wrap:wrap;font-size:7px;
+  margin-bottom:4px;
+}
+.signal-pill{
+  display:inline-flex;align-items:center;gap:1px;
+  padding:2px 4px;border-radius:2px;
+  background:var(--bg-3);color:var(--text-md);
+  font-weight:600;letter-spacing:.02em;
+}
+.signal-pill.critical{background:rgba(239,68,68,0.2);color:var(--red);}
+.signal-pill.lr{background:rgba(249,115,22,0.2);color:var(--orange);}
+.signal-pill.inc{background:rgba(59,130,246,0.2);color:var(--blue);}
+
+.incident-meta{
+  display:grid;grid-template-columns:1fr 1fr;gap:4px 8px;
+  font-size:8px;color:var(--text-lo);
+}
+.meta-label{font-weight:600;color:var(--text-lo);}
+.meta-val{font-family:var(--mono);color:var(--text-hi);font-weight:600;}
+
+/* ── RIGHT COLUMN: MANAGEMENT TILES ── */
+.cc-right{display:flex;flex-direction:column;gap:12px;min-height:0;}
+
+/* INC Tile - Compact */
+.inc-sources-compact{padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.inc-source-mini{
+  padding:8px;background:var(--bg-3);border-radius:4px;
+  border-left:3px solid transparent;
+}
+.inc-source-mini.pcard{border-left-color:var(--teal);}
+.inc-source-mini.manual{border-left-color:var(--purple);}
+.inc-source-mini.alert{border-left-color:var(--amber);}
+.inc-source-mini.dpa{border-left-color:var(--blue);}
+
+.inc-mini-name{
+  font-size:8px;font-weight:700;text-transform:uppercase;
+  color:var(--text-lo);margin-bottom:4px;letter-spacing:.04em;
+}
+.inc-mini-count{
+  font-size:18px;font-weight:800;font-family:var(--mono);
+  line-height:1;margin-bottom:2px;
+}
+.inc-mini-count.pcard{color:var(--teal);}
+.inc-mini-count.manual{color:var(--purple);}
+.inc-mini-count.alert{color:var(--amber);}
+.inc-mini-count.dpa{color:var(--blue);}
+
+.inc-mini-pct{
+  font-size:8px;color:var(--text-lo);
+}
+
+/* Blast Radius Compact */
+.blast-compact{padding:12px;display:flex;flex-direction:column;gap:8px;}
+.blast-label{
+  font-size:8px;font-weight:700;text-transform:uppercase;
+  color:var(--text-lo);letter-spacing:.04em;
+}
+.blast-bar{
+  height:16px;background:var(--bg-3);border-radius:3px;
+  overflow:hidden;position:relative;
+}
+.blast-fill{
+  height:100%;background:linear-gradient(90deg,var(--green),var(--amber),var(--red));
+  width:72%;
+}
+.blast-score{
+  position:absolute;top:50%;right:6px;transform:translateY(-50%);
+  font-size:9px;font-weight:700;font-family:var(--mono);
+  color:white;text-shadow:0 1px 2px rgba(0,0,0,0.5);
+}
+
+.blast-zones{
+  font-size:8px;color:var(--text-lo);
+}
+.zone-row{
+  display:flex;justify-content:space-between;
+  padding:4px 0;border-bottom:1px solid var(--border);
+}
+.zone-label{color:var(--text-md);}
+.zone-count{font-family:var(--mono);font-weight:700;color:var(--text-hi);}
+
+/* ── FAR RIGHT COLUMN: VCT HEALTH ── */
+.cc-vct-health{display:flex;flex-direction:column;gap:12px;min-height:0;}
+
+.vct-cards{
+  padding:12px;display:flex;flex-direction:column;gap:8px;
+  overflow-y:auto;
+}
+.vct-card{
+  padding:8px;background:var(--bg-3);border-radius:4px;
+  border-left:3px solid transparent;
+  display:flex;flex-direction:column;gap:4px;
+}
+.vct-card.healthy{border-left-color:var(--green);}
+.vct-card.warn{border-left-color:var(--amber);}
+.vct-card.crit{border-left-color:var(--red);}
+
+.vct-card-name{
+  font-size:9px;font-weight:700;color:var(--text-hi);
+}
+.vct-card-status{
+  font-size:8px;
+}
+.vct-status-badge{
+  display:inline-flex;align-items:center;gap:2px;
+  padding:2px 4px;border-radius:2px;font-weight:600;
+}
+.vct-status-badge.green{background:rgba(34,197,94,0.15);color:var(--green);}
+.vct-status-badge.amber{background:rgba(245,158,11,0.15);color:var(--amber);}
+.vct-status-badge.red{background:rgba(239,68,68,0.15);color:var(--red);}
+
+.vct-signals{
+  font-size:7px;display:flex;gap:3px;flex-wrap:wrap;
+}
+.vct-signal-tag{
+  padding:2px 3px;border-radius:2px;background:var(--bg-2);
+  color:var(--text-md);
+}
+.vct-signal-tag.incident{background:rgba(59,130,246,0.15);color:var(--blue);}
+.vct-signal-tag.lr{background:rgba(239,68,68,0.15);color:var(--red);}
+.vct-signal-tag.comment{background:rgba(245,158,11,0.15);color:var(--amber);}
+
+/* ── BANNER ── */
+.cc-banner{
+  padding:10px 16px;background:var(--red-d);border-top:1px solid var(--red);
+  font-size:8px;color:var(--text-md);flex-shrink:0;
+  display:flex;align-items:center;gap:8px;
+}
+.cc-banner-icon{
+  width:12px;height:12px;border-radius:2px;background:var(--red);
+  display:flex;align-items:center;justify-content:center;
+  color:white;font-weight:700;font-size:6px;flex-shrink:0;
+}
+
+/* ── DETAIL PANEL ── */
+.detail-panel{
+  position:fixed;right:0;top:0;width:340px;height:100%;
+  background:var(--bg-1);border-left:1px solid var(--border);
+  z-index:100;display:flex;flex-direction:column;
+  box-shadow:0 0 32px rgba(0,0,0,0.5);
+  transform:translateX(100%);transition:transform .3s ease;
+}
+.detail-panel.open{transform:translateX(0);}
+.detail-header{
+  padding:14px;border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;
+  flex-shrink:0;
+}
+.detail-close{
+  background:transparent;border:none;color:var(--text-md);
+  cursor:pointer;font-size:16px;
+}
+.detail-content{
+  flex:1;overflow-y:auto;min-height:0;
+}
+
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<div class="cc-header">
+  <div class="cc-header-left">
+    <div class="cc-logo">ICC</div>
+    <div class="cc-title">
+      <div class="cc-title-main">Command Center</div>
+      <div class="cc-title-sub">Real-Time Operations</div>
+    </div>
+  </div>
+  <div class="cc-header-right">
+    <div class="cc-status-bar">
+      <div class="cc-live-dot"></div>
+      <span>LIVE</span>
+      <span id="cc-time" style="font-family:var(--mono);font-size:8px;">00:00 UTC</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── MAIN GRID (4 COLUMNS) ── -->
+<div class="cc-container">
+
+  <!-- LEFT: SIGNALS & HEALTH -->
+  <div class="cc-left">
+
+    <!-- LR BUCKETS -->
+    <div class="tile">
+      <div class="tile-header">
+        <div class="tile-title">LR Buckets</div>
+      </div>
+      <div class="lr-buckets">
+        <div class="bucket">
+          <span class="bucket-label">All Open</span>
+          <span class="bucket-count">26</span>
+        </div>
+        <div class="bucket" style="background:rgba(239,68,68,0.15);color:var(--red);">
+          <span class="bucket-label">🔴 Critical >120m</span>
+          <span class="bucket-count">1</span>
+        </div>
+        <div class="bucket" style="background:rgba(249,115,22,0.15);color:var(--orange);">
+          <span class="bucket-label">⏱️ LR >60m</span>
+          <span class="bucket-count">3</span>
+        </div>
+        <div class="bucket" style="background:rgba(245,158,11,0.15);color:var(--amber);">
+          <span class="bucket-label">⏱️ Watch >30m</span>
+          <span class="bucket-count">7</span>
+        </div>
+        <div class="bucket">
+          <span class="bucket-label">✓ Active Swarms</span>
+          <span class="bucket-count">2</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- VCT RAIL -->
+    <div class="tile" style="flex:1;min-height:0;">
+      <div class="tile-header">
+        <div class="tile-title">VCT Pressure</div>
+      </div>
+      <div class="vct-rail" style="overflow-y:auto;">
+        <div class="vct-badge">
+          <span class="vct-name">Client Management</span>
+          <span class="vct-count">0</span>
+        </div>
+        <div class="vct-badge crit">
+          <span class="vct-name">Move Money 3.0</span>
+          <span class="vct-count">8</span>
+        </div>
+        <div class="vct-badge">
+          <span class="vct-name">Advisor Email</span>
+          <span class="vct-count">2</span>
+        </div>
+        <div class="vct-badge warn">
+          <span class="vct-name">Account View 2.0</span>
+          <span class="vct-count">3</span>
+        </div>
+        <div class="vct-badge crit">
+          <span class="vct-name">Trading</span>
+          <span class="vct-count">5</span>
+        </div>
+        <div class="vct-badge">
+          <span class="vct-name">NAO</span>
+          <span class="vct-count">0</span>
+        </div>
+        <div class="vct-badge">
+          <span class="vct-name">Statements</span>
+          <span class="vct-count">1</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- NO-COMMENT ALERT -->
+    <div class="no-comment-alert">
+      <div class="no-comment-icon">!</div>
+      <div><strong>4 P-Cards with no comments</strong><br/> (avg 68m old, attention needed)</div>
+    </div>
+
+  </div>
+
+  <!-- CENTER: UNIFIED QUEUE -->
+  <div class="cc-center">
+
+    <!-- QUEUE HEADER -->
+    <div class="queue-header">
+      <div class="queue-info">
+        <div><span class="queue-stat">26</span> <span class="queue-stat-label">Open</span></div>
+        <div><span class="queue-stat">4</span> <span class="queue-stat-label">No Comment</span></div>
+        <div><span class="queue-stat">11</span> <span class="queue-stat-label">LR/Watch</span></div>
+      </div>
+    </div>
+
+    <!-- INCIDENT QUEUE -->
+    <div class="tile" style="flex:1;min-height:0;">
+      <div class="tile-header">
+        <div class="tile-title">Incident Queue (All Sources)</div>
+        <div class="tile-count">26</div>
+      </div>
+      <div class="tile-content">
+
+        <!-- INC 1: P-Card, Critical -->
+        <div class="incident-row selected">
+          <div class="incident-id-line">
+            <span class="incident-id">INC0012910 · P-2650011447</span>
+            <span class="incident-age">Age: <span class="incident-age-val">138m</span></span>
+          </div>
+          <div class="incident-service">Move Money 3.0 · Payment Service</div>
+          <div class="incident-signals">
+            <span class="signal-pill critical">🔴 Critical LR >120m</span>
+            <span class="signal-pill">↺ Recurring</span>
+            <span class="signal-pill">⬡ Swarm(2)</span>
+          </div>
+          <div class="incident-meta">
+            <div><span class="meta-label">Origin:</span> <span class="meta-val">P-Card (DT)</span></div>
+            <div><span class="meta-label">Comments:</span> <span class="meta-val">0</span></div>
+            <div><span class="meta-label">Blast:</span> <span class="meta-val">87</span></div>
+            <div><span class="meta-label">Impact:</span> <span class="meta-val">High</span></div>
+          </div>
+        </div>
+
+        <!-- INC 2: P-Card, LR -->
+        <div class="incident-row">
+          <div class="incident-id-line">
+            <span class="incident-id">INC0012905 · P-2650011398</span>
+            <span class="incident-age">Age: <span class="incident-age-val">68m</span></span>
+          </div>
+          <div class="incident-service">Trading · Market Data</div>
+          <div class="incident-signals">
+            <span class="signal-pill lr">⏱️ LR >60m</span>
+            <span class="signal-pill">⬡ Correlated</span>
+          </div>
+          <div class="incident-meta">
+            <div><span class="meta-label">Origin:</span> <span class="meta-val">P-Card (DT)</span></div>
+            <div><span class="meta-label">Comments:</span> <span class="meta-val">3</span></div>
+            <div><span class="meta-label">Blast:</span> <span class="meta-val">72</span></div>
+            <div><span class="meta-label">Last:</span> <span class="meta-val">8m ago</span></div>
+          </div>
+        </div>
+
+        <!-- INC 3: Manual ICC -->
+        <div class="incident-row">
+          <div class="incident-id-line">
+            <span class="incident-id">INC0012902 · Manual</span>
+            <span class="incident-age">Age: <span class="incident-age-val">45m</span></span>
+          </div>
+          <div class="incident-service">Account View 2.0 · Cache Layer</div>
+          <div class="incident-signals">
+            <span class="signal-pill lr">⏱️ Watch >30m</span>
+            <span class="signal-pill">No P-Card link</span>
+          </div>
+          <div class="incident-meta">
+            <div><span class="meta-label">Origin:</span> <span class="meta-val">Manual ICC</span></div>
+            <div><span class="meta-label">Comments:</span> <span class="meta-val">2</span></div>
+            <div><span class="meta-label">Blast:</span> <span class="meta-val">41</span></div>
+            <div><span class="meta-label">Last:</span> <span class="meta-val">3m ago</span></div>
+          </div>
+        </div>
+
+        <!-- INC 4: AlertSite -->
+        <div class="incident-row">
+          <div class="incident-id-line">
+            <span class="incident-id">INC0012898 · AlertSite</span>
+            <span class="incident-age">Age: <span class="incident-age-val">22m</span></span>
+          </div>
+          <div class="incident-service">Advisor Email · Authentication</div>
+          <div class="incident-signals">
+            <span class="signal-pill">Synthetic Alert</span>
+          </div>
+          <div class="incident-meta">
+            <div><span class="meta-label">Origin:</span> <span class="meta-val">AlertSite</span></div>
+            <div><span class="meta-label">Comments:</span> <span class="meta-val">5</span></div>
+            <div><span class="meta-label">Blast:</span> <span class="meta-val">28</span></div>
+            <div><span class="meta-label">Last:</span> <span class="meta-val">1m ago</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT: MANAGEMENT TILES -->
+  <div class="cc-right">
+
+    <!-- INC SOURCES -->
+    <div class="tile" style="flex:0 0 auto;">
+      <div class="tile-header">
+        <div class="tile-title">INC Sources</div>
+        <div class="tile-count">47</div>
+      </div>
+      <div class="inc-sources-compact">
+        <div class="inc-source-mini pcard">
+          <div class="inc-mini-name">P-Card</div>
+          <div class="inc-mini-count pcard">28</div>
+          <div class="inc-mini-pct">60%</div>
+        </div>
+        <div class="inc-source-mini manual">
+          <div class="inc-mini-name">Manual</div>
+          <div class="inc-mini-count manual">11</div>
+          <div class="inc-mini-pct">23%</div>
+        </div>
+        <div class="inc-source-mini alert">
+          <div class="inc-mini-name">AlertSite</div>
+          <div class="inc-mini-count alert">6</div>
+          <div class="inc-mini-pct">13%</div>
+        </div>
+        <div class="inc-source-mini dpa">
+          <div class="inc-mini-name">SolarWinds</div>
+          <div class="inc-mini-count dpa">2</div>
+          <div class="inc-mini-pct">4%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLAST RADIUS COMPACT -->
+    <div class="tile" style="flex:0 0 180px;">
+      <div class="tile-header">
+        <div class="tile-title">Blast Radius</div>
+      </div>
+      <div class="blast-compact">
+        <div class="blast-label">Impact Coverage</div>
+        <div class="blast-bar">
+          <div class="blast-fill"></div>
+          <div class="blast-score">72%</div>
+        </div>
+
+        <div class="blast-zones">
+          <div class="zone-row">
+            <span class="zone-label">Direct:</span>
+            <span class="zone-count">12</span>
+          </div>
+          <div class="zone-row">
+            <span class="zone-label">Secondary:</span>
+            <span class="zone-count">8</span>
+          </div>
+          <div class="zone-row">
+            <span class="zone-label">Dependent:</span>
+            <span class="zone-count">14</span>
+          </div>
+        </div>
+        <button style="padding:6px;margin-top:4px;border:1px solid var(--border);background:transparent;
+          color:var(--blue);font-size:8px;font-weight:600;border-radius:3px;cursor:pointer;">
+          Expand Map
+        </button>
+      </div>
+    </div>
+
+    <!-- VCT HEALTH -->
+    <div class="tile" style="flex:1;min-height:0;">
+      <div class="tile-header">
+        <div class="tile-title">VCT Health</div>
+      </div>
+      <div class="vct-cards">
+        <div class="vct-card healthy">
+          <div class="vct-card-name">Client Mgmt</div>
+          <div class="vct-card-status"><span class="vct-status-badge green">✓ Healthy</span></div>
+          <div class="vct-signals">
+            <span class="vct-signal-tag">0 INC</span>
+          </div>
+        </div>
+
+        <div class="vct-card crit">
+          <div class="vct-card-name">Move Money</div>
+          <div class="vct-card-status"><span class="vct-status-badge red">🔴 Critical</span></div>
+          <div class="vct-signals">
+            <span class="vct-signal-tag incident">8 INC</span>
+            <span class="vct-signal-tag lr">2 LR</span>
+            <span class="vct-signal-tag comment">No cmt</span>
+          </div>
+        </div>
+
+        <div class="vct-card healthy">
+          <div class="vct-card-name">Advisor Email</div>
+          <div class="vct-card-status"><span class="vct-status-badge green">✓ Healthy</span></div>
+          <div class="vct-signals">
+            <span class="vct-signal-tag">2 INC</span>
+          </div>
+        </div>
+
+        <div class="vct-card warn">
+          <div class="vct-card-name">Account View</div>
+          <div class="vct-card-status"><span class="vct-status-badge amber">⚠ Watch</span></div>
+          <div class="vct-signals">
+            <span class="vct-signal-tag incident">3 INC</span>
+            <span class="vct-signal-tag comment">15m+ sil</span>
+          </div>
+        </div>
+
+        <div class="vct-card crit">
+          <div class="vct-card-name">Trading</div>
+          <div class="vct-card-status"><span class="vct-status-badge red">🔴 Critical</span></div>
+          <div class="vct-signals">
+            <span class="vct-signal-tag lr">1 Critical</span>
+            <span class="vct-signal-tag incident">5 INC</span>
+          </div>
+        </div>
+
+        <div class="vct-card healthy">
+          <div class="vct-card-name">NAO</div>
+          <div class="vct-card-status"><span class="vct-status-badge green">✓ Healthy</span></div>
+          <div class="vct-signals">
+            <span class="vct-signal-tag">0 INC</span>
+          </div>
+        </div>
+
+        <div class="vct-card warn">
+          <div class="vct-card-name">Statements</div>
+          <div class="vct-card-status"><span class="vct-status-badge amber">⚠ Watch</span></div>
+          <div class="vct-signals">
+            <span class="vct-signal-tag incident">1 INC</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ── BOTTOM BANNER ── -->
+<div class="cc-banner">
+  <div class="cc-banner-icon">⚠</div>
+  <div>
+    <strong>DT → SNow Sync One-Way Only:</strong> P-Card comments push to incidents, but incident updates do not flow back to Dynatrace. Always verify both systems.
+  </div>
+</div>
+
+<script>
+function updateClock() {
+  const now = new Date();
+  document.getElementById('cc-time').textContent =
+    now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false });
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// Row selection
+document.querySelectorAll('.incident-row').forEach(row => {
+  row.addEventListener('click', () => {
+    document.querySelectorAll('.incident-row').forEach(r => r.classList.remove('selected'));
+    row.classList.add('selected');
+  });
+});
+</script>
+</body>
+</html>
