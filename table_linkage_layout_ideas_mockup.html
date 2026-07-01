@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ICC Table Layout Ideas Mockup</title>
+<style>
+:root{
+  --bg:#03111d;
+  --panel:#071a2a;
+  --panel2:#0b2235;
+  --line:#17344b;
+  --line2:#214c6b;
+  --text:#d6edf9;
+  --muted:#7ea6c3;
+  --blue:#35b6f2;
+  --green:#22c55e;
+  --yellow:#eab308;
+  --orange:#f97316;
+  --red:#ef4444;
+  --gray:#6b7280;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Segoe UI,Roboto,Arial,sans-serif}
+.wrap{max-width:1560px;margin:0 auto;padding:14px 14px 18px}
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}
+.h1{font-size:20px;font-weight:800;letter-spacing:.02em}
+.sub{font-size:12px;color:var(--muted);margin-top:4px;max-width:980px;line-height:1.45}
+.switches{display:flex;gap:8px;flex-wrap:wrap}
+.switches button{background:rgba(53,182,242,.08);color:var(--blue);border:1px solid rgba(53,182,242,.28);padding:8px 12px;border-radius:999px;font-size:11px;font-weight:800;cursor:pointer}
+.switches button.active{background:rgba(53,182,242,.18);box-shadow:inset 0 0 0 1px rgba(53,182,242,.18)}
+.concept{display:none}
+.concept.active{display:block}
+.note{margin:0 0 10px;font-size:11px;color:var(--muted)}
+.panel{background:linear-gradient(160deg,var(--panel),#04111c);border:1px solid var(--line);border-radius:12px;box-shadow:0 16px 45px rgba(0,0,0,.18)}
+.split{display:grid;gap:10px}
+.dual{grid-template-columns:1.05fr 1.05fr}
+.dual-center{grid-template-columns:1fr 320px 1fr}
+.hub{display:flex;flex-direction:column;min-height:540px}
+.hub-hd{padding:10px 12px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.hub-title{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.hub-meta{font-size:11px;color:var(--muted);margin-top:4px}
+.metrics{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.metric{min-width:70px;padding:7px 8px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.02)}
+.metric .lab{font-size:9px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.metric .val{font-size:16px;font-weight:800;margin-top:2px}
+.toolbar{padding:8px 12px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:8px;align-items:center}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.chip{padding:4px 8px;border-radius:999px;border:1px solid var(--line2);font-size:10px;font-weight:800;color:var(--muted);cursor:pointer;background:rgba(255,255,255,.02)}
+.chip.on{color:var(--text);border-color:rgba(53,182,242,.35);background:rgba(53,182,242,.08)}
+.search{min-width:210px;display:flex;align-items:center;background:#071521;border:1px solid var(--line);border-radius:8px;padding:0 8px}
+.search input{width:100%;height:28px;background:transparent;border:none;color:var(--text);font-size:11px;outline:none}
+.grid{width:100%;border-collapse:collapse;table-layout:fixed}
+.grid-wrap{padding:0 8px 8px;overflow:auto;flex:1}
+.grid th{position:sticky;top:0;background:#071826;z-index:1;font-size:9px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;text-align:left;padding:8px;border-bottom:1px solid var(--line)}
+.grid td{padding:8px;border-bottom:1px solid rgba(23,52,75,.75);font-size:11px;vertical-align:middle}
+.grid tr{cursor:pointer}
+.grid tr:hover{background:rgba(53,182,242,.05)}
+.grid tr.selected{background:rgba(53,182,242,.11);outline:1px solid rgba(53,182,242,.25)}
+.grid tr.related{background:rgba(34,197,94,.08)}
+.grid .truncate{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 7px;border-radius:999px;border:1px solid;font-size:9px;font-weight:800;white-space:nowrap}
+.b-green{color:#bbf7d0;border-color:rgba(34,197,94,.38);background:rgba(34,197,94,.10)}
+.b-yellow{color:#fef3c7;border-color:rgba(234,179,8,.34);background:rgba(234,179,8,.12)}
+.b-orange{color:#ffedd5;border-color:rgba(249,115,22,.38);background:rgba(249,115,22,.10)}
+.b-red{color:#fecaca;border-color:rgba(239,68,68,.36);background:rgba(239,68,68,.10)}
+.b-blue{color:#bfe8ff;border-color:rgba(53,182,242,.35);background:rgba(53,182,242,.12)}
+.b-gray{color:#c7d2de;border-color:rgba(107,114,128,.35);background:rgba(107,114,128,.10)}
+.center-rail{display:flex;flex-direction:column;gap:10px;padding:10px}
+.rail-card{padding:12px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.02)}
+.rail-title{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.rail-main{font-size:14px;font-weight:800;line-height:1.35}
+.rail-sub{font-size:11px;color:var(--muted);line-height:1.45;margin-top:6px}
+.link-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.link-pill{padding:4px 7px;border-radius:999px;border:1px solid var(--line2);font-size:10px;color:var(--text);background:rgba(53,182,242,.06)}
+.inspector{margin-top:10px;padding:12px}
+.inspector-hd{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:10px}
+.ins-title{font-size:13px;font-weight:800}
+.ins-sub{font-size:11px;color:var(--muted);line-height:1.45;margin-top:4px}
+.ins-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.info-card{padding:10px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.02)}
+.info-card h4{margin:0 0 8px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.kv{display:grid;grid-template-columns:98px 1fr;gap:6px 8px;font-size:11px;line-height:1.35}
+.kv .k{color:var(--muted)}
+.ideas{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+.idea{padding:10px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.02)}
+.idea h4{margin:0 0 6px;font-size:11px}
+.idea p{margin:0;font-size:11px;color:var(--muted);line-height:1.45}
+.footer-tip{margin-top:10px;font-size:11px;color:var(--muted)}
+@media (max-width:1300px){
+  .dual,.dual-center{grid-template-columns:1fr}
+  .ins-grid,.ideas{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <div class="h1">UI Ideas — Active P-Cards + Active INCs with Linked Selection</div>
+      <div class="sub">Standalone mockup showing different layout ideas for two operational tables. Focus areas: compact presentation, handling long labels, clear P-Card ↔ INC relationships, and a selection model that exposes more detail without making the full page too dense.</div>
+    </div>
+    <div class="switches">
+      <button class="active" data-concept="conceptA">Idea A · Dual Hubs + Bottom Inspector</button>
+      <button data-concept="conceptB">Idea B · Center Link Rail</button>
+      <button data-concept="conceptC">Idea C · Dense Operations View</button>
+    </div>
+  </div>
+
+  <section id="conceptA" class="concept active">
+    <div class="note">Idea A: best when you want the cleanest side-by-side comparison. Selection details appear underneath both tables, which keeps the main tables wide enough for real work.</div>
+    <div class="split dual">
+      <div class="panel hub" id="cardHubA"></div>
+      <div class="panel hub" id="incHubA"></div>
+    </div>
+    <div class="panel inspector" id="inspectorA"></div>
+    <div class="ideas">
+      <div class="idea"><h4>Why it works</h4><p>Each table stays wide enough to show card number, age, priority, owner, and linked counts without turning every field into a tooltip.</p></div>
+      <div class="idea"><h4>Long label handling</h4><p>Use a fixed-width table with ellipsis in long columns such as entity, title, and assignment group. Show the full value on hover and again in the inspector.</p></div>
+      <div class="idea"><h4>Best use case</h4><p>This is the strongest option if operators work both tables continuously and need a balanced P-Card Hub and Incident Hub.</p></div>
+    </div>
+  </section>
+
+  <section id="conceptB" class="concept">
+    <div class="note">Idea B: best when the linked relationship itself is the centerpiece. A dedicated center rail summarizes direct links, correlated links, confidence, and affected services.</div>
+    <div class="split dual-center">
+      <div class="panel hub" id="cardHubB"></div>
+      <div class="panel center-rail" id="railB"></div>
+      <div class="panel hub" id="incHubB"></div>
+    </div>
+    <div class="footer-tip">This layout is useful if you want to emphasize correlation, source-versus-symptom analysis, and quick actions like “show only linked rows” or “form swarm.”</div>
+  </section>
+
+  <section id="conceptC" class="concept">
+    <div class="note">Idea C: best when you want the most compact widescreen footprint. The tables remain side by side, but the inspector is shallow and embedded directly under the headers. Good for 34" ultrawide displays.</div>
+    <div class="panel" style="padding:10px">
+      <div class="split dual">
+        <div>
+          <div class="panel hub" id="cardHubC" style="min-height:460px"></div>
+        </div>
+        <div>
+          <div class="panel hub" id="incHubC" style="min-height:460px"></div>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:10px;padding:10px" id="miniInspectorC"></div>
+    </div>
+    <div class="ideas">
+      <div class="idea"><h4>Why it works</h4><p>It minimizes vertical travel and avoids a large bottom workspace. Detail is shown in a shallow strip with high-value fields only.</p></div>
+      <div class="idea"><h4>Tradeoff</h4><p>You get less room for comments and long history. Use a “full details” drawer or modal from this compact selection strip.</p></div>
+      <div class="idea"><h4>Best use case</h4><p>Use this for wallboard-like daily triage or a fast-moving operations desk where the table itself is the main workspace.</p></div>
+    </div>
+  </section>
+</div>
+
+<script>
+const cards = [
+  {id:'PB-26062649', age:'13m', opened:'13:50', sev:'VCT', service:'Move Money', title:'TIBCO high error rate causing downstream request failures', entity:'TIBCO-PRD-INT-BUS-MESSAGE-SVC-CLUSTER-PRIMARY-LONG-ENTITY-NAME', role:'Source', cluster:'TIBCO-1', link:'INC0042811', linkType:'Direct', blast:'5 apps', state:'Swarm', comment:'No first comment yet', owner:'Middleware'},
+  {id:'PB-26062615', age:'2h 24m', opened:'11:39', sev:'P2', service:'Client Mgmt', title:'Failure rate increase — CLIENTMGR API timeout pattern', entity:'aws-prod-clientmgmt-api-gateway-main-cluster-a-very-long-entity', role:'Symptom', cluster:'TIBCO-1', link:'INC0042811', linkType:'Correlated', blast:'3 apps', state:'Watch', comment:'12m ago acked', owner:'App Dev'},
+  {id:'PB-26062603', age:'1h 3m', opened:'13:00', sev:'Perf', service:'Trading', title:'Latency spike in order routing service', entity:'trade-order-route-orchestrator-east-prod-k8s-long-name', role:'Unknown', cluster:'TRAD-2', link:'INC0042804', linkType:'Direct', blast:'2 svcs', state:'FCR Cand', comment:'28m ago acked', owner:'Trading'},
+  {id:'PB-26062522', age:'43m', opened:'13:19', sev:'Avail', service:'Account View', title:'Availability dip on advisor dashboard widgets', entity:'advisor-dashboard-widget-orchestrator-production-super-long-entity-label', role:'Symptom', cluster:'TIBCO-1', link:'INC0042811', linkType:'Correlated', blast:'2 apps', state:'Watch', comment:'24m ago acked', owner:'Web Platform'},
+  {id:'PB-26062471', age:'28m', opened:'13:35', sev:'Perf', service:'Advisor Email', title:'Response time degradation', entity:'advisor-email-outbound-transport-fabric-long-prod-service-id', role:'Source', cluster:'MAIL-3', link:'', linkType:'Unlinked', blast:'local', state:'Open', comment:'14m ago acked', owner:'Messaging'}
+];
+
+const incs = [
+  {id:'INC0042811', age:'18m', opened:'13:47', pri:'P3 Non-Major', source:'ICC', summary:'Move Money degradation tied to TIBCO error spike', owner:'Middleware', linked:3, coordination:'Swarm', state:'Active', severity:'High', topCause:'Assignment group missing earlier', note:'2 related symptom cards still active'},
+  {id:'INC0042804', age:'56m', opened:'13:09', pri:'Medium', source:'Dynatrace', summary:'Trading order routing latency', owner:'Trading', linked:1, coordination:'Normal', state:'Assigned', severity:'Moderate', topCause:'Service saturation', note:'No bridge required'},
+  {id:'INC0042798', age:'1h 42m', opened:'12:23', pri:'Low', source:'ICC', summary:'Advisor Email degradation', owner:'Messaging', linked:1, coordination:'Watch', state:'Active', severity:'Low', topCause:'Outbound queue backlog', note:'Monitor only'},
+  {id:'INC0042791', age:'2h 4m', opened:'11:58', pri:'P3 Non-Major', source:'IM', summary:'Client Mgmt API impact', owner:'App Dev', linked:1, coordination:'Swarm', state:'Active', severity:'High', topCause:'Downstream dependency issue', note:'Correlated to TIBCO cluster'},
+  {id:'INC0042787', age:'2h 33m', opened:'11:29', pri:'Medium', source:'AlertSite', summary:'Login availability dip', owner:'Identity', linked:0, coordination:'Normal', state:'Active', severity:'Moderate', topCause:'Transient auth errors', note:'No linked pcard'}
+];
+
+let selectedCard = cards[0].id;
+let selectedInc = 'INC0042811';
+let focusMode = 'both';
+
+function sevBadge(value){
+  if(value.includes('P3')) return 'b-orange';
+  if(value==='P2' || value==='High') return 'b-red';
+  if(value==='Medium' || value==='Moderate') return 'b-yellow';
+  if(value==='Low') return 'b-gray';
+  if(value==='VCT') return 'b-red';
+  return 'b-blue';
+}
+function stateBadge(value){
+  if(value==='Swarm') return 'b-orange';
+  if(value==='Watch') return 'b-yellow';
+  if(value==='FCR Cand') return 'b-green';
+  if(value==='Open') return 'b-blue';
+  if(value==='Assigned') return 'b-green';
+  if(value==='Active') return 'b-orange';
+  return 'b-gray';
+}
+function linkBadge(value){
+  if(value==='Direct') return 'b-green';
+  if(value==='Correlated') return 'b-yellow';
+  return 'b-gray';
+}
+function getSelectedCard(){ return cards.find(c=>c.id===selectedCard) || cards[0]; }
+function getSelectedInc(){ return incs.find(i=>i.id===selectedInc) || incs[0]; }
+function linkedCards(incId){ return cards.filter(c=>c.link===incId); }
+function relatedInc(card){ return incs.find(i=>i.id===card.link); }
+
+function hubHeader(title, subtitle, metrics){
+  return `
+    <div class="hub-hd">
+      <div>
+        <div class="hub-title">${title}</div>
+        <div class="hub-meta">${subtitle}</div>
+      </div>
+      <div class="metrics">${metrics.map(m=>`<div class="metric"><div class="lab">${m.label}</div><div class="val">${m.value}</div></div>`).join('')}</div>
+    </div>`;
+}
+
+function cardHubMarkup(instance){
+  return `
+    ${hubHeader('Active P-Card Hub','Working queue for live problems, clusters, and linked incidents',[
+      {label:'Open',value:cards.length},{label:'Linked',value:cards.filter(c=>c.link).length},{label:'Clustered',value:'3'},{label:'No Comment',value:'1'}
+    ])}
+    <div class="toolbar">
+      <div class="filters">
+        <div class="chip on">All</div><div class="chip">VCT</div><div class="chip">Clustered</div><div class="chip">Recurring</div><div class="chip">Long Labels</div>
+      </div>
+      <div class="search"><input placeholder="Search card, service, entity, link" /></div>
+    </div>
+    <div class="grid-wrap">
+      <table class="grid">
+        <colgroup>
+          <col style="width:70px"><col style="width:112px"><col style="width:78px"><col style="width:110px"><col><col style="width:82px"><col style="width:94px"><col style="width:112px"><col style="width:88px">
+        </colgroup>
+        <thead><tr><th>Age</th><th>P-Card</th><th>Open</th><th>Service</th><th>Title / Entity</th><th>Role</th><th>Cluster</th><th>Link</th><th>State</th></tr></thead>
+        <tbody>
+          ${cards.map(c=>{
+            const selected = c.id===selectedCard ? 'selected' : '';
+            const related = c.link && c.link===selectedInc ? 'related' : '';
+            return `<tr class="${selected} ${related}" onclick="selectCard('${c.id}','${instance}')">
+              <td>${c.age}</td>
+              <td><span class="truncate" title="${c.id}"><strong>${c.id}</strong></span></td>
+              <td>${c.opened}</td>
+              <td><span class="truncate" title="${c.service}">${c.service}</span></td>
+              <td title="${c.title} • ${c.entity}"><span class="truncate"><strong>${c.title}</strong></span><span class="truncate" style="color:var(--muted);margin-top:2px">${c.entity}</span></td>
+              <td><span class="badge ${c.role==='Source'?'b-red':c.role==='Symptom'?'b-yellow':'b-gray'}">${c.role}</span></td>
+              <td>${c.cluster}</td>
+              <td>${c.link ? `<div><strong>${c.link}</strong></div><span class="badge ${linkBadge(c.linkType)}">${c.linkType}</span>` : `<span class="badge b-gray">Unlinked</span>`}</td>
+              <td><span class="badge ${stateBadge(c.state)}">${c.state}</span></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function incHubMarkup(instance){
+  return `
+    ${hubHeader('Active Incident Hub','Formal incident queue with ownership and linked signal context',[
+      {label:'Active',value:incs.length},{label:'P3 NM+',value:'2'},{label:'No Owner',value:'1'},{label:'Swarms',value:'2'}
+    ])}
+    <div class="toolbar">
+      <div class="filters">
+        <div class="chip on">Active</div><div class="chip">P3+</div><div class="chip">Linked</div><div class="chip">No Owner</div><div class="chip">Swarm</div>
+      </div>
+      <div class="search"><input placeholder="Search INC, summary, owner, source" /></div>
+    </div>
+    <div class="grid-wrap">
+      <table class="grid">
+        <colgroup>
+          <col style="width:120px"><col style="width:112px"><col style="width:78px"><col><col style="width:120px"><col style="width:70px"><col style="width:72px"><col style="width:96px">
+        </colgroup>
+        <thead><tr><th>Priority</th><th>INC</th><th>Open</th><th>Summary</th><th>Owner</th><th>Age</th><th>P-Cards</th><th>Coord.</th></tr></thead>
+        <tbody>
+          ${incs.map(i=>{
+            const selected = i.id===selectedInc ? 'selected' : '';
+            const related = getSelectedCard().link===i.id ? 'related' : '';
+            return `<tr class="${selected} ${related}" onclick="selectInc('${i.id}','${instance}')">
+              <td><span class="badge ${sevBadge(i.pri)}">${i.pri}</span></td>
+              <td><span class="truncate" title="${i.id}"><strong>${i.id}</strong></span></td>
+              <td>${i.opened}</td>
+              <td title="${i.summary}"><span class="truncate"><strong>${i.summary}</strong></span><span class="truncate" style="color:var(--muted);margin-top:2px">${i.source} · ${i.state} · ${i.topCause}</span></td>
+              <td title="${i.owner}"><span class="truncate">${i.owner}</span></td>
+              <td>${i.age}</td>
+              <td>${i.linked}</td>
+              <td><span class="badge ${stateBadge(i.coordination)}">${i.coordination}</span></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function inspectorMarkup(mode='full'){
+  const card = getSelectedCard();
+  const inc = card.link ? relatedInc(card) : getSelectedInc();
+  const relatedCards = inc ? linkedCards(inc.id) : [];
+  if(mode==='mini'){
+    return `
+      <div class="inspector-hd">
+        <div>
+          <div class="ins-title">Selected relationship · ${card.id} ${inc ? '⇄ ' + inc.id : '· no linked incident'}</div>
+          <div class="ins-sub">${card.title} · ${card.role} signal · ${card.blast} blast radius · ${inc ? inc.coordination + ' coordination' : 'P-Card-only workflow'}</div>
+        </div>
+        <div class="link-list">
+          <span class="link-pill">${card.service}</span>
+          <span class="link-pill">${card.cluster}</span>
+          <span class="link-pill">${card.linkType || 'Unlinked'}</span>
+          ${inc ? `<span class="link-pill">${relatedCards.length} related cards</span>` : ''}
+        </div>
+      </div>`;
+  }
+  return `
+    <div class="inspector-hd">
+      <div>
+        <div class="ins-title">Selected relationship · ${card.id} ${inc ? '⇄ ' + inc.id : '· no linked incident'}</div>
+        <div class="ins-sub">Use selection to keep the tables compact, then push the full detail below. Long values are allowed here even if truncated in the table. This is where you recover entity names, ownership detail, comments, and relationship reasoning.</div>
+      </div>
+      <div class="link-list">
+        <span class="link-pill">Service: ${card.service}</span>
+        <span class="link-pill">Cluster: ${card.cluster}</span>
+        <span class="link-pill">Link: ${card.linkType || 'Unlinked'}</span>
+        <span class="link-pill">Blast: ${card.blast}</span>
+      </div>
+    </div>
+    <div class="ins-grid">
+      <div class="info-card">
+        <h4>P-Card Details</h4>
+        <div class="kv">
+          <div class="k">Card</div><div>${card.id}</div>
+          <div class="k">Opened</div><div>${card.opened} · ${card.age} ago</div>
+          <div class="k">Title</div><div>${card.title}</div>
+          <div class="k">Entity</div><div>${card.entity}</div>
+          <div class="k">Role</div><div>${card.role}</div>
+          <div class="k">Owner</div><div>${card.owner}</div>
+          <div class="k">Comment</div><div>${card.comment}</div>
+        </div>
+      </div>
+      <div class="info-card">
+        <h4>Linkage Summary</h4>
+        <div class="kv">
+          <div class="k">Link type</div><div>${card.link ? card.linkType : 'Unlinked'}</div>
+          <div class="k">Reasoning</div><div>${card.linkType==='Direct' ? 'P-Card explicitly referenced in SNOW / validated by triage' : card.linkType==='Correlated' ? 'Shared cluster, same service family, overlapping timeline, similar symptom pattern' : 'No confirmed incident match'}</div>
+          <div class="k">Related cards</div><div>${inc ? relatedCards.map(c=>c.id).join(', ') : 'None'}</div>
+          <div class="k">Impacted svcs</div><div>${[...new Set((inc ? relatedCards : [card]).map(c=>c.service))].join(', ')}</div>
+          <div class="k">Blast radius</div><div>${card.blast} · downstream app/service awareness needed</div>
+          <div class="k">Next action</div><div>${inc ? 'Keep P-Card and INC synchronized; show all linked rows; decide swarm / assignment / FCR path.' : 'Work as signal only or create INC if threshold is crossed.'}</div>
+        </div>
+      </div>
+      <div class="info-card">
+        <h4>Incident Details</h4>
+        ${inc ? `<div class="kv">
+          <div class="k">INC</div><div>${inc.id}</div>
+          <div class="k">Priority</div><div>${inc.pri}</div>
+          <div class="k">Summary</div><div>${inc.summary}</div>
+          <div class="k">Owner</div><div>${inc.owner}</div>
+          <div class="k">Coordination</div><div>${inc.coordination}</div>
+          <div class="k">Top cause</div><div>${inc.topCause}</div>
+          <div class="k">Notes</div><div>${inc.note}</div>
+        </div>` : `<div class="kv"><div class="k">INC</div><div>No linked incident</div><div class="k">Opportunity</div><div>This could remain P-Card-only or become a candidate for incident creation if urgency, breadth, or ownership conditions rise.</div></div>`}
+      </div>
+    </div>`;
+}
+
+function railMarkup(){
+  const card = getSelectedCard();
+  const inc = getSelectedInc();
+  const relatedCards = linkedCards(inc.id);
+  return `
+    <div class="rail-card">
+      <div class="rail-title">Current Focus</div>
+      <div class="rail-main">${card.id} ⇄ ${inc.id}</div>
+      <div class="rail-sub">This middle rail is the relationship layer. It works best if correlation, link confidence, and recommended action are the core operational intelligence.</div>
+    </div>
+    <div class="rail-card">
+      <div class="rail-title">Link Type</div>
+      <div class="rail-main"><span class="badge ${linkBadge(card.linkType)}">${card.linkType || 'Unlinked'}</span></div>
+      <div class="rail-sub">${card.linkType==='Direct' ? 'Best when the card is explicitly attached to the incident.' : card.linkType==='Correlated' ? 'Useful when the relationship is inferred from time, entity, cluster, or service overlap.' : 'Show a clear path to incident creation if needed.'}</div>
+    </div>
+    <div class="rail-card">
+      <div class="rail-title">Why They Are Linked</div>
+      <div class="rail-sub">Shared cluster: <strong>${card.cluster}</strong><br>Service family: <strong>${card.service}</strong><br>Potential affected apps: <strong>${card.blast}</strong><br>Relationship count: <strong>${relatedCards.length}</strong> related cards</div>
+      <div class="link-list">
+        ${relatedCards.map(c=>`<span class="link-pill">${c.id}</span>`).join('')}
+      </div>
+    </div>
+    <div class="rail-card">
+      <div class="rail-title">Recommended Use</div>
+      <div class="rail-sub">Keep the tables narrow by moving explanation here. Great place for “Show linked only”, “Create swarm”, “Open SNOW”, “View raw comments”, and source-vs-symptom guidance.</div>
+    </div>`;
+}
+
+function renderAll(){
+  document.getElementById('cardHubA').innerHTML = cardHubMarkup('A');
+  document.getElementById('incHubA').innerHTML = incHubMarkup('A');
+  document.getElementById('inspectorA').innerHTML = inspectorMarkup('full');
+
+  document.getElementById('cardHubB').innerHTML = cardHubMarkup('B');
+  document.getElementById('incHubB').innerHTML = incHubMarkup('B');
+  document.getElementById('railB').innerHTML = railMarkup();
+
+  document.getElementById('cardHubC').innerHTML = cardHubMarkup('C');
+  document.getElementById('incHubC').innerHTML = incHubMarkup('C');
+  document.getElementById('miniInspectorC').innerHTML = inspectorMarkup('mini');
+}
+
+function selectCard(id){
+  selectedCard = id;
+  const card = getSelectedCard();
+  if(card.link) selectedInc = card.link;
+  renderAll();
+}
+function selectInc(id){
+  selectedInc = id;
+  const related = linkedCards(id);
+  if(related.length) selectedCard = related[0].id;
+  renderAll();
+}
+
+document.querySelectorAll('.switches button').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.switches button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.concept').forEach(c=>c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.concept).classList.add('active');
+  });
+});
+
+renderAll();
+</script>
+</body>
+</html>
