@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Command Center — Variant A: Split Queue</title>
+<style>
+:root {
+  --surface-0: #f9f8f6;
+  --surface-1: #f2f0ed;
+  --surface-2: #ebe8e3;
+  --border: rgba(0,0,0,0.08);
+  --border-strong: rgba(0,0,0,0.12);
+  --text-primary: #1a1a1a;
+  --text-secondary: #666;
+  --text-muted: #999;
+  --text-accent: #2563eb;
+  --fill-danger: #dc2626;
+  --fill-warning: #f59e0b;
+  --fill-success: #16a34a;
+  --fill-accent: #2563eb;
+  --bg-danger: rgba(220,38,38,0.1);
+  --bg-warning: rgba(245,158,11,0.1);
+  --text-danger: #991b1b;
+  --text-warning: #92400e;
+  --on-accent: #fff;
+  --radius: 8px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--surface-0); color: var(--text-primary); }
+body { display: flex; flex-direction: column; font-size: 14px; }
+
+/* Header */
+.chrome { background: var(--surface-1); border-bottom: 0.5px solid var(--border); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; }
+.chrome-left { display: flex; align-items: center; gap: 12px; }
+.chrome-title { font-size: 13px; font-weight: 500; }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--fill-success); }
+.status { font-size: 11px; color: var(--text-muted); display: inline-flex; align-items: center; gap: 4px; }
+.chrome-right { display: flex; gap: 6px; }
+.btn-small { background: transparent; border: 0.5px solid var(--border); padding: 4px 8px; border-radius: var(--radius); cursor: pointer; color: var(--text-secondary); font-size: 11px; }
+.btn-small:hover { border-color: var(--border-strong); }
+
+/* Main grid */
+.main { display: grid; grid-template-columns: 1fr 280px; flex: 1; min-height: 0; }
+.queue-col { border-right: 0.5px solid var(--border); overflow-y: auto; overflow-x: hidden; }
+.context-col { background: var(--surface-1); border-left: 0.5px solid var(--border); display: flex; flex-direction: column; min-height: 0; }
+
+/* Queue header */
+.queue-header { position: sticky; top: 0; background: var(--surface-1); border-bottom: 0.5px solid var(--border); padding: 10px 12px; display: flex; justify-content: space-between; font-size: 12px; z-index: 10; }
+.queue-title { font-weight: 500; color: var(--text-secondary); }
+.queue-count { color: var(--text-muted); }
+
+/* P-Card rows */
+.pcard-row { padding: 8px 12px; border-bottom: 0.5px solid var(--border); cursor: pointer; transition: background 120ms; border-left: 2px solid transparent; }
+.pcard-row:hover { background: var(--surface-2); }
+.pcard-row.active { background: var(--surface-2); border-left-color: var(--fill-accent); }
+.pcard-row.danger-tier { border-left-color: var(--fill-danger); }
+.pcard-row.warning-tier { border-left-color: var(--fill-warning); }
+
+.pcard-title-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+.pcard-name { font-weight: 500; font-size: 13px; }
+.pcard-badge { font-size: 11px; padding: 2px 6px; border-radius: 3px; font-weight: 500; }
+.badge-danger { background: var(--bg-danger); color: var(--text-danger); }
+.badge-warning { background: var(--bg-warning); color: var(--text-warning); }
+
+.pcard-meta { display: flex; gap: 8px; font-size: 11px; color: var(--text-secondary); align-items: center; flex-wrap: wrap; }
+.divider { width: 1px; height: 12px; background: var(--border); }
+.signal { font-size: 11px; }
+.signal.recurring { color: var(--fill-warning); }
+.signal.ansible { color: var(--fill-accent); }
+
+/* Context panel */
+.inc-summary { padding: 12px; border-bottom: 0.5px solid var(--border); background: var(--surface-2); }
+.summary-title { font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 8px; }
+.summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.summary-cell { background: var(--surface-1); padding: 8px; border-radius: var(--radius); border: 0.5px solid var(--border); }
+.summary-label { font-size: 10px; color: var(--text-muted); margin-bottom: 4px; }
+.summary-value { font-size: 18px; font-weight: 500; }
+.summary-note { font-size: 11px; color: var(--text-secondary); line-height: 1.4; }
+
+/* Triage panel */
+.triage-panel { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 12px; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+.panel-card { background: var(--surface-0); padding: 10px; border-radius: var(--radius); border: 0.5px solid var(--border); }
+.panel-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 500; text-transform: uppercase; }
+.panel-title { font-size: 13px; font-weight: 500; margin-bottom: 6px; }
+.panel-content { font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
+.panel-content div { margin-bottom: 2px; }
+
+/* Signals */
+.signals-list { display: flex; flex-direction: column; gap: 4px; font-size: 11px; }
+.signal-item { color: var(--text-secondary); }
+.signal-item strong { color: var(--text-primary); }
+
+/* Actions */
+.action-zone { margin-top: auto; }
+.btn-action { width: 100%; background: var(--fill-accent); color: var(--on-accent); border: none; padding: 6px; border-radius: var(--radius); font-size: 11px; font-weight: 500; cursor: pointer; }
+.btn-action:hover { opacity: 0.9; }
+.action-note { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+
+/* Scrollbar styling */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.3); }
+</style>
+</head>
+<body>
+
+<div class="chrome">
+  <div class="chrome-left">
+    <span class="chrome-title">Command Center — Live Operations</span>
+    <span class="status">
+      <span class="status-dot"></span>
+      12 active
+    </span>
+  </div>
+  <div class="chrome-right">
+    <button class="btn-small">Filters</button>
+    <button class="btn-small">Settings</button>
+  </div>
+</div>
+
+<div class="main">
+  
+  <!-- P-CARD QUEUE -->
+  <div class="queue-col">
+    <div class="queue-header">
+      <span class="queue-title">P-Cards — Priority Sort</span>
+      <span class="queue-count">42 open</span>
+    </div>
+
+    <!-- NO COMMENT (highest priority) -->
+    <div class="pcard-row active danger-tier">
+      <div class="pcard-title-row">
+        <span class="pcard-name">Move Money 3.0 — Payment timeout</span>
+        <span class="pcard-badge badge-danger">NO COMMENT</span>
+      </div>
+      <div class="pcard-meta">
+        <span>08m 24s</span>
+        <span class="divider"></span>
+        <span>🔴 P3 Major</span>
+        <span class="signal recurring">↺ Recur</span>
+        <span class="signal ansible">⚡ Ansible</span>
+      </div>
+    </div>
+
+    <!-- CRITICAL LR -->
+    <div class="pcard-row danger-tier">
+      <div class="pcard-title-row">
+        <span class="pcard-name">Account View 2.0 — DB timeout</span>
+        <span class="pcard-badge badge-danger">128m</span>
+      </div>
+      <div class="pcard-meta">
+        <span>CritLR</span>
+        <span class="divider"></span>
+        <span>INC-0047</span>
+        <span>⬡ Corr</span>
+      </div>
+    </div>
+
+    <!-- COMMENT SLA BREACH -->
+    <div class="pcard-row warning-tier">
+      <div class="pcard-title-row">
+        <span class="pcard-name">Trading — Market feed lag</span>
+        <span class="pcard-badge badge-warning">CMNT SLA</span>
+      </div>
+      <div class="pcard-meta">
+        <span>22m 08s</span>
+        <span class="divider"></span>
+        <span>17m no update</span>
+      </div>
+    </div>
+
+    <!-- LR TIER -->
+    <div class="pcard-row warning-tier">
+      <div class="pcard-title-row">
+        <span class="pcard-name">Advisor Email — SMTP reject</span>
+        <span class="pcard-badge" style="color: var(--text-secondary);">75m</span>
+      </div>
+      <div class="pcard-meta">
+        <span>LR</span>
+        <span>↑ Reopen</span>
+      </div>
+    </div>
+
+    <!-- WATCH TIER -->
+    <div class="pcard-row">
+      <div class="pcard-title-row">
+        <span class="pcard-name">Client Management — UI lag</span>
+        <span class="pcard-badge" style="color: var(--text-secondary);">34m</span>
+      </div>
+      <div class="pcard-meta">
+        <span style="color: var(--fill-warning); font-weight: 500;">WATCH</span>
+        <span>◎ FCR</span>
+      </div>
+    </div>
+
+    <!-- ESCALATED -->
+    <div class="pcard-row">
+      <div class="pcard-title-row">
+        <span class="pcard-name">NAO — Form validation</span>
+        <span class="pcard-badge" style="color: var(--text-secondary);">18m</span>
+      </div>
+      <div class="pcard-meta">
+        <span>Escalated to AppDev</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CONTEXT & ACTIONS -->
+  <div class="context-col">
+    
+    <!-- INC SUMMARY -->
+    <div class="inc-summary">
+      <div class="summary-title">Active Incidents</div>
+      <div class="summary-grid">
+        <div class="summary-cell">
+          <div class="summary-label">Open now</div>
+          <div class="summary-value" style="color: var(--fill-danger);">7</div>
+        </div>
+        <div class="summary-cell">
+          <div class="summary-label">Created today</div>
+          <div class="summary-value">42</div>
+        </div>
+      </div>
+      <div class="summary-note">
+        <div>↓ 3 vs yesterday</div>
+        <div>↑ 8% vs 7-day avg</div>
+      </div>
+    </div>
+
+    <!-- TRIAGE PANEL -->
+    <div class="triage-panel">
+      
+      <!-- Selected P-Card -->
+      <div class="panel-card">
+        <div class="panel-label">Selected</div>
+        <div class="panel-title">Move Money 3.0</div>
+        <div class="panel-content">
+          <div>Age: 8m 24s</div>
+          <div>Tier: No comment (RED)</div>
+          <div>INC: none yet</div>
+          <div style="margin-top: 6px; padding-top: 6px; border-top: 0.5px solid var(--border);">
+            <span class="pcard-badge badge-danger">ACTION NEEDED</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Signals -->
+      <div class="panel-card">
+        <div class="panel-label">Signals</div>
+        <div class="signals-list">
+          <div class="signal-item"><span style="color: var(--fill-warning);">↺ Recurring</span> — seen 12× in 7d</div>
+          <div class="signal-item"><span style="color: var(--fill-accent);">⚡ Ansible match</span> — payment_timeout_reset</div>
+        </div>
+      </div>
+
+      <!-- Teams Action -->
+      <div class="panel-card action-zone">
+        <div class="panel-label">Post to Teams</div>
+        <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 6px; line-height: 1.4;">
+          Post adaptive card to Teams channel. Monitors LR greater than 60m.
+        </div>
+        <button class="btn-action">Post LR Card</button>
+        <div class="action-note">Auto-updates on SLA breach</div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>
