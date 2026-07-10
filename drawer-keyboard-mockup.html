@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ICC Command Center — Drawer + Keyboard Nav Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0e16;
+    --panel-bg:#10161f;
+    --panel-bg-2:#141b26;
+    --row-bg:#0d1219;
+    --row-hover:#161e2b;
+    --border:#1f2937;
+    --border-soft:#182130;
+    --text-primary:#e6ebf2;
+    --text-secondary:#8b97a8;
+    --text-dim:#5b6678;
+    --accent-blue:#3b82f6;
+    --accent-blue-dim:#1d4ed8;
+    --critical:#ef4444;
+    --high:#f97316;
+    --medium:#eab308;
+    --good:#22c55e;
+    --purple:#a855f7;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text-primary);
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.ui-label,.tab,.btn,.section-title{font-family:'Syne',sans-serif;}
+
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:12px 20px;border-bottom:1px solid var(--border);background:var(--panel-bg);
+  }
+  .topbar-left{display:flex;align-items:center;gap:10px;}
+  .logo-dot{width:10px;height:10px;border-radius:50%;background:var(--accent-blue);box-shadow:0 0 10px var(--accent-blue);}
+  .topbar-title{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;letter-spacing:0.02em;}
+  .topbar-sub{font-size:10px;color:var(--text-dim);margin-top:2px;}
+  .hint{
+    font-family:'Syne',sans-serif;font-size:11px;color:var(--text-secondary);
+    display:flex;align-items:center;gap:14px;
+  }
+  kbd{
+    background:var(--panel-bg-2);border:1px solid var(--border);border-radius:4px;
+    padding:2px 6px;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--text-primary);
+  }
+
+  .layout{
+    display:flex;
+    height:calc(100vh - 49px);
+    overflow:hidden;
+  }
+
+  /* ---- QUEUE PANEL ---- */
+  .queue-panel{
+    flex:1 1 auto;
+    min-width:0;
+    padding:16px 18px;
+    overflow-y:auto;
+    transition:max-width .28s ease;
+  }
+  .layout.expanded .queue-panel{
+    max-width:340px;
+  }
+  .queue-header{
+    display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;
+  }
+  .section-title{font-size:13px;font-weight:700;letter-spacing:0.03em;color:var(--text-primary);}
+  .section-sub{font-size:10px;color:var(--text-dim);margin-top:2px;font-family:'JetBrains Mono',monospace;}
+
+  .queue-list{display:flex;flex-direction:column;gap:6px;}
+
+  .row{
+    display:grid;
+    grid-template-columns:56px 1fr 90px auto;
+    gap:10px;
+    align-items:center;
+    background:var(--row-bg);
+    border:1px solid var(--border-soft);
+    border-left:3px solid transparent;
+    border-radius:6px;
+    padding:9px 10px;
+    cursor:pointer;
+    position:relative;
+    transition:background .12s ease, border-color .12s ease;
+  }
+  .row:hover{background:var(--row-hover);}
+  .row.selected{
+    background:#132033;
+    border-color:var(--accent-blue);
+    border-left-color:var(--accent-blue);
+  }
+  .row.selected::before{
+    content:'';
+    position:absolute;left:-1px;top:-1px;bottom:-1px;width:3px;
+  }
+  .layout.expanded .row{
+    grid-template-columns:44px 1fr;
+    padding:8px 9px;
+  }
+  .layout.expanded .row .row-age,
+  .layout.expanded .row .row-actions{display:none;}
+
+  .sev{
+    font-family:'Syne',sans-serif;font-size:9.5px;font-weight:700;letter-spacing:0.04em;
+    padding:3px 0;border-radius:4px;text-align:center;
+  }
+  .sev.critical{color:var(--critical);}
+  .sev.high{color:var(--high);}
+  .sev.medium{color:var(--medium);}
+  .sev-age{font-size:9px;color:var(--text-dim);text-align:center;margin-top:2px;}
+
+  .row-main{min-width:0;}
+  .row-title{font-size:12.5px;color:var(--text-primary);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .row-meta{font-size:10px;color:var(--text-dim);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .row-tag{color:var(--accent-blue);}
+
+  .row-age{font-size:10.5px;color:var(--text-secondary);text-align:right;}
+
+  .row-actions{display:flex;gap:4px;}
+  .mini-btn{
+    background:var(--panel-bg-2);border:1px solid var(--border);border-radius:4px;
+    color:var(--text-secondary);font-size:9.5px;font-family:'Syne',sans-serif;font-weight:600;
+    padding:4px 6px;cursor:pointer;
+  }
+  .mini-btn:hover{border-color:var(--accent-blue);color:var(--text-primary);}
+  .overflow-btn{
+    background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--text-dim);
+    width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;
+  }
+
+  /* ---- DRAWER ---- */
+  .drawer-wrap{
+    flex:0 0 auto;
+    display:flex;
+    position:relative;
+  }
+  .resize-handle{
+    width:6px;cursor:col-resize;background:transparent;position:relative;flex:0 0 auto;
+  }
+  .resize-handle::after{
+    content:'';position:absolute;left:2px;top:0;bottom:0;width:2px;background:var(--border);
+  }
+  .resize-handle:hover::after{background:var(--accent-blue);}
+
+  .drawer{
+    width:460px;
+    background:var(--panel-bg);
+    border-left:1px solid var(--border);
+    display:flex;flex-direction:column;
+    transition:width .28s ease;
+  }
+  .layout.expanded .drawer{width:calc(100vw - 380px);}
+
+  .drawer-top{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:12px 16px;border-bottom:1px solid var(--border);
+  }
+  .drawer-top-left{display:flex;align-items:center;gap:10px;}
+  .drawer-nav-btn{
+    width:26px;height:26px;border-radius:5px;border:1px solid var(--border);background:var(--panel-bg-2);
+    color:var(--text-secondary);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;
+  }
+  .drawer-nav-btn:hover{border-color:var(--accent-blue);color:var(--text-primary);}
+  .drawer-position{font-size:10.5px;color:var(--text-dim);}
+
+  .expand-toggle{
+    display:flex;align-items:center;gap:6px;background:var(--panel-bg-2);border:1px solid var(--border);
+    border-radius:5px;padding:5px 10px;color:var(--text-secondary);font-family:'Syne',sans-serif;
+    font-size:10.5px;font-weight:600;cursor:pointer;
+  }
+  .expand-toggle:hover{border-color:var(--accent-blue);color:var(--text-primary);}
+  .expand-toggle.active{background:rgba(59,130,246,0.14);border-color:var(--accent-blue);color:var(--accent-blue);}
+
+  .drawer-id-row{padding:14px 16px 10px;border-bottom:1px solid var(--border);}
+  .pcard-badge{
+    display:inline-block;background:rgba(239,68,68,0.15);color:var(--critical);
+    font-family:'Syne',sans-serif;font-size:9.5px;font-weight:700;padding:3px 7px;border-radius:4px;
+    letter-spacing:0.03em;margin-bottom:8px;
+  }
+  .drawer-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin:0 0 4px;}
+  .drawer-subtitle{font-size:11px;color:var(--text-secondary);}
+
+  .drawer-actions{display:flex;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+  .btn{
+    font-family:'Syne',sans-serif;font-size:11px;font-weight:600;padding:7px 12px;border-radius:5px;
+    border:1px solid var(--border);background:var(--panel-bg-2);color:var(--text-primary);cursor:pointer;
+  }
+  .btn.primary{background:var(--accent-blue);border-color:var(--accent-blue);color:#fff;}
+  .btn:hover{border-color:var(--accent-blue);}
+
+  .drawer-tabs{display:flex;gap:2px;padding:0 16px;border-bottom:1px solid var(--border);overflow-x:auto;}
+  .dtab{
+    font-family:'Syne',sans-serif;font-size:10.5px;font-weight:600;color:var(--text-dim);
+    padding:9px 10px;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;
+  }
+  .dtab.active{color:var(--accent-blue);border-bottom-color:var(--accent-blue);}
+
+  .drawer-body{flex:1;overflow-y:auto;padding:16px;}
+  .layout.expanded .drawer-body{
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;align-content:start;
+  }
+
+  .goal-badges{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
+  .layout.expanded .goal-badges{grid-column:1 / -1;}
+  .goal-badge{
+    display:flex;align-items:center;gap:6px;background:var(--panel-bg-2);border:1px solid var(--border);
+    border-radius:6px;padding:6px 10px;font-size:10px;
+  }
+  .goal-badge .dot{width:6px;height:6px;border-radius:50%;}
+  .goal-badge .lbl{font-family:'Syne',sans-serif;font-weight:600;color:var(--text-secondary);}
+  .goal-badge .val{color:var(--text-primary);font-weight:600;}
+
+  .panel-block{background:var(--panel-bg-2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:12px;}
+  .layout.expanded .panel-block{margin-bottom:0;}
+  .block-title{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;margin-bottom:10px;color:var(--text-primary);}
+  .kv{display:flex;justify-content:space-between;font-size:11px;padding:4px 0;color:var(--text-secondary);}
+  .kv .v{color:var(--text-primary);}
+  .kv .v.warn{color:var(--medium);}
+  .kv .v.crit{color:var(--critical);}
+  .kv .v.good{color:var(--good);}
+
+  .sla-bar{height:6px;border-radius:3px;background:var(--border);overflow:hidden;margin:8px 0 4px;}
+  .sla-fill{height:100%;background:linear-gradient(90deg,var(--good),var(--medium));}
+  .sla-label{display:flex;justify-content:space-between;font-size:9.5px;color:var(--text-dim);}
+
+  .runbook-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:11px;border-bottom:1px solid var(--border-soft);}
+  .runbook-row:last-child{border-bottom:none;}
+  .run-btn{background:var(--accent-blue);color:#fff;border:none;border-radius:4px;padding:4px 10px;font-family:'Syne',sans-serif;font-weight:600;font-size:9.5px;cursor:pointer;}
+
+  .empty-hint{
+    display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-dim);
+    font-family:'Syne',sans-serif;font-size:12px;text-align:center;padding:40px;
+  }
+
+  .toast{
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--panel-bg-2);border:1px solid var(--accent-blue);border-radius:8px;
+    padding:10px 16px;font-family:'Syne',sans-serif;font-size:11px;color:var(--text-primary);
+    opacity:0;transition:all .25s ease;pointer-events:none;display:flex;align-items:center;gap:8px;
+    box-shadow:0 8px 24px rgba(0,0,0,0.4);
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .toast .dot{width:6px;height:6px;border-radius:50%;background:var(--accent-blue);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="logo-dot"></div>
+    <div>
+      <div class="topbar-title">ICC COMMAND CENTER</div>
+      <div class="topbar-sub">Drawer redesign — v2 concept</div>
+    </div>
+  </div>
+  <div class="hint">
+    <span><kbd>↑</kbd><kbd>↓</kbd> or <kbd>J</kbd><kbd>K</kbd> next/prev item</span>
+    <span><kbd>E</kbd> expand drawer</span>
+    <span><kbd>Esc</kbd> close</span>
+  </div>
+</div>
+
+<div class="layout" id="layout">
+
+  <div class="queue-panel" id="queuePanel">
+    <div class="queue-header">
+      <div>
+        <div class="section-title">OPERATIONAL QUEUE</div>
+        <div class="section-sub">7 of 19 · click a row or use ↑/↓ while drawer is open</div>
+      </div>
+    </div>
+    <div class="queue-list" id="queueList"></div>
+  </div>
+
+  <div class="drawer-wrap" id="drawerWrap">
+    <div class="resize-handle" id="resizeHandle" title="Drag to resize"></div>
+    <div class="drawer">
+      <div class="drawer-top">
+        <div class="drawer-top-left">
+          <button class="drawer-nav-btn" id="prevBtn" title="Previous item (K)">↑</button>
+          <button class="drawer-nav-btn" id="nextBtn" title="Next item (J)">↓</button>
+          <span class="drawer-position" id="drawerPosition">Item 1 of 7</span>
+        </div>
+        <button class="expand-toggle" id="expandToggle">
+          <span id="expandIcon">⤢</span>
+          <span id="expandLabel">Expand</span>
+        </button>
+      </div>
+
+      <div class="drawer-id-row">
+        <div class="pcard-badge" id="drawerBadge">P-CARD</div>
+        <div class="drawer-title" id="drawerTitle">High Failure Rate on svc-order-api</div>
+        <div class="drawer-subtitle" id="drawerSubtitle">Impact: None Confirmed · Payments SRE · Bridge 4</div>
+      </div>
+
+      <div class="drawer-actions">
+        <button class="btn primary">Post LR</button>
+        <button class="btn">Create INC</button>
+        <button class="btn">Create BO</button>
+        <button class="btn">Open DT</button>
+        <button class="btn">Open SNOW</button>
+      </div>
+
+      <div class="drawer-tabs">
+        <div class="dtab active">Overview</div>
+        <div class="dtab">Operations</div>
+        <div class="dtab">Breakout Room</div>
+        <div class="dtab">Timeline</div>
+        <div class="dtab">Automation</div>
+        <div class="dtab">History</div>
+      </div>
+
+      <div class="drawer-body">
+        <div class="goal-badges">
+          <div class="goal-badge"><span class="dot" style="background:var(--good)"></span><span class="lbl">FCR-eligible</span><span class="val" id="fcrVal">Yes · 38m left</span></div>
+          <div class="goal-badge"><span class="dot" style="background:var(--medium)"></span><span class="lbl">Repeat cluster</span><span class="val" id="clusterVal">#124 · 5 P-Cards</span></div>
+          <div class="goal-badge"><span class="dot" style="background:var(--high)"></span><span class="lbl">Comment slack</span><span class="val" id="slackVal">18m</span></div>
+          <div class="goal-badge"><span class="dot" style="background:var(--accent-blue)"></span><span class="lbl">Automation</span><span class="val">2 runbooks available</span></div>
+        </div>
+
+        <div class="panel-block">
+          <div class="block-title">Operational Status</div>
+          <div class="kv"><span>Status</span><span class="v">Open</span></div>
+          <div class="kv"><span>Priority</span><span class="v warn">High</span></div>
+          <div class="kv"><span>Age</span><span class="v" id="ageVal">1h 42m</span></div>
+          <div class="kv"><span>Owner</span><span class="v" id="ownerVal">Middleware Team</span></div>
+          <div class="kv"><span>Linked INC</span><span class="v" style="color:var(--accent-blue)">INC0012345</span></div>
+        </div>
+
+        <div class="panel-block">
+          <div class="block-title">Comment Hygiene — SLA Slack</div>
+          <div class="sla-bar"><div class="sla-fill" style="width:65%"></div></div>
+          <div class="sla-label"><span>102m elapsed</span><span>Slack: 18m</span></div>
+          <div class="kv" style="margin-top:6px;"><span>Last ICC comment</span><span class="v">12m ago</span></div>
+          <div class="kv"><span>Max idle gap</span><span class="v">18m</span></div>
+        </div>
+
+        <div class="panel-block">
+          <div class="block-title">Ansible Runbooks</div>
+          <div class="runbook-row"><span>Restart svc-order-api</span><button class="run-btn">Run</button></div>
+          <div class="runbook-row"><span>Restart Order Worker</span><button class="run-btn">Run</button></div>
+          <div class="runbook-row"><span>Clear Order Cache</span><button class="run-btn">Run</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span class="dot"></span><span id="toastText"></span></div>
+
+<script>
+const items = [
+  {sev:'critical', age:'>60m', badge:'P-CARD', id:'PB-67891', title:'High Failure Rate', meta:'svc-order-api', cluster:'#124', clusterCount:5, ageVal:'1h 42m', owner:'Payments SRE', slack:'18m', fcr:'Yes · 38m left'},
+  {sev:'high', age:'>30m', badge:'P-CARD', id:'PB-66890', title:'Elevated Error Rate', meta:'kafka-cluster-01', cluster:'#221', clusterCount:3, ageVal:'1h 18m', owner:'Messaging SRE', slack:'12m', fcr:'Yes · 22m left'},
+  {sev:'medium', age:'58m', badge:'P-CARD', id:'PB-67531', title:'Slow Response Time', meta:'svc-account-service', cluster:'—', clusterCount:2, ageVal:'58m', owner:'Applications', slack:'27m', fcr:'Yes · 41m left'},
+  {sev:'high', age:'>45m', badge:'INCIDENT', id:'INC0012352', title:'P3 Non-Major: DB Latency', meta:'Database Cluster', cluster:'#309', clusterCount:6, ageVal:'1h 05m', owner:'Database Team', slack:'6m', fcr:'No · escalated'},
+  {sev:'medium', age:'32m', badge:'P-CARD', id:'INC0012553', title:'P4 Request Timeout', meta:'api.trading.internal', cluster:'—', clusterCount:1, ageVal:'32m', owner:'Infra Support', slack:'34m', fcr:'Yes · 56m left'},
+  {sev:'medium', age:'28m', badge:'P-CARD', id:'PB-66221', title:'Login Failures', meta:'login-service', cluster:'#124', clusterCount:3, ageVal:'28m', owner:'IAM Team', slack:'41m', fcr:'Yes · 62m left'},
+  {sev:'high', age:'>20m', badge:'P-CARD', id:'PB-67122', title:'DB Connections High', meta:'order-db-primary', cluster:'#124', clusterCount:5, ageVal:'21m', owner:'Payments SRE', slack:'15m', fcr:'Yes · 19m left'},
+];
+
+let selected = 0;
+let expanded = false;
+
+const queueList = document.getElementById('queueList');
+const layout = document.getElementById('layout');
+const toast = document.getElementById('toast');
+const toastText = document.getElementById('toastText');
+
+function renderQueue(){
+  queueList.innerHTML = items.map((it, i) => `
+    <div class="row ${i===selected?'selected':''}" data-i="${i}">
+      <div>
+        <div class="sev ${it.sev}">${it.sev.toUpperCase()}</div>
+        <div class="sev-age">${it.age}</div>
+      </div>
+      <div class="row-main">
+        <div class="row-title">${it.badge==='INCIDENT'?'⬤':'▣'} ${it.id} — ${it.title}</div>
+        <div class="row-meta">${it.meta} · Cluster <span class="row-tag">${it.cluster}</span></div>
+      </div>
+      <div class="row-age">${it.ageVal}</div>
+      <div class="row-actions">
+        <button class="mini-btn">DT</button>
+        <button class="mini-btn">SNW</button>
+        <button class="overflow-btn">⋯</button>
+      </div>
+    </div>
+  `).join('');
+  document.querySelectorAll('.row').forEach(r=>{
+    r.addEventListener('click', ()=>{ selected = parseInt(r.dataset.i); render(); showToast('Selected via click'); });
+  });
+}
+
+function renderDrawer(){
+  const it = items[selected];
+  document.getElementById('drawerBadge').textContent = it.badge;
+  document.getElementById('drawerTitle').textContent = it.title + (it.meta ? ' on ' + it.meta : '');
+  document.getElementById('drawerSubtitle').textContent = `Owner: ${it.owner} · Cluster ${it.cluster}`;
+  document.getElementById('drawerPosition').textContent = `Item ${selected+1} of ${items.length}`;
+  document.getElementById('fcrVal').textContent = it.fcr;
+  document.getElementById('clusterVal').textContent = `${it.cluster} · ${it.clusterCount} P-Cards`;
+  document.getElementById('slackVal').textContent = it.slack;
+  document.getElementById('ageVal').textContent = it.ageVal;
+  document.getElementById('ownerVal').textContent = it.owner;
+}
+
+function render(){
+  renderQueue();
+  renderDrawer();
+}
+
+function showToast(msg){
+  toastText.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(()=>toast.classList.remove('show'), 1400);
+}
+
+function move(delta){
+  selected = Math.max(0, Math.min(items.length-1, selected+delta));
+  render();
+  showToast(delta>0 ? 'Next item (↓ / J)' : 'Previous item (↑ / K)');
+}
+
+document.getElementById('nextBtn').addEventListener('click', ()=>move(1));
+document.getElementById('prevBtn').addEventListener('click', ()=>move(-1));
+
+const expandToggle = document.getElementById('expandToggle');
+const expandLabel = document.getElementById('expandLabel');
+const expandIcon = document.getElementById('expandIcon');
+function toggleExpand(){
+  expanded = !expanded;
+  layout.classList.toggle('expanded', expanded);
+  expandToggle.classList.toggle('active', expanded);
+  expandLabel.textContent = expanded ? 'Compact' : 'Expand';
+  expandIcon.textContent = expanded ? '⤡' : '⤢';
+  showToast(expanded ? 'Expanded drawer (E)' : 'Compact drawer (E)');
+}
+expandToggle.addEventListener('click', toggleExpand);
+
+document.addEventListener('keydown', (e)=>{
+  if(e.key==='ArrowDown' || e.key==='j' || e.key==='J'){ e.preventDefault(); move(1); }
+  if(e.key==='ArrowUp' || e.key==='k' || e.key==='K'){ e.preventDefault(); move(-1); }
+  if(e.key==='e' || e.key==='E'){ toggleExpand(); }
+});
+
+// Resize handle drag
+const handle = document.getElementById('resizeHandle');
+const drawer = document.querySelector('.drawer');
+let dragging = false;
+handle.addEventListener('mousedown', (e)=>{ dragging = true; e.preventDefault(); });
+document.addEventListener('mousemove', (e)=>{
+  if(!dragging || expanded) return;
+  const newWidth = Math.max(360, Math.min(window.innerWidth - 300, window.innerWidth - e.clientX));
+  drawer.style.width = newWidth + 'px';
+});
+document.addEventListener('mouseup', ()=>{ dragging = false; });
+
+render();
+</script>
+</body>
+</html>
