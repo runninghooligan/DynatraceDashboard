@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ICC Command Center — Operational Intelligence Prototype</title>
+<style>
+:root{
+  --bg:#06111d;
+  --panel:#0a1827;
+  --panel-2:#0d1e30;
+  --panel-3:#10243a;
+  --line:#1e3a55;
+  --line-soft:#163048;
+  --text:#e8f2fb;
+  --muted:#88a9c0;
+  --blue:#31a8ff;
+  --cyan:#22d3ee;
+  --green:#2fd07f;
+  --yellow:#f3c64f;
+  --orange:#ff9737;
+  --red:#ff5b66;
+  --purple:#9b7bff;
+  --sidebar:176px;
+  --radius:12px;
+  --shadow:0 10px 28px rgba(0,0,0,.22);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif}
+button,input{font:inherit}
+body{overflow:hidden}
+.app{height:100vh;display:grid;grid-template-columns:var(--sidebar) 1fr}
+.sidebar{
+  background:linear-gradient(180deg,#07131f,#06101a);
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;
+  min-width:0;
+}
+.brand{height:62px;padding:12px 14px;border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:center}
+.logo{width:34px;height:34px;border:1px solid #2f7fc0;background:linear-gradient(145deg,#0a4d7d,#0b2e4e);border-radius:9px;display:grid;place-items:center;font-weight:900}
+.brand b{font-size:13px;letter-spacing:.04em}
+.brand small{display:block;color:var(--muted);font-size:9px;margin-top:2px}
+.nav{padding:10px 8px;overflow:auto}
+.nav .label{font-size:8px;text-transform:uppercase;letter-spacing:.16em;color:#5c809c;margin:11px 8px 5px}
+.nav button{width:100%;height:34px;border:0;background:transparent;color:#a9bfd1;text-align:left;border-radius:8px;padding:0 10px;cursor:pointer;font-size:11px}
+.nav button:hover{background:#0b1c2d}
+.nav button.active{background:rgba(49,168,255,.14);color:#e8f7ff;border:1px solid rgba(49,168,255,.25)}
+.system{margin:auto 10px 12px;padding:10px;border:1px solid var(--line);background:#081522;border-radius:10px;font-size:9px;color:var(--muted);line-height:1.8}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;background:var(--green)}
+.main{display:flex;flex-direction:column;min-width:0}
+.topbar{
+  height:62px;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;background:#07131f;
+}
+.title h1{font-size:16px;margin:0}
+.title p{font-size:9px;color:var(--muted);margin:4px 0 0}
+.top-actions{display:flex;align-items:center;gap:7px}
+.pill,.btn,.icon-btn,.seg button{
+  border:1px solid var(--line);background:#0b1b2b;color:var(--text);
+  border-radius:8px;cursor:pointer;
+}
+.pill{height:30px;padding:0 10px;font-size:10px}
+.btn{height:32px;padding:0 11px;font-size:10px;font-weight:800}
+.btn.primary{background:linear-gradient(180deg,#146ec4,#0f4d91);border-color:#2587e0}
+.btn.purple{background:linear-gradient(180deg,#6b4fd5,#4534a8);border-color:#8c77ef}
+.btn.warn{color:#ffe0ad;background:rgba(255,151,55,.10);border-color:rgba(255,151,55,.36)}
+.content{flex:1;overflow:auto;padding:10px 12px 14px}
+.content::-webkit-scrollbar{width:7px}
+.content::-webkit-scrollbar-thumb{background:#18324a;border-radius:6px}
+.scopebar{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.seg{display:flex;gap:5px}
+.seg button{height:30px;padding:0 10px;font-size:10px;color:var(--muted)}
+.seg button.active{background:rgba(49,168,255,.13);color:#dff4ff;border-color:rgba(49,168,255,.4)}
+.kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr)) 1.45fr;gap:8px;margin-bottom:8px}
+.card{
+  background:linear-gradient(160deg,var(--panel-2),var(--panel));
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+}
+.kpi{min-height:112px;padding:10px;position:relative;overflow:hidden}
+.kpi h3{font-size:9px;margin:0;color:#c5d9e7;text-transform:uppercase;letter-spacing:.04em}
+.kpi .value{font-size:25px;font-weight:900;margin-top:8px}
+.kpi .sub{font-size:9px;color:var(--muted);margin-top:4px;line-height:1.5}
+.kpi .footer{position:absolute;left:10px;right:10px;bottom:8px;display:flex;justify-content:space-between;font-size:8px;color:#79a3bd}
+.red{color:var(--red)} .green{color:var(--green)} .yellow{color:var(--yellow)} .orange{color:var(--orange)} .purple{color:var(--purple)} .blue{color:var(--blue)}
+.spark{width:100%;height:48px;margin-top:6px}
+.workgrid{display:grid;grid-template-columns:minmax(0,1fr) 430px;gap:8px;align-items:start}
+.queue-card{min-width:0}
+.panel-hd{height:44px;padding:8px 12px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.panel-hd h2{font-size:12px;margin:0}
+.panel-hd span{font-size:9px;color:var(--muted)}
+.issuebar{padding:8px 10px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:7px;overflow:auto}
+.issue{min-width:205px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:#0b1b2b}
+.issue strong{font-size:10px;display:block}
+.issue small{font-size:8.5px;color:var(--muted)}
+.issue.active{border-color:rgba(255,91,102,.55);background:rgba(255,91,102,.08)}
+.toolbar{padding:8px 10px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:8px;align-items:center}
+.filters{display:flex;gap:5px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:#0a1a29;color:#9ab3c7;border-radius:7px;height:28px;padding:0 8px;font-size:9px;cursor:pointer}
+.chip.active{color:#dff4ff;background:rgba(49,168,255,.13)}
+.search{height:29px;width:190px;background:#081624;border:1px solid var(--line);border-radius:8px;color:var(--text);padding:0 10px;font-size:9px}
+.table-wrap{overflow:auto;max-height:560px}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+th{position:sticky;top:0;background:#0b1b2a;color:#7fa0b8;font-size:8px;text-transform:uppercase;letter-spacing:.06em;text-align:left;padding:8px;border-bottom:1px solid var(--line);z-index:2}
+td{padding:8px;border-bottom:1px solid rgba(30,58,85,.62);font-size:10px;vertical-align:middle}
+tr:hover{background:rgba(49,168,255,.04)}
+tr.selected{background:rgba(49,168,255,.08);box-shadow:inset 3px 0 var(--blue)}
+.badge{display:inline-flex;align-items:center;gap:4px;border-radius:7px;padding:3px 6px;border:1px solid;font-size:8px;font-weight:800;white-space:nowrap}
+.b-red{color:#ffd0d3;border-color:rgba(255,91,102,.42);background:rgba(255,91,102,.10)}
+.b-orange{color:#ffe0bd;border-color:rgba(255,151,55,.42);background:rgba(255,151,55,.10)}
+.b-yellow{color:#fff0b4;border-color:rgba(243,198,79,.38);background:rgba(243,198,79,.08)}
+.b-green{color:#cef8df;border-color:rgba(47,208,127,.38);background:rgba(47,208,127,.08)}
+.b-blue{color:#d6efff;border-color:rgba(49,168,255,.36);background:rgba(49,168,255,.08)}
+.event-title{font-weight:800;font-size:10.5px}
+.meta{font-size:8.5px;color:var(--muted);margin-top:3px;line-height:1.4}
+.age{font-size:12px;font-weight:900}
+.action-set{display:flex;gap:4px}
+.icon-btn{width:27px;height:27px;font-size:9px}
+.workspace{min-width:0;position:sticky;top:0}
+.workspace .head{padding:10px 12px;border-bottom:1px solid var(--line)}
+.workspace .head-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.workspace .head h2{margin:6px 0 3px;font-size:16px}
+.workspace .head p{margin:0;color:var(--muted);font-size:9px}
+.actions-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.tabs{display:flex;border-bottom:1px solid var(--line);padding:0 10px}
+.tabs button{background:transparent;border:0;color:#87a8bf;height:34px;padding:0 9px;font-size:9px;cursor:pointer}
+.tabs button.active{color:#e7f6ff;border-bottom:2px solid var(--blue)}
+.workspace-body{padding:8px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.subcard{border:1px solid var(--line-soft);background:#091725;border-radius:10px;padding:9px}
+.subcard h3{font-size:9px;margin:0 0 8px;color:#c9dce8;text-transform:uppercase}
+.fact{display:flex;justify-content:space-between;gap:10px;padding:4px 0;border-bottom:1px solid rgba(30,58,85,.45);font-size:9px}
+.fact:last-child{border-bottom:0}
+.fact span{color:var(--muted)}
+.lrbar{height:10px;background:#102a40;border-radius:99px;overflow:hidden;margin:10px 0 4px;position:relative}
+.lrbar i{display:block;height:100%;width:84%;background:linear-gradient(90deg,var(--green),var(--yellow),var(--orange),var(--red))}
+.lr-labels{display:flex;justify-content:space-between;color:#6f91aa;font-size:8px}
+.comment-state{font-size:20px;font-weight:900;color:var(--green)}
+.mini-chart{height:54px;margin-top:6px}
+.list{display:flex;flex-direction:column;gap:6px}
+.list-row{border:1px solid var(--line-soft);background:#0b1b2a;border-radius:8px;padding:7px 8px}
+.list-row b{font-size:9.5px}
+.list-row small{display:block;color:var(--muted);font-size:8.5px;margin-top:3px}
+.reco{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.reco button{height:27px;padding:0 8px;font-size:8.5px}
+.intel{margin-top:8px}
+.intel-tabs{display:flex;gap:5px;padding:8px 10px;border-bottom:1px solid var(--line)}
+.intel-tabs button{height:28px;border:1px solid var(--line);background:#0a1a29;color:#8ba9bd;border-radius:7px;padding:0 9px;font-size:9px;cursor:pointer}
+.intel-tabs button.active{color:#e9f7ff;background:rgba(49,168,255,.13)}
+.intel-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:9px}
+.intel-card{border:1px solid var(--line-soft);background:#091725;border-radius:10px;padding:9px}
+.intel-card h4{margin:0 0 6px;font-size:10px}
+.intel-card p{margin:0;color:var(--muted);font-size:8.5px;line-height:1.45}
+.intel-card .metric{font-size:20px;font-weight:900;margin:8px 0 2px}
+.intel-card button{margin-top:8px;width:100%;height:28px;border-radius:7px;border:1px solid var(--line);background:#0c2237;color:#d7edfb;font-size:8.5px;cursor:pointer}
+.timeline{margin-top:8px;padding:9px 10px}
+.timeline h3{font-size:10px;margin:0 0 8px}
+.timeline-track{height:68px;position:relative;border-top:1px solid var(--line);margin-top:18px}
+.event-dot{position:absolute;top:-5px;width:10px;height:10px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 3px rgba(49,168,255,.12)}
+.event-label{position:absolute;top:10px;transform:translateX(-50%);font-size:8px;color:var(--muted);white-space:nowrap}
+.footer-note{font-size:8px;color:#5f829d;text-align:right;margin-top:7px}
+@media(max-width:1450px){
+  :root{--sidebar:150px}
+  .workgrid{grid-template-columns:minmax(0,1fr) 380px}
+  .kpis{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .workspace-body{grid-template-columns:1fr}
+}
+@media(max-width:1100px){
+  body{overflow:auto}
+  .app{height:auto;grid-template-columns:1fr}
+  .sidebar{display:none}
+  .main{min-height:100vh}
+  .workgrid{grid-template-columns:1fr}
+  .workspace{position:static}
+  .intel-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="logo">ICC</div><div><b>ICC / NOC</b><small>Operations Console v2</small></div></div>
+    <div class="nav">
+      <div class="label">Operations</div>
+      <button class="active">Command Center</button>
+      <button>Daily Overview</button>
+      <button>Signal Intelligence</button>
+      <button>P-Cards</button>
+      <button>Incidents</button>
+      <button>Swarm Coordination</button>
+      <div class="label">Intelligence</div>
+      <button>Analytics</button>
+      <button>Ownership</button>
+      <button>FCR Intelligence</button>
+      <button>Automation Ops</button>
+      <div class="label">Platform</div>
+      <button>Admin</button>
+    </div>
+    <div class="system"><b>System status</b><br><span class="dot"></span>Collectors healthy<br>DT 2m · SNOW 3m<br>Teams 1m · Ansible 5m</div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="title"><h1>Operations Console</h1><p>Command Center · Queue-first · Actionable intelligence for the next 5–15 minutes</p></div>
+      <div class="top-actions">
+        <span class="badge b-green">API OK</span>
+        <span class="badge b-green">COLLECTORS ACTIVE</span>
+        <span class="badge b-green">SN 09m AGO</span>
+        <span class="badge b-orange">LR OPEN 14</span>
+        <button class="pill">FCR CAND. 0</button>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="scopebar">
+        <div class="seg">
+          <button class="active">Last 15 minutes</button><button>Day shift</button><button>Night shift</button>
+        </div>
+        <div class="seg">
+          <button class="active">Shift-Wide</button><button>Event-Scoped</button>
+        </div>
+      </div>
+
+      <section class="kpis">
+        <article class="card kpi"><h3>Needs Action</h3><div class="value red">18</div><div class="sub">11 P-Cards · 7 INCs<br>4 worsened in 15m</div><div class="footer"><span>Queue first</span><span>Protect flow</span></div></article>
+        <article class="card kpi"><h3>Long Running</h3><div class="value orange">14</div><div class="sub">Oldest P-Card 5h 47m<br>6 no recent update</div><div class="footer"><span>LR lifecycle</span><span>Post Teams</span></div></article>
+        <article class="card kpi"><h3>Comment Hygiene</h3><div class="value blue">6m</div><div class="sub">Median ICC acknowledgement<br>5 idle P-Cards</div><div class="footer"><span>MTTA</span><span>Cadence</span></div></article>
+        <article class="card kpi"><h3>Active Swarms</h3><div class="value purple">3</div><div class="sub">1 missing owner<br>2 missing critical teams</div><div class="footer"><span>Coordinate</span><span>Coverage</span></div></article>
+        <article class="card kpi"><h3>Automation Ready</h3><div class="value green">5</div><div class="sub">3 Ansible matches<br>2 approval-ready</div><div class="footer"><span>Execute</span><span>Save time</span></div></article>
+        <article class="card kpi"><h3>Automation Gaps</h3><div class="value yellow">3</div><div class="sub">No playbook available<br>Document and target</div><div class="footer"><span>Gap log</span><span>Build backlog</span></div></article>
+        <article class="card kpi"><h3>Event Trend · 24h</h3><svg class="spark" viewBox="0 0 320 48" preserveAspectRatio="none"><polyline fill="none" stroke="#31a8ff" stroke-width="2" points="0,38 28,36 56,35 84,34 112,33 140,32 168,9 196,35 224,33 252,36 280,30 320,34"/><polyline fill="none" stroke="#ff9737" stroke-width="1.5" points="0,41 28,40 56,39 84,38 112,39 140,39 168,19 196,41 224,39 252,40 280,37 320,39"/></svg><div class="sub">P-Cards · LR · No Comment · INCs</div></article>
+      </section>
+
+      <div class="workgrid">
+        <section class="card queue-card">
+          <div class="panel-hd"><div><h2>Operational Queue</h2><span>Prioritized by impact, risk, age, and missing action</span></div><button class="btn">Refresh</button></div>
+          <div class="issuebar">
+            <div class="issue active"><strong>Critical · Account View</strong><small>2 P-Cards · 1 INC · AlertSite failing</small></div>
+            <div class="issue"><strong>High · Kafka latency</strong><small>4 P-Cards · 1 INC · BO candidate</small></div>
+            <div class="issue"><strong>High · Client login</strong><small>3 P-Cards · 1 synthetic · no owner</small></div>
+          </div>
+          <div class="toolbar">
+            <div class="filters"><button class="chip active">All 19</button><button class="chip">P-Cards 14</button><button class="chip">Incidents 5</button><button class="chip">Needs Action 7</button><button class="chip">LR 6</button><button class="chip">No Comment 5</button></div>
+            <input class="search" placeholder="Search queue..." />
+          </div>
+          <div class="table-wrap">
+            <table>
+              <colgroup><col style="width:115px"><col><col style="width:150px"><col style="width:145px"><col style="width:130px"><col style="width:118px"></colgroup>
+              <thead><tr><th>Attention</th><th>Event</th><th>Relationship</th><th>Age / Update</th><th>Owner</th><th>Actions</th></tr></thead>
+              <tbody id="queueRows">
+                <tr class="selected" data-event="PB-67891"><td><span class="badge b-red">CRITICAL · &gt;60m</span></td><td><div class="event-title">High Failure Rate on svc-order-api</div><div class="meta">P-CARD · PB-67891 · Move Money</div></td><td><div class="event-title">5 related P-Cards</div><div class="meta">INC0012345 · BO #6</div></td><td><div class="age red">1h 42m</div><div class="meta">DT 10m · SNOW 12m</div></td><td><div class="event-title">Payments SRE</div><div class="meta">Bridge 4</div></td><td><div class="action-set"><button class="icon-btn">DT</button><button class="icon-btn">SN</button><button class="icon-btn">⋯</button></div></td></tr>
+                <tr data-event="PB-66890"><td><span class="badge b-orange">HIGH · &gt;30m</span></td><td><div class="event-title">Elevated Error Rate on Kafka-cluster-01</div><div class="meta">P-CARD · PB-66890 · Middleware</div></td><td><div class="event-title">3 related P-Cards</div><div class="meta">INC0012346 · cluster #221</div></td><td><div class="age orange">1h 18m</div><div class="meta">DT 8m · SNOW 45m</div></td><td><div class="event-title">Messaging SRE</div><div class="meta">Bridge 2</div></td><td><div class="action-set"><button class="icon-btn">DT</button><button class="icon-btn">SN</button><button class="icon-btn">⋯</button></div></td></tr>
+                <tr data-event="PB-67531"><td><span class="badge b-yellow">NO COMMENT</span></td><td><div class="event-title">Slow Response Time on svc-account-service</div><div class="meta">P-CARD · PB-67531 · Client Management</div></td><td><div class="event-title">2 related P-Cards</div><div class="meta">INC0012351 · no BO</div></td><td><div class="age yellow">58m</div><div class="meta">DT — · SNOW 35m</div></td><td><div class="event-title">Applications</div><div class="meta">Unassigned</div></td><td><div class="action-set"><button class="icon-btn">DT</button><button class="icon-btn">SN</button><button class="icon-btn">⋯</button></div></td></tr>
+                <tr data-event="INC0012352"><td><span class="badge b-orange">STALE INC</span></td><td><div class="event-title">P3 Non-Major: Database latency</div><div class="meta">INCIDENT · INC0012352 · Trading</div></td><td><div class="event-title">4 related P-Cards</div><div class="meta">cluster #309 · BO suggested</div></td><td><div class="age orange">1h 05m</div><div class="meta">DT 5m · SNOW 15m</div></td><td><div class="event-title">Database Team</div><div class="meta">No bridge</div></td><td><div class="action-set"><button class="icon-btn">DT</button><button class="icon-btn">SN</button><button class="icon-btn">⋯</button></div></td></tr>
+                <tr data-event="PB-67122"><td><span class="badge b-blue">AUTOMATION</span></td><td><div class="event-title">Database Connections High</div><div class="meta">P-CARD · PB-67122 · Trading</div></td><td><div class="event-title">Ansible match</div><div class="meta">Restart DB connection pool</div></td><td><div class="age yellow">47m</div><div class="meta">DT 6m · SNOW 10m</div></td><td><div class="event-title">Database Team</div><div class="meta">DB Bridge</div></td><td><div class="action-set"><button class="icon-btn">DT</button><button class="icon-btn">SN</button><button class="icon-btn">⋯</button></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <aside class="card workspace">
+          <div class="head">
+            <div class="head-top"><span class="badge b-red">P-CARD</span><span class="badge b-orange">High</span></div>
+            <h2 id="eventTitle">High Failure Rate on svc-order-api</h2>
+            <p id="eventSubtitle">PB-67891 · Move Money · No confirmed customer impact</p>
+            <div class="actions-row"><button class="btn purple">Post LR</button><button class="btn primary">Create INC</button><button class="btn">Create BO</button><button class="btn">Open DT</button><button class="btn">Open SNOW</button></div>
+          </div>
+          <div class="tabs"><button class="active">Overview</button><button>Operations</button><button>Breakout Room</button><button>Timeline</button><button>Automation</button></div>
+          <div class="workspace-body">
+            <div class="subcard"><h3>Operational Status</h3><div class="fact"><span>Status</span><b>Open</b></div><div class="fact"><span>Age</span><b class="red">1h 42m</b></div><div class="fact"><span>Owner</span><b>Payments SRE</b></div><div class="fact"><span>Linked INC</span><b class="blue">INC0012345</b></div><div class="fact"><span>Breakout Room</span><b class="purple">BO #6 Active</b></div><div class="fact"><span>AlertSite</span><b class="green">Passing</b></div></div>
+            <div class="subcard"><h3>Long Running Lifecycle</h3><div class="lrbar"><i></i></div><div class="lr-labels"><span>0m</span><span>30m</span><span>60m</span><span>90m</span><span>120m</span></div><div class="fact"><span>LR Teams post</span><b class="green">Sent 09:51</b></div><div class="fact"><span>Current idle time</span><b class="yellow">12m</b></div><div class="fact"><span>Next action</span><b>Escalate if no update in 18m</b></div></div>
+            <div class="subcard"><h3>Comment Hygiene</h3><div class="comment-state">Good</div><div class="fact"><span>ICC acknowledgement</span><b>09:17 AM</b></div><div class="fact"><span>MTTA</span><b>25m</b></div><div class="fact"><span>Last ICC comment</span><b>12m ago</b></div><div class="fact"><span>Max idle gap</span><b>18m</b></div><svg class="mini-chart" viewBox="0 0 220 54" preserveAspectRatio="none"><polyline fill="none" stroke="#2fd07f" stroke-width="2" points="0,45 35,40 70,27 105,38 140,16 175,31 220,20"/></svg></div>
+            <div class="subcard"><h3>Ansible Runbooks</h3><div class="list"><div class="list-row reco"><div><b>Restart svc-order-api</b><small>Playbook available</small></div><button class="btn primary">Run</button></div><div class="list-row reco"><div><b>Restart order worker</b><small>Playbook available</small></div><button class="btn primary">Run</button></div><div class="list-row reco"><div><b>Flush API tokens</b><small>No playbook</small></div><button class="btn warn">Document Gap</button></div></div></div>
+            <div class="subcard"><h3>Breakout Room</h3><div class="fact"><span>Room</span><b>BO #6</b></div><div class="fact"><span>Participants</span><b>18</b></div><div class="fact"><span>Missing teams</span><b class="red">Network, Storage</b></div><div class="fact"><span>Last room update</span><b>12m ago</b></div><button class="btn" style="margin-top:8px;width:100%">Open in Teams</button></div>
+            <div class="subcard"><h3>Recommended Actions</h3><div class="list"><div class="list-row reco"><div><b>Update Dynatrace comment</b><small>Cadence approaching warning</small></div><button class="btn">Do It</button></div><div class="list-row reco"><div><b>Invite Network</b><small>Missing critical team</small></div><button class="btn">Invite</button></div><div class="list-row reco"><div><b>Run Ansible restart</b><small>Known safe action</small></div><button class="btn primary">Run Now</button></div></div></div>
+          </div>
+        </aside>
+      </div>
+
+      <section class="card timeline">
+        <h3>Selected Event Timeline · Last 2 Hours</h3>
+        <div class="timeline-track">
+          <span class="event-dot" style="left:8%"></span><span class="event-label" style="left:8%">P-Card opened</span>
+          <span class="event-dot" style="left:23%;background:var(--green)"></span><span class="event-label" style="left:23%">ICC ack</span>
+          <span class="event-dot" style="left:39%;background:var(--orange)"></span><span class="event-label" style="left:39%">INC created</span>
+          <span class="event-dot" style="left:52%;background:var(--purple)"></span><span class="event-label" style="left:52%">BO created</span>
+          <span class="event-dot" style="left:70%;background:var(--yellow)"></span><span class="event-label" style="left:70%">LR post</span>
+          <span class="event-dot" style="left:84%;background:var(--green)"></span><span class="event-label" style="left:84%">Ansible run</span>
+        </div>
+      </section>
+
+      <section class="card intel">
+        <div class="panel-hd"><div><h2>Operational Intelligence</h2><span>Supporting context—ranked lists first, visualization only when needed</span></div></div>
+        <div class="intel-tabs"><button class="active">Swarms</button><button>Clusters</button><button>Repeat Offenders</button><button>Automation Candidates</button><button>Topology</button></div>
+        <div class="intel-grid">
+          <article class="intel-card"><h4>Suggested Swarm</h4><div class="metric red">5</div><p>Move Money degradation<br>5 related P-Cards · 2 applications<br>Missing: Network</p><button>Create BO</button></article>
+          <article class="intel-card"><h4>Largest Cluster</h4><div class="metric orange">7</div><p>Kafka latency cluster<br>1 underlying dependency suspected<br>2 incidents already open</p><button>Review Cluster</button></article>
+          <article class="intel-card"><h4>Top Repeat Offender</h4><div class="metric purple">11</div><p>TIBCO errors in 7 days<br>8 prior INCs<br>Recommend PRB review</p><button>Open History</button></article>
+          <article class="intel-card"><h4>Automation Gap</h4><div class="metric yellow">3</div><p>Three repeat actions lack Ansible coverage<br>Most frequent: token flush</p><button>Document Gaps</button></article>
+        </div>
+      </section>
+      <div class="footer-note">Standalone prototype · simulated data · reference for production React implementation</div>
+    </div>
+  </main>
+</div>
+
+<script>
+const rows = [...document.querySelectorAll('#queueRows tr')];
+const title = document.getElementById('eventTitle');
+const subtitle = document.getElementById('eventSubtitle');
+const data = {
+  'PB-67891':['High Failure Rate on svc-order-api','PB-67891 · Move Money · No confirmed customer impact'],
+  'PB-66890':['Elevated Error Rate on Kafka-cluster-01','PB-66890 · Middleware · Cluster #221'],
+  'PB-67531':['Slow Response Time on svc-account-service','PB-67531 · Client Management · No ICC comment'],
+  'INC0012352':['P3 Non-Major: Database latency','INC0012352 · Trading · Breakout room suggested'],
+  'PB-67122':['Database Connections High','PB-67122 · Trading · Ansible playbook available']
+};
+rows.forEach(row=>{
+  row.addEventListener('click',()=>{
+    rows.forEach(r=>r.classList.remove('selected'));
+    row.classList.add('selected');
+    const d=data[row.dataset.event];
+    title.textContent=d[0];
+    subtitle.textContent=d[1];
+  });
+});
+document.querySelectorAll('.intel-tabs button,.tabs button,.seg button').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const parent=btn.parentElement;
+    parent.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
